@@ -3,3 +3,8 @@ node_modules
 dist
 datasets/hooktheory
 datasets/processed
+*.npy
+*.pth
+__pycache__
+log.txt
+embedding_lengths.json
