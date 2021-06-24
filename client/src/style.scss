@@ -1,0 +1,33 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap');
+$title-font: 'Monoton', sans-serif;
+$body-font: 'Segoe UI', sans-serif;
+
+* {
+  font-family: $body-font;
+  color: white;
+}
+
+body {
+  background: url("background.jpg"), black;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center center;
+  background-size: cover;
+  margin: 0;
+}
+
+#container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+}
+
+#header {
+  font-family: $title-font;
+  font-size: 800%;
+  user-select: none;
+}
