@@ -71,12 +71,13 @@ class Decoder(nn.Module):
         chord_prediction = self.chord_linear(hx)
         output = [chord_prediction]
 
-        # force stop when reaching max length
+        # stop when reaching max length
         max_chord_progression_length = 325
         for i in range(max_chord_progression_length):
             hx, cx = self.cell(hx, (hx, cx))
             chord_prediction = self.chord_linear(hx)
             output.append(chord_prediction)
+            # break when all have predicted an 8
 
         output = torch.stack(output, dim=1)
         preds = output.argmax(dim=2)

@@ -84,7 +84,7 @@ class SongDataset(Dataset):
 
 
 if __name__ == '__main__':
-    dataset_folder = "../datasets/processed"
+    dataset_folder = "dataset/processed"
     dataset_files = os.listdir(dataset_folder)
     embeddings_file = "embeddings"
     embedding_lengths_file = "embedding_lengths.json"
