@@ -2,11 +2,16 @@ import os
 import time
 import json
 import shutil
-from pathlib import Path
 import requests
+import spotipy
 from bs4 import BeautifulSoup
+from spotipy import SpotifyClientCredentials
+from pathlib import Path
 
-spotify_and_lyrics_file = "spotify_and_lyrics.csv"
+add_lyrics = False
+add_spotify = True
+lyrics_provider = "google"  # google or musixmatch
+
 hooktheory_folder = "hooktheory"
 output_folder = "processed"
 log_file = "log.txt"
@@ -16,6 +21,10 @@ headers = {
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36",
     "referer": "https://www.google.com/"
 }
+client_id = Path("spotify_client_id").read_text()
+client_secret = Path("spotify_client_secret").read_text()
+sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id, client_secret))
+
 
 def log(text):
     print(text)
@@ -33,16 +42,50 @@ def process_song(artist, song, path):
 
     artist_name = artist.replace("-", " ").title()
     song_name = song.replace("-", " ").title()
-    lyrics = retrieve_lyrics_google(artist_name, song_name)
-    time.sleep(1)
 
-    new_name = f"{artist_name} - {song_name}.json"
-    if lyrics is not None:
-        with open(file) as json_file:
-            json_data = json.load(json_file)
+    with open(file) as json_file:
+        json_data = json.load(json_file)
+        if add_lyrics:
+            if lyrics_provider == "google":
+                lyrics = retrieve_lyrics_google(artist_name, song_name)
+            else:
+                lyrics = retrieve_lyrics_musixmatch(artist_name, song_name)
+            time.sleep(1)
+
+            if lyrics is None:
+                return
             json_data["lyrics"] = lyrics
-            with open(f"{output_folder}/{new_name}", 'w') as outfile:
-                json.dump(json_data, outfile)
+
+        if add_spotify:
+            result = add_audio_features(f"{artist_name} - {song_name}", json_data)
+            if not result:
+                return
+
+        output_name = f"{artist_name} - {song_name}.json"
+        with open(f"{output_folder}/{output_name}", 'w') as outfile:
+            json.dump(json_data, outfile)
+
+
+def add_audio_features(search_string, json):
+    results = sp.search(q=search_string, limit=1)
+    tracks = results['tracks']['items']
+    if len(tracks) == 0:
+        log(f"Spotify track not found for {search_string}")
+    else:
+        track = results['tracks']['items'][0]
+        id = track["id"]
+
+        audio_features = sp.audio_features(id)[0]
+        if audio_features is None:
+            log(f"Could not get audio features for {search_string}")
+            return False
+        del audio_features["track_href"]
+        del audio_features["analysis_url"]
+        del audio_features["uri"]
+        del audio_features["type"]
+
+        json["audio_features"] = audio_features
+        return True
 
 
 def retrieve_lyrics_google(artist, song):
@@ -103,7 +146,6 @@ def retrieve_lyrics_musixmatch(artist, song):
 
 
 def process_hooktheory():
-    counter = 0
     for letter in [f.name for f in os.scandir(hooktheory_folder) if f.is_dir()]:
         letter_path = f"{hooktheory_folder}/{letter}"
         for artist in [f.name for f in os.scandir(letter_path) if f.is_dir()]:
@@ -111,16 +153,14 @@ def process_hooktheory():
             for song in [f.name for f in os.scandir(artist_path) if f.is_dir()]:
                 path = f"{artist_path}/{song}"
                 process_song(artist, song, path)
-                counter += 1
-                #if counter > 200:
-                #    return
 
 
-if os.path.isfile(log_file):
-    os.remove(log_file)
-if os.path.isdir(output_folder):
-    shutil.rmtree(output_folder)
-os.mkdir(output_folder)
-process_hooktheory()
+if __name__ == '__main__':
+    if os.path.isfile(log_file):
+        os.remove(log_file)
+    if os.path.isdir(output_folder):
+        shutil.rmtree(output_folder)
+    os.mkdir(output_folder)
+    process_hooktheory()
 
-print(f"Result: {len([name for name in os.listdir(output_folder) if os.path.isfile(name)])} samples")
+    print(f"Result: {len([name for name in os.listdir(output_folder) if os.path.isfile(name)])} samples")
