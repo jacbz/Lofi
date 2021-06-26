@@ -81,6 +81,7 @@ class Player {
   seek(seconds: number) {
     if (this.currentTrack) {
       Tone.Transport.seconds = seconds;
+      this.updateDisplayTime(seconds);
     }
   }
 

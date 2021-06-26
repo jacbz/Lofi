@@ -43,9 +43,19 @@ body {
   background: rgba(0, 0, 0, 0.25);
   border-radius: 6px;
   backdrop-filter: blur(6px);
-  padding: 6px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
+}
+
+button {
+  display: block;
+  cursor: pointer;
+  font-size: 125%;
+
+  &:focus {
+    outline: none;
+  }
 }
 
 #play-button {
@@ -63,12 +73,46 @@ body {
   }
 }
 
-button {
-  display: block;
-  cursor: pointer;
-  font-size: 125%;
+#seekbar {
+  margin-top: auto;
+}
+
+input[type='range'] {
+  -webkit-appearance: none;
+  background: transparent;
 
   &:focus {
     outline: none;
+  }
+
+  @mixin slider-track {
+    width: 100%;
+    height: 10px;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.35);
+    border-radius: 5px;
+  }
+
+  @mixin slider-thumb {
+    height: 18px;
+    width: 18px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    cursor: pointer;
+    margin-top: -5px;
+  }
+
+  &::-webkit-slider-runnable-track {
+    @include slider-track;
+  }
+  &::-moz-range-track {
+    @include slider-track;
+  }
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    @include slider-thumb;
+  }
+  &::-moz-range-thumb {
+    @include slider-thumb;
   }
 }

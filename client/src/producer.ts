@@ -8,7 +8,7 @@ abstract class Producer {
       mode: null as any,
       bpm: 70,
       numMeasures: 6,
-      drumLoops: [[1, new Loop('0m', '6m')]]
+      drumLoops: [[1, new Loop('0m', '5m')]]
     });
     return track;
   }
