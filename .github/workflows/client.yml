@@ -1,10 +1,9 @@
-name: CI/CD
+name: Client CI/CD
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    paths: [ client/** ]
 
   workflow_dispatch:
 
