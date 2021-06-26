@@ -10,6 +10,7 @@
     "serve": "webpack serve --open --config webpack.dev.js"
   },
   "dependencies": {
+    "@tonaljs/tonal": "^4.6.0",
     "copy-webpack-plugin": "^9.0.0",
     "css-loader": "^5.2.6",
     "html-webpack-plugin": "^5.3.1",

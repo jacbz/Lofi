@@ -1,7 +1,7 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Monoton&family=Reem+Kufi&display=swap');
 $title-font: 'Monoton', sans-serif;
-$body-font: 'Segoe UI', sans-serif;
+$body-font: 'Reem Kufi', 'Segoe UI', sans-serif;
 
 * {
   font-family: $body-font;
@@ -17,17 +17,58 @@ body {
   margin: 0;
 }
 
-#container {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backdrop-filter: blur(4px);
-  display: flex;
-  justify-content: center;
-}
-
 #header {
   font-family: $title-font;
   font-size: 800%;
   user-select: none;
+}
+
+#container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+#center-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 500px;
+  height: 300px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 6px;
+  backdrop-filter: blur(6px);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+#play-button {
+  height: 72px;
+  width: 72px;
+  border-radius: 50%;
+  border: 0;
+  left: 0;
+  right: 0;
+  margin: 0px auto;
+  background: rgba(0, 0, 0, 0.25);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+button {
+  display: block;
+  cursor: pointer;
+  font-size: 125%;
+
+  &:focus {
+    outline: none;
+  }
 }

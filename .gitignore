@@ -1,10 +1,16 @@
+# Client
+client/node_modules
+client/dist
+client/assets/samples
+
+# Model
 .idea
-node_modules
-dist
+.cache
+__pycache__
 model/dataset/hooktheory
-model/dataset/processed
+model/dataset/processed*
+spotify_client_*
 *.npy
 *.pth
-__pycache__
-log.txt
 embedding_lengths.json
+log.txt

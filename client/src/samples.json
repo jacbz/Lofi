@@ -1,0 +1,12 @@
+{
+  "drum_loops": [
+    {
+      "id": 1,
+      "name": "Loop 1",
+      "url": "Loop1.wav",
+      "bpm": 70,
+      "volume": 0
+    }
+  ],
+  "fx": []
+}
