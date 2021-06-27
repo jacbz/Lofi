@@ -21,7 +21,7 @@ abstract class Producer {
 
   static produce(params: OutputParams): Track {
     // tonic note, e.g. 'G'
-    const tonic = Note.transpose('C', `${params.key}m`);
+    const tonic = Scale.get('C chromatic').notes[params.key - 1];
 
     // musical mode, e.g. 'ionian'
     const mode = Mode.names()[params.mode - 1];
@@ -43,13 +43,15 @@ abstract class Producer {
       for (let chordNo = 0; chordNo < params.chordProgression.length; chordNo += 1) {
         const measure = i * 4 + chordNo;
         const chordIndex = params.chordProgression[chordNo].sd - 1;
+        const chordString = chords[chordIndex];
+        // e.g. Chord.getChord("maj7", "G4")
+        const chord = Chord.getChord(Chord.get(chordString).aliases[0], `${notes[chordIndex]}3`);
 
         // bass line
-        const bassTiming = new Timing('bassguitar', `${notes[chordIndex]}1`, '1m', this.toTime(measure, 0));
+        const rootNote = Mode.notes(mode, `${tonic}1`)[chordIndex];
+        const bassTiming = new Timing('bassguitar', rootNote, '1m', this.toTime(measure, 0));
         noteTimings.push(bassTiming);
 
-        const chordString = chords[chordIndex];
-        const chord = Chord.getChord(Chord.get(chordString).aliases[0], `${notes[chordIndex]}3`);
         for (let note = 0; note < 4; note += 1) {
           noteTimings.push(new Timing('piano', Note.simplify(chord.notes[note]), '0:3', this.toTime(measure, note * 0.25 + 1)));
         }
