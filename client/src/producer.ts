@@ -1,4 +1,4 @@
-import { Chord, Mode, Note, Scale } from '@tonaljs/tonal';
+import { Chord, Key, Mode, Note, Scale } from '@tonaljs/tonal';
 import { InstrumentNote, SampleLoop, Track } from './track';
 import { OutputParams } from './params';
 import { LOOPS } from './samples';
@@ -47,6 +47,8 @@ class Producer {
     // musical mode, e.g. 'ionian'
     this.mode = Mode.names()[params.mode - 1];
 
+    this.simplifyKeySignature();
+
     // array of notes, e.g. ["C", "D", "E", "F", "G", "A", "B"]
     this.notesInScale = Mode.notes(this.mode, this.tonic);
 
@@ -71,7 +73,9 @@ class Producer {
     this.produceMain();
     this.produceOutro();
 
+    const title = `Lofi track in ${this.tonic} ${this.mode}`;
     const track = new Track({
+      title,
       mode: this.mode,
       key: this.tonic,
       energy: this.energy,
@@ -155,7 +159,6 @@ class Producer {
     // end with I9 chord
     const i9chord = Chord.getChord('9', `${this.tonic}2`);
     for (let note = 0; note < i9chord.notes.length; note += 1) {
-      console.log(Note.simplify(i9chord.notes[note]));
       this.instrumentNotes.push(
         new InstrumentNote(
           'piano',
@@ -188,6 +191,26 @@ class Producer {
         Producer.toTime(measureStart - 1, 3)
       )
     );
+  }
+
+  /** simplify key signature, e.g. Db major instead of C# major */
+  simplifyKeySignature() {
+    if (this.mode === 'ionian') {
+      this.mode = 'major';
+      const enharmonic = Note.enharmonic(this.tonic);
+      const enharmonicKey = Key.majorKey(enharmonic);
+      if (Key.majorKey(this.tonic).keySignature.length >= enharmonicKey.keySignature.length) {
+        this.tonic = enharmonic;
+      }
+    }
+    if (this.mode === 'aeolian') {
+      this.mode = 'minor';
+      const enharmonic = Note.enharmonic(this.tonic);
+      const enharmonicKey = Key.majorKey(enharmonic);
+      if (Key.minorKey(this.tonic).keySignature.length >= enharmonicKey.keySignature.length) {
+        this.tonic = enharmonic;
+      }
+    }
   }
 
   static randomFromInterval(min: number, max: number, seed: number) {

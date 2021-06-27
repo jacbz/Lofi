@@ -22,8 +22,8 @@ class Player {
     this.onPlayingStateChange(isPlaying);
   }
 
-  /** Function to update the time in the UI */
-  updateDisplayTime: (seconds: number) => void;
+  /** Function to update track information in the UI */
+  updateTrackDisplay: (seconds: number) => void;
 
   /** Function to call when isPlaying changes */
   onPlayingStateChange: (isPlaying: boolean) => void;
@@ -89,7 +89,7 @@ class Player {
 
     Tone.Transport.scheduleRepeat((time) => {
       const seconds = Tone.Transport.getSecondsAtTime(time);
-      this.updateDisplayTime(seconds);
+      this.updateTrackDisplay(seconds);
 
       if (this.currentTrack.length - seconds < 0) {
         Tone.Transport.stop();
@@ -103,7 +103,7 @@ class Player {
   seek(seconds: number) {
     if (this.currentTrack) {
       Tone.Transport.seconds = seconds;
-      this.updateDisplayTime(seconds);
+      this.updateTrackDisplay(seconds);
     }
   }
 

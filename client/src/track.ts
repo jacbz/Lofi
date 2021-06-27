@@ -12,6 +12,9 @@ class Track {
   /** Musical mode of key, e.g. 'major' or 'lydian' */
   mode: string;
 
+  /** Title of the track */
+  title: string;
+
   /** How energetic the track should be, 0 (less energetic) to 1 (very energetic) */
   energy: number
 

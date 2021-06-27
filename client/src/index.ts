@@ -19,10 +19,12 @@ seekbar.addEventListener('input', () => {
   player.seek(seekbar.valueAsNumber);
 });
 
-// Time
+// Track details and time
+const titleLabel = document.getElementById('title');
 const timeLabel = document.getElementById('time');
 const totalTimeLabel = document.getElementById('total-time');
-player.updateDisplayTime = (seconds: number) => {
+player.updateTrackDisplay = (seconds: number) => {
+  titleLabel.textContent = player.currentTrack.title;
   const totalLength = player.currentTrack.length;
   seekbar.max = `${totalLength}`;
 
