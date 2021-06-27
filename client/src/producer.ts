@@ -58,13 +58,14 @@ class Producer {
     this.valence = params.valence;
     this.chordProgression = params.chordProgression;
 
-    this.introLength = 0;
+    this.introLength = 1;
     this.numberOfIterations = 6;
     this.mainLength = params.chordProgression.length * this.numberOfIterations;
     this.outroLength = 1;
 
     this.numMeasures = this.introLength + this.mainLength + this.outroLength;
 
+    this.instruments.push('guitar-bass', 'piano', 'guitar-electric');
     this.produceFx();
     this.produceIntro();
     this.produceMain();
@@ -96,7 +97,10 @@ class Producer {
     this.sampleLoops.push(new SampleLoop('vinyl', randomVinyl, '0:0', `${this.numMeasures}:0`));
   }
 
-  produceIntro() {}
+  produceIntro() {
+    const measureEnd = this.introLength;
+    // silent intro (except fx)
+  }
 
   produceMain() {
     // measure where the main part starts
@@ -108,10 +112,9 @@ class Producer {
     this.samples.push(['drumloop1', 0]);
     this.sampleLoops.push(new SampleLoop('drumloop1', 0, `${measureStart}:0`, `${measureEnd}:0`));
 
-    this.instruments.push('guitar-bass', 'piano', 'guitar-electric');
     for (let i = 0; i < this.numberOfIterations; i += 1) {
       for (let chordNo = 0; chordNo < this.chordProgression.length; chordNo += 1) {
-        const measure = i * this.chordProgression.length + chordNo;
+        const measure = measureStart + i * this.chordProgression.length + chordNo;
         const chordIndex = this.chordProgression[chordNo] - 1;
         const chordString = this.chordsInScale[chordIndex];
         // e.g. Chord.getChord("maj7", "G4")
