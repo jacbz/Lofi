@@ -1,4 +1,5 @@
 import * as Tone from 'tone';
+import { OutputParams } from './params';
 import Player from './player';
 import Producer from './producer';
 
@@ -31,6 +32,9 @@ player.updateDisplayTime = (seconds: number) => {
   totalTimeLabel.textContent = formatTime(totalLength);
 };
 
+// Input field
+const inputTextarea = document.getElementById('input') as HTMLTextAreaElement;
+
 // Play button
 const playButton = document.getElementById('play-button');
 const updatePlayingState = (isPlaying: boolean) => {
@@ -44,7 +48,15 @@ player.onPlayingStateChange = updatePlayingState;
 playButton.addEventListener('click', async () => {
   await Tone.start();
   if (!player.currentTrack) {
-    const track = Producer.produceExampleTrack();
+    let params: OutputParams;
+    try {
+      params = JSON.parse(inputTextarea.value);
+    } catch (e) {
+      window.alert('Could not parse JSON');
+      return;
+    }
+
+    const track = Producer.produce(params);
     player.currentTrack = track;
     await player.play();
     return;

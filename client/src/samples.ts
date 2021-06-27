@@ -20,8 +20,22 @@ class Sample {
   }
 }
 
+class Instrument {
+  name: String;
+
+  map: any;
+}
+
 /** Drum loop configs as loaded from samples.json */
 export const DRUM_LOOPS: Map<number, Sample> = sampleConfig.drum_loops.reduce((map, drumLoop) => {
   map.set(drumLoop.id, new Sample(drumLoop.name, drumLoop.url, drumLoop.bpm, drumLoop.volume));
   return map;
 }, new Map());
+
+export const INSTRUMENTS: Map<string, Instrument> = sampleConfig.instruments.reduce(
+  (map, instrument) => {
+    map.set(instrument.name, instrument);
+    return map;
+  },
+  new Map()
+);

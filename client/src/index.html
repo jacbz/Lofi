@@ -10,7 +10,26 @@
   <div id="container">
     <div id="header">LOFI</div>
     <div id="center-panel">
-      <input type="text" id="chord-progression-input">
+      <textarea rows="10" id="input">
+{
+  "key": 1,
+  "mode": 1,
+  "chordProgression": [
+    {
+      "sd": 1
+    },
+    {
+      "sd": 4
+    },
+    {
+      "sd": 6
+    },
+    {
+      "sd": 5
+    }
+  ]
+}
+      </textarea>
       <button id="play-button">Play</button>
       <input type="range" min="0" max="0" step="0.1" value="0" class="slider" id="seekbar">
       <span>

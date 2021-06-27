@@ -4,9 +4,21 @@
       "id": 1,
       "name": "Loop 1",
       "url": "Loop1.wav",
-      "bpm": 70,
+      "bpm": 80,
       "volume": 0
     }
   ],
-  "fx": []
+  "fx_loops": [],
+  "instruments": [
+    {
+      "name": "Bass1",
+      "map": {
+        "C1": "Bass1-C.mp3",
+        "D#1": "Bass1-Ds.mp3",
+        "E1": "Bass1-E.mp3",
+        "F1": "Bass1-F.mp3",
+        "G1": "Bass1-G.mp3"
+      }
+    }
+  ]
 }

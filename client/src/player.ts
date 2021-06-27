@@ -38,10 +38,11 @@ class Player {
     Tone.Transport.bpm.value = this.currentTrack.bpm;
 
     const drumPlayers: Map<number, Tone.Player> = new Map();
+    const instrumentSamplers: Map<string, Tone.Sampler> = new Map();
 
     // load samples
-    for (const [drumLoopId, loop] of this.currentTrack.drumLoops) {
-      const drumLoop = Samples.DRUM_LOOPS.get(drumLoopId);
+    for (const sampleId of this.currentTrack.loopIds) {
+      const drumLoop = Samples.DRUM_LOOPS.get(sampleId);
       const player = new Tone.Player({
         url: drumLoop.url,
         volume: drumLoop.volume,
@@ -49,24 +50,36 @@ class Player {
         fadeIn: '4n',
         fadeOut: '4n',
         playbackRate: this.currentTrack.bpm / drumLoop.bpm // TODO: don't change pitch
-      }).toDestination();
-      drumPlayers.set(drumLoopId, player);
+      }).toDestination().sync();
+      drumPlayers.set(sampleId, player);
+    }
+    // load instruments
+    for (const instrumentName of this.currentTrack.instruments) {
+      const instrument = Samples.INSTRUMENTS.get(instrumentName);
+      const sampler = new Tone.Sampler({
+        urls: instrument.map,
+        baseUrl: Samples.SAMPLES_BASE_URL
+      }).toDestination().sync();
+      instrumentSamplers.set(instrumentName, sampler);
     }
 
     // wait until all samples are loaded
     await Tone.loaded();
 
-    for (const [drumLoopId, loop] of this.currentTrack.drumLoops) {
-      const drumPlayer = drumPlayers.get(drumLoopId);
-      drumPlayer.sync().start(loop.startTime);
-      drumPlayer.sync().stop(loop.stopTime);
+    for (const sampleLoop of this.currentTrack.loops) {
+      const drumPlayer = drumPlayers.get(sampleLoop.sampleId);
+      drumPlayer.start(sampleLoop.startTime);
+      drumPlayer.stop(sampleLoop.stopTime);
     }
 
-    // const synthA = new Tone.AMSynth().toDestination();
-    // const loopA = new Tone.Loop((time) => {
-    //   synthA.triggerAttackRelease('C3', '8n', time);
-    // }, '1m');
-    // loopA.start(0);
+    for (const noteTiming of this.currentTrack.noteTimings) {
+      const instrumentSampler = instrumentSamplers.get(noteTiming.instrument);
+      instrumentSampler.triggerAttackRelease(
+        noteTiming.pitch,
+        noteTiming.duration,
+        noteTiming.time
+      );
+    }
 
     Tone.Transport.scheduleRepeat((time) => {
       const seconds = Tone.Transport.getSecondsAtTime(time);
