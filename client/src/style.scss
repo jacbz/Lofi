@@ -42,7 +42,7 @@ body {
   bottom: 0;
   margin: auto;
   width: 500px;
-  height: 320px;
+  height: 330px;
   background: $ui-background;
   border-radius: 6px;
   backdrop-filter: blur(6px);
@@ -50,6 +50,29 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  margin-bottom: 8px;
+  text-align: center;
+
+  #github {
+    &:before {      
+      content: "";
+      width: 20px;
+      height: 20px;
+      background: url('icons/github.svg');
+      background-size: 100%;
+      display: inline-block;
+      margin-right: 3px;
+      vertical-align: -3px;
+    }
+  }
 }
 
 button {
@@ -67,13 +90,30 @@ button {
   width: 72px;
   border-radius: 50%;
   border: 0;
-  left: 0;
-  right: 0;
-  margin: 0px auto;
+  margin: 6px auto;
   background: $ui-background;
 
   &:hover {
     background: $ui-hover-background;
+  }
+  
+  #play-button-icon {
+    height: 28px;
+    width: 28px;
+    box-sizing: border-box;
+    border-style: solid;
+    border-width: 14px 0px 14px 24px;
+    border-color: transparent transparent transparent white;
+    transition: all 100ms ease-in-out;
+    margin-left: 20px;
+  }
+
+  &.paused {
+    #play-button-icon {
+      border-style: double;
+      border-width: 0px 0px 0px 26px;
+      margin-left: 16px;
+    }
   }
 }
 
@@ -86,6 +126,7 @@ textarea {
   background: $ui-background;
   border: 0;
   font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Courier New', Courier, monospace;
+  resize: none;
 
   &:focus, &:hover {
     outline: none;

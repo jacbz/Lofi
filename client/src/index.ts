@@ -41,9 +41,9 @@ const inputTextarea = document.getElementById('input') as HTMLTextAreaElement;
 const playButton = document.getElementById('play-button');
 const updatePlayingState = (isPlaying: boolean) => {
   if (isPlaying) {
-    playButton.textContent = 'Pause';
+    playButton.classList.toggle('paused', true);
   } else {
-    playButton.textContent = 'Play';
+    playButton.classList.toggle('paused', false);
   }
 };
 player.onPlayingStateChange = updatePlayingState;
