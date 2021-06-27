@@ -1,22 +1,32 @@
 import sampleConfig from './samples.json';
 
-export const SAMPLES_BASE_URL = './samples/';
+export const SAMPLES_BASE_URL = './samples';
 export const DRUM_LOOP_DEFAULT_VOLUME = -10;
 
-class Sample {
+class SampleGroup {
   name: string;
 
-  url: string;
+  category: string;
+
+  urls: string[];
 
   bpm: number;
 
   volume: number;
 
-  public constructor(name: string, url: string, bpm: number, volume: number) {
+  size: number;
+
+  public constructor(name: string, category: string, urls: string[], bpm: number, volume: number) {
     this.name = name;
-    this.url = SAMPLES_BASE_URL + url;
+    this.category = category;
+    this.urls = urls;
     this.bpm = bpm;
     this.volume = DRUM_LOOP_DEFAULT_VOLUME + volume;
+    this.size = urls.length;
+  }
+
+  getSampleUrl(index: number) {
+    return `${SAMPLES_BASE_URL}/loops/${this.category}/${this.name}/${this.urls[index]}`;
   }
 }
 
@@ -28,9 +38,17 @@ class SampleInstrument {
   map: any;
 }
 
-/** Drum loop configs as loaded from samples.json */
-export const DRUM_LOOPS: Map<number, Sample> = sampleConfig.drum_loops.reduce((map, drumLoop) => {
-  map.set(drumLoop.id, new Sample(drumLoop.name, drumLoop.url, drumLoop.bpm, drumLoop.volume));
+export const LOOPS: Map<string, SampleGroup> = sampleConfig.loops.reduce((map, sampleGroup) => {
+  map.set(
+    sampleGroup.name,
+    new SampleGroup(
+      sampleGroup.name,
+      sampleGroup.category,
+      sampleGroup.urls,
+      sampleGroup.bpm,
+      sampleGroup.volume
+    )
+  );
   return map;
 }, new Map());
 

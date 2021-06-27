@@ -1,6 +1,7 @@
 import { Chord, Mode, Note, Scale } from '@tonaljs/tonal';
-import { Track, Loop, Timing } from './track';
+import { InstrumentNote, SampleLoop, Track } from './track';
 import { OutputParams } from './params';
+import { LOOPS } from './samples';
 
 abstract class Producer {
   static toTime(measure: number, beat: number) {
@@ -26,7 +27,7 @@ abstract class Producer {
     const numMeasures = params.chordProgression.length * numberOfIterations;
 
     const instruments = ['guitar-bass', 'piano', 'guitar-electric'];
-    const noteTimings: Timing[] = [];
+    const instrumentNotes: InstrumentNote[] = [];
     for (let i = 0; i < numberOfIterations; i += 1) {
       for (let chordNo = 0; chordNo < params.chordProgression.length; chordNo += 1) {
         const measure = i * params.chordProgression.length + chordNo;
@@ -37,12 +38,12 @@ abstract class Producer {
 
         // bass line
         const rootNote = Mode.notes(mode, `${tonic}1`)[chordIndex];
-        const bassTiming = new Timing('guitar-bass', rootNote, '1m', this.toTime(measure, 0));
-        noteTimings.push(bassTiming);
+        const bassTiming = new InstrumentNote('guitar-bass', rootNote, '1m', this.toTime(measure, 0));
+        instrumentNotes.push(bassTiming);
 
         for (let note = 0; note < 4; note += 1) {
-          noteTimings.push(
-            new Timing(
+          instrumentNotes.push(
+            new InstrumentNote(
               i % 2 === 0 ? 'piano' : 'guitar-electric',
               Note.simplify(chord.notes[note]),
               '0:3',
@@ -53,17 +54,41 @@ abstract class Producer {
       }
     }
 
+    const { energy, valence } = params;
+
+    const samples: [string, number][] = [];
+    const sampleLoops: SampleLoop[] = [];
+
+    samples.push(['drumloop1', 0]);
+    sampleLoops.push(new SampleLoop('drumloop1', 0, '0:0', `${numMeasures}:0`));
+
+    const randomVinyl = this.randomFromInterval(0, LOOPS.get('vinyl').size - 1, energy + valence);
+    samples.push(['vinyl', randomVinyl]);
+    sampleLoops.push(new SampleLoop('vinyl', randomVinyl, '0:0', `${numMeasures}:0`));
+
     const track = new Track({
       mode,
       key: tonic,
+      energy,
+      valence,
       numMeasures,
       bpm: 80,
-      loopIds: [1],
-      loops: [new Loop(1, '0:0', `${numMeasures}:0`)],
+      samples,
+      sampleLoops,
       instruments,
-      noteTimings
+      instrumentNotes
     });
     return track;
+  }
+
+  static randomFromInterval(min: number, max: number, seed: number) {
+    return Math.floor(this.random(seed) * (max - min + 1) + min);
+  }
+
+  /** Returns a quasi-random number between 0-1 based on given seed number */
+  static random(seed: number) {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
   }
 }
 

@@ -1,14 +1,19 @@
 {
-  "drum_loops": [
+  "loops": [    
     {
-      "id": 1,
-      "name": "Loop 1",
-      "url": "drum-loops/Loop1.wav",
+      "name": "drumloop1",
+      "category": "drums",
+      "urls": [ "Loop1.wav" ],
       "bpm": 80,
       "volume": 0
-    }
+    },
+    {
+      "name": "vinyl",
+      "category": "fx",
+      "urls": [ "vinyl1.mp3", "vinyl2.mp3", "vinyl3.mp3", "vinyl4.mp3", "vinyl5.mp3", "vinyl6.mp3", "vinyl7.mp3", "vinyl8.mp3", "vinyl9.mp3", "vinyl10.mp3", "vinyl11.mp3", "vinyl12.mp3", "vinyl13.mp3", "vinyl14.mp3", "vinyl15.mp3", "vinyl16.mp3", "vinyl17.mp3", "vinyl18.mp3", "vinyl19.mp3", "vinyl20.mp3", "vinyl21.mp3", "vinyl22.mp3", "vinyl23.mp3", "vinyl24.mp3", "vinyl25.mp3", "vinyl26.mp3", "vinyl27.mp3", "vinyl28.mp3", "vinyl29.mp3", "vinyl30.mp3", "vinyl31.mp3", "vinyl32.mp3"],
+      "volume": 8
+    }    
   ],
-  "fx_loops": [],
   "instruments": [
     {
       "name": "piano",

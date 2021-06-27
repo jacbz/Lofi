@@ -6,9 +6,17 @@ import { Time } from 'tone/build/esm/core/type/Units';
  * Every Track has time signature 4/4.
  */
 class Track {
+  /** Root note of key, e.g. 'Db' */
   key: string;
 
+  /** Musical mode of key, e.g. 'major' or 'lydian' */
   mode: string;
+
+  /** How energetic the track should be, 0 (less energetic) to 1 (very energetic) */
+  energy: number
+
+  /** How positive the music should be, 0 (sad) to 1 (cheerful) */
+  valence: number
 
   /** Tempo in BPM (beats per minute) */
   bpm: number = 100;
@@ -21,17 +29,17 @@ class Track {
     return Math.ceil(((this.numMeasures * 4) / this.bpm) * 60);
   }
 
-  /** Loops to use, by sample id */
-  loopIds: number[];
+  /** List of (sampleGroupName, sampleIndex) */
+  samples: [string, number][];
 
-  /** Timings of the sample loops */
-  loops: Loop[];
+  /** Sample loops */
+  sampleLoops: SampleLoop[];
 
   /** Instruments to use, by name */
   instruments: string[];
 
   /** Timings of notes */
-  noteTimings: Timing[];
+  instrumentNotes: InstrumentNote[];
 
   public constructor(init?: Partial<Track>) {
     Object.assign(this, init);
@@ -41,9 +49,12 @@ class Track {
 /**
  * Specifies a loop with a Tone.js start time and end time
  */
-class Loop {
-  /** Id of the sample */
-  sampleId: number;
+class SampleLoop {
+  /** Name of the sample group */
+  sampleGroupName: string;
+
+  /** Index within sample group */
+  sampleIndex: number;
 
   /** Onset time in Tone.js */
   startTime: Time;
@@ -51,8 +62,9 @@ class Loop {
   /** Stop time in Tone.js */
   stopTime: Time;
 
-  public constructor(sampleId: number, startTime: Time, stopTime: Time) {
-    this.sampleId = sampleId;
+  public constructor(sample: string, sampleIndex: number, startTime: Time, stopTime: Time) {
+    this.sampleGroupName = sample;
+    this.sampleIndex = sampleIndex;
     this.startTime = startTime;
     this.stopTime = stopTime;
   }
@@ -61,7 +73,7 @@ class Loop {
 /**
  * Precise timing of a single note played by an instrument
  */
-class Timing {
+class InstrumentNote {
   /** Name of the instrument */
   instrument: string;
 
@@ -82,4 +94,4 @@ class Timing {
   }
 }
 
-export { Track, Loop, Timing };
+export { Track, SampleLoop, InstrumentNote };

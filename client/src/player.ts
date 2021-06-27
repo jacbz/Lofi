@@ -37,21 +37,25 @@ class Player {
     Tone.Transport.cancel();
     Tone.Transport.bpm.value = this.currentTrack.bpm;
 
-    const drumPlayers: Map<number, Tone.Player> = new Map();
+    const samplePlayers: Map<string, Tone.Player[]> = new Map();
     const instrumentSamplers: Map<string, Tone.Sampler> = new Map();
 
     // load samples
-    for (const sampleId of this.currentTrack.loopIds) {
-      const drumLoop = Samples.DRUM_LOOPS.get(sampleId);
+    for (const [sampleGroupName, sampleIndex] of this.currentTrack.samples) {
+      const sampleGroup = Samples.LOOPS.get(sampleGroupName);
       const player = new Tone.Player({
-        url: drumLoop.url,
-        volume: drumLoop.volume,
+        url: sampleGroup.getSampleUrl(sampleIndex),
+        volume: sampleGroup.volume,
         loop: true,
         fadeIn: '4n',
         fadeOut: '4n',
-        playbackRate: this.currentTrack.bpm / drumLoop.bpm // TODO: don't change pitch
+        // TODO: don't change pitch
+        playbackRate: sampleGroup.bpm ? this.currentTrack.bpm / sampleGroup.bpm : 1.0
       }).toDestination().sync();
-      drumPlayers.set(sampleId, player);
+      if (!samplePlayers.has(sampleGroupName)) {
+        samplePlayers.set(sampleGroupName, Array(sampleGroup.size));
+      }
+      samplePlayers.get(sampleGroupName)[sampleIndex] = player;
     }
 
     // load instruments
@@ -59,7 +63,7 @@ class Player {
       const instrument = Samples.SAMPLE_INSTRUMENTS.get(instrumentName);
       const sampler = new Tone.Sampler({
         urls: instrument.map,
-        baseUrl: `${Samples.SAMPLES_BASE_URL}/${instrument.name}/`,
+        baseUrl: `${Samples.SAMPLES_BASE_URL}/instruments/${instrument.name}/`,
         volume: instrument.volume
       }).toDestination().sync();
       instrumentSamplers.set(instrumentName, sampler);
@@ -68,13 +72,13 @@ class Player {
     // wait until all samples are loaded
     await Tone.loaded();
 
-    for (const sampleLoop of this.currentTrack.loops) {
-      const drumPlayer = drumPlayers.get(sampleLoop.sampleId);
-      drumPlayer.start(sampleLoop.startTime);
-      drumPlayer.stop(sampleLoop.stopTime);
+    for (const sampleLoop of this.currentTrack.sampleLoops) {
+      const samplePlayer = samplePlayers.get(sampleLoop.sampleGroupName)[sampleLoop.sampleIndex];
+      samplePlayer.start(sampleLoop.startTime);
+      samplePlayer.stop(sampleLoop.stopTime);
     }
 
-    for (const noteTiming of this.currentTrack.noteTimings) {
+    for (const noteTiming of this.currentTrack.instrumentNotes) {
       const instrumentSampler = instrumentSamplers.get(noteTiming.instrument);
       instrumentSampler.triggerAttackRelease(
         noteTiming.pitch,
