@@ -18,12 +18,7 @@ class OutputParams {
    */
   mode: number
 
-  chordProgression: ChordDTO[]
-}
-
-class ChordDTO {
-  /** Scale degree from 1-7; 0 is rest */
-  sd: number
+  chordProgression: number[]
 }
 
 export { InputParams, OutputParams };

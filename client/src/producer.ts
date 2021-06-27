@@ -41,8 +41,8 @@ abstract class Producer {
     const noteTimings: Timing[] = [];
     for (let i = 0; i < numberOfIterations; i += 1) {
       for (let chordNo = 0; chordNo < params.chordProgression.length; chordNo += 1) {
-        const measure = i * 4 + chordNo;
-        const chordIndex = params.chordProgression[chordNo].sd - 1;
+        const measure = i * params.chordProgression.length + chordNo;
+        const chordIndex = params.chordProgression[chordNo] - 1;
         const chordString = chords[chordIndex];
         // e.g. Chord.getChord("maj7", "G4")
         const chord = Chord.getChord(Chord.get(chordString).aliases[0], `${notes[chordIndex]}3`);
