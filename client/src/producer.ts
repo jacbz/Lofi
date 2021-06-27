@@ -3,18 +3,6 @@ import { Track, Loop, Timing } from './track';
 import { OutputParams } from './params';
 
 abstract class Producer {
-  static produceExampleTrack(): Track {
-    const track = new Track({
-      key: null as any,
-      mode: null as any,
-      bpm: 70,
-      numMeasures: 6,
-      loopIds: [1],
-      loops: [new Loop(1, '1:0', '5:0')]
-    });
-    return track;
-  }
-
   static toTime(measure: number, beat: number) {
     return `${measure}:${beat}`;
   }
@@ -37,7 +25,7 @@ abstract class Producer {
 
     const numMeasures = params.chordProgression.length * numberOfIterations;
 
-    const instruments = ['bassguitar', 'piano'];
+    const instruments = ['guitar-bass', 'piano', 'guitar-electric'];
     const noteTimings: Timing[] = [];
     for (let i = 0; i < numberOfIterations; i += 1) {
       for (let chordNo = 0; chordNo < params.chordProgression.length; chordNo += 1) {
@@ -49,11 +37,18 @@ abstract class Producer {
 
         // bass line
         const rootNote = Mode.notes(mode, `${tonic}1`)[chordIndex];
-        const bassTiming = new Timing('bassguitar', rootNote, '1m', this.toTime(measure, 0));
+        const bassTiming = new Timing('guitar-bass', rootNote, '1m', this.toTime(measure, 0));
         noteTimings.push(bassTiming);
 
         for (let note = 0; note < 4; note += 1) {
-          noteTimings.push(new Timing('piano', Note.simplify(chord.notes[note]), '0:3', this.toTime(measure, note * 0.25 + 1)));
+          noteTimings.push(
+            new Timing(
+              i % 2 === 0 ? 'piano' : 'guitar-electric',
+              Note.simplify(chord.notes[note]),
+              '0:3',
+              this.toTime(measure, note * 0.25 + 1)
+            )
+          );
         }
       }
     }

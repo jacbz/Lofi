@@ -59,7 +59,8 @@ class Player {
       const instrument = Samples.SAMPLE_INSTRUMENTS.get(instrumentName);
       const sampler = new Tone.Sampler({
         urls: instrument.map,
-        baseUrl: `${Samples.SAMPLES_BASE_URL}/${instrument.name}/`
+        baseUrl: `${Samples.SAMPLES_BASE_URL}/${instrument.name}/`,
+        volume: instrument.volume
       }).toDestination().sync();
       instrumentSamplers.set(instrumentName, sampler);
     }

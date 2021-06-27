@@ -3,7 +3,7 @@
     {
       "id": 1,
       "name": "Loop 1",
-      "url": "drumloops/Loop1.wav",
+      "url": "drum-loops/Loop1.wav",
       "bpm": 80,
       "volume": 0
     }
@@ -37,7 +37,7 @@
       }
     },
     {
-      "name": "bassguitar",
+      "name": "guitar-bass",
       "map": {
         "E1": "E.mp3",
         "A1": "A.mp3",
@@ -45,7 +45,30 @@
       }
     },
     {
-      "name": "bass1",
+      "name": "guitar-electric",
+      "volume": -8,
+      "map": {
+        "A2": "A2.mp3",
+        "A3": "A3.mp3",
+        "A4": "A4.mp3",
+        "A5": "A5.mp3",
+        "C3": "C3.mp3",
+        "C4": "C4.mp3",
+        "C5": "C5.mp3",
+        "C6": "C6.mp3",
+        "C#2": "Cs2.mp3",
+        "D#3": "Ds3.mp3",
+        "D#4": "Ds4.mp3",
+        "D#5": "Ds5.mp3",
+        "E2": "E2.mp3",
+        "F#2": "Fs2.mp3",
+        "F#3": "Fs3.mp3",
+        "F#4": "Fs4.mp3",
+        "F#5": "Fs5.mp3"
+      }
+    },
+    {
+      "name": "bass",
       "map": {
         "C1": "C.mp3",
         "D#1": "Ds.mp3",

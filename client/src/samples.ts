@@ -23,6 +23,8 @@ class Sample {
 class SampleInstrument {
   name: String;
 
+  volume: number;
+
   map: any;
 }
 
