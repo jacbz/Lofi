@@ -3,7 +3,7 @@
     {
       "id": 1,
       "name": "Loop 1",
-      "url": "Loop1.wav",
+      "url": "drumloops/Loop1.wav",
       "bpm": 80,
       "volume": 0
     }
@@ -11,13 +11,39 @@
   "fx_loops": [],
   "instruments": [
     {
-      "name": "Bass1",
+      "name": "piano",
       "map": {
-        "C1": "Bass1-C.mp3",
-        "D#1": "Bass1-Ds.mp3",
-        "E1": "Bass1-E.mp3",
-        "F1": "Bass1-F.mp3",
-        "G1": "Bass1-G.mp3"
+        "A4": "A4v6.mp3",
+        "A7": "A7v6.mp3",
+        "C3": "C3v6.mp3",
+        "C6": "C6v6.mp3",
+        "D#4": "Ds4v6.mp3",
+        "D#7": "Ds7v6.mp3",
+        "F#3": "Fs3v6.mp3",
+        "F#6": "Fs6v6.mp3",
+        "A5": "A5v6.mp3",
+        "C4": "C4v6.mp3",
+        "C7": "C7v6.mp3",
+        "D#5": "Ds5v6.mp3",
+        "F#4": "Fs4v6.mp3",
+        "F#7": "Fs7v6.mp3",
+        "A3": "A3v6.mp3",
+        "A6": "A6v6.mp3",
+        "C5": "C5v6.mp3",
+        "C8": "C8v6.mp3",
+        "D#3": "Ds3v6.mp3",
+        "D#6": "Ds6v6.mp3",
+        "F#5": "Fs5v6.mp3"
+      }
+    },
+    {
+      "name": "bass1",
+      "map": {
+        "C1": "C.mp3",
+        "D#1": "Ds.mp3",
+        "E1": "E.mp3",
+        "F1": "F.mp3",
+        "G1": "G.mp3"
       }
     }
   ]

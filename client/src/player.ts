@@ -53,12 +53,13 @@ class Player {
       }).toDestination().sync();
       drumPlayers.set(sampleId, player);
     }
+
     // load instruments
     for (const instrumentName of this.currentTrack.instruments) {
-      const instrument = Samples.INSTRUMENTS.get(instrumentName);
+      const instrument = Samples.SAMPLE_INSTRUMENTS.get(instrumentName);
       const sampler = new Tone.Sampler({
         urls: instrument.map,
-        baseUrl: Samples.SAMPLES_BASE_URL
+        baseUrl: `${Samples.SAMPLES_BASE_URL}/${instrument.name}/`
       }).toDestination().sync();
       instrumentSamplers.set(instrumentName, sampler);
     }

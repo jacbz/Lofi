@@ -20,7 +20,7 @@ class Sample {
   }
 }
 
-class Instrument {
+class SampleInstrument {
   name: String;
 
   map: any;
@@ -32,7 +32,7 @@ export const DRUM_LOOPS: Map<number, Sample> = sampleConfig.drum_loops.reduce((m
   return map;
 }, new Map());
 
-export const INSTRUMENTS: Map<string, Instrument> = sampleConfig.instruments.reduce(
+export const SAMPLE_INSTRUMENTS: Map<string, SampleInstrument> = sampleConfig.instruments.reduce(
   (map, instrument) => {
     map.set(instrument.name, instrument);
     return map;

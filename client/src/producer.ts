@@ -30,20 +30,28 @@ abstract class Producer {
     const notes = Mode.notes(mode, tonic);
 
     // array of triads, e.g. ["C", "Dm", "Em", "F", "G", "Am", "Bdim"]
-    const triads = Mode.triads(mode, tonic);
+    const chords = Mode.seventhChords(mode, tonic);
 
     const numberOfIterations = 6;
 
     const numMeasures = params.chordProgression.length * numberOfIterations;
 
-    const instruments = ['Bass1'];
+    const instruments = ['bass1', 'piano'];
     const noteTimings: Timing[] = [];
     for (let i = 0; i < numberOfIterations; i += 1) {
       for (let chordNo = 0; chordNo < params.chordProgression.length; chordNo += 1) {
         const measure = i * 4 + chordNo;
-        const rootNoteIndex = params.chordProgression[chordNo].sd - 1;
-        const bassTiming = new Timing('Bass1', `${notes[rootNoteIndex]}1`, '1m', this.toTime(measure, 0));
+        const chordIndex = params.chordProgression[chordNo].sd - 1;
+
+        // bass line
+        const bassTiming = new Timing('bass1', `${notes[chordIndex]}1`, '1m', this.toTime(measure, 0));
         noteTimings.push(bassTiming);
+
+        const chordString = chords[chordIndex];
+        const chord = Chord.getChord(chordString.substring(1), `${notes[chordIndex]}3`);
+        for (let note = 0; note < 4; note += 1) {
+          noteTimings.push(new Timing('piano', chord.notes[note], '0:3', this.toTime(measure, note * 0.25 + 1)));
+        }
       }
     }
 
