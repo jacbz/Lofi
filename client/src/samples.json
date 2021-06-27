@@ -37,6 +37,13 @@
       }
     },
     {
+      "name": "bassguitar",
+      "map": {
+        "C1": "C.mp3",
+        "A1": "A.mp3"
+      }
+    },
+    {
       "name": "bass1",
       "map": {
         "C1": "C.mp3",

@@ -37,7 +37,7 @@ abstract class Producer {
 
     const numMeasures = params.chordProgression.length * numberOfIterations;
 
-    const instruments = ['bass1', 'piano'];
+    const instruments = ['bassguitar', 'piano'];
     const noteTimings: Timing[] = [];
     for (let i = 0; i < numberOfIterations; i += 1) {
       for (let chordNo = 0; chordNo < params.chordProgression.length; chordNo += 1) {
@@ -45,7 +45,7 @@ abstract class Producer {
         const chordIndex = params.chordProgression[chordNo].sd - 1;
 
         // bass line
-        const bassTiming = new Timing('bass1', `${notes[chordIndex]}1`, '1m', this.toTime(measure, 0));
+        const bassTiming = new Timing('bassguitar', `${notes[chordIndex]}1`, '1m', this.toTime(measure, 0));
         noteTimings.push(bassTiming);
 
         const chordString = chords[chordIndex];
