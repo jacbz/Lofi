@@ -1,7 +1,10 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Monoton&family=Reem+Kufi&display=swap');
+
 $title-font: 'Monoton', sans-serif;
 $body-font: 'Reem Kufi', 'Segoe UI', sans-serif;
+$ui-background: rgba(0, 0, 0, 0.25);
+$ui-hover-background: rgba(255, 255, 255, 0.2);
 
 * {
   font-family: $body-font;
@@ -39,13 +42,14 @@ body {
   bottom: 0;
   margin: auto;
   width: 500px;
-  height: 300px;
-  background: rgba(0, 0, 0, 0.25);
+  height: 160px;
+  background: $ui-background;
   border-radius: 6px;
   backdrop-filter: blur(6px);
   padding: 12px;
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
 button {
@@ -66,15 +70,27 @@ button {
   left: 0;
   right: 0;
   margin: 0px auto;
-  background: rgba(0, 0, 0, 0.25);
+  background: $ui-background;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: $ui-hover-background;
   }
 }
 
 #seekbar {
   margin-top: auto;
+}
+
+input[type='text'] {
+  background: transparent;
+  background: $ui-background;
+  border: 0;
+  font-size: 125%;
+
+  &:focus, &:hover {
+    outline: none;
+    background: $ui-hover-background;
+  }
 }
 
 input[type='range'] {

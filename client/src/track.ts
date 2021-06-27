@@ -18,7 +18,7 @@ class Track {
 
   /** Total length of the track in seconds */
   get length() {
-    return ((this.numMeasures * 4) / this.bpm) * 60;
+    return Math.ceil(((this.numMeasures * 4) / this.bpm) * 60);
   }
 
   /** Drum loops of the track, as a tuple list of (drum loop id, loop parameters) */

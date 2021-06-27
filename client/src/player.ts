@@ -45,7 +45,10 @@ class Player {
       const player = new Tone.Player({
         url: drumLoop.url,
         volume: drumLoop.volume,
-        loop: true
+        loop: true,
+        fadeIn: '4n',
+        fadeOut: '4n',
+        playbackRate: this.currentTrack.bpm / drumLoop.bpm // TODO: don't change pitch
       }).toDestination();
       drumPlayers.set(drumLoopId, player);
     }
@@ -69,7 +72,7 @@ class Player {
       const seconds = Tone.Transport.getSecondsAtTime(time);
       this.updateDisplayTime(seconds);
 
-      if (this.currentTrack.length - seconds < 0.1) {
+      if (this.currentTrack.length - seconds < 0) {
         Tone.Transport.stop();
         this.isPlaying = false;
       }

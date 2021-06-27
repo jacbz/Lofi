@@ -8,6 +8,7 @@ const player = new Player();
 function formatTime(seconds: number) {
   const format = (val: number) => `0${Math.floor(val)}`.slice(-2);
   const minutes = (seconds % 3600) / 60;
+  if (minutes < 0) return '00:00';
   return [minutes, seconds % 60].map(format).join(':');
 }
 
@@ -21,15 +22,13 @@ seekbar.addEventListener('input', () => {
 const timeLabel = document.getElementById('time');
 const totalTimeLabel = document.getElementById('total-time');
 player.updateDisplayTime = (seconds: number) => {
-  seekbar.max = `${player.currentTrack.length}`;
+  const totalLength = player.currentTrack.length;
+  seekbar.max = `${totalLength}`;
 
-  const roundedLength = Math.ceil(player.currentTrack.length);
   seekbar.valueAsNumber = seconds;
   // when current time is within 0.1s of total length, display total length
-  timeLabel.textContent = formatTime(
-    player.currentTrack.length - seconds < 0.1 ? roundedLength : seconds
-  );
-  totalTimeLabel.textContent = formatTime(roundedLength);
+  timeLabel.textContent = formatTime(seconds);
+  totalTimeLabel.textContent = formatTime(totalLength);
 };
 
 // Play button
