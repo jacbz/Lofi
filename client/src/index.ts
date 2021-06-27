@@ -55,7 +55,6 @@ playButton.addEventListener('click', async () => {
       window.alert('Could not parse JSON');
       return;
     }
-
     const track = Producer.produce(params);
     player.currentTrack = track;
     await player.play();

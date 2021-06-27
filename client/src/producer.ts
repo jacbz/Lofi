@@ -31,6 +31,7 @@ abstract class Producer {
 
     // array of triads, e.g. ["C", "Dm", "Em", "F", "G", "Am", "Bdim"]
     const chords = Mode.seventhChords(mode, tonic);
+    console.log(chords);
 
     const numberOfIterations = 6;
 
@@ -48,9 +49,9 @@ abstract class Producer {
         noteTimings.push(bassTiming);
 
         const chordString = chords[chordIndex];
-        const chord = Chord.getChord(chordString.substring(1), `${notes[chordIndex]}3`);
+        const chord = Chord.getChord(Chord.get(chordString).aliases[0], `${notes[chordIndex]}3`);
         for (let note = 0; note < 4; note += 1) {
-          noteTimings.push(new Timing('piano', chord.notes[note], '0:3', this.toTime(measure, note * 0.25 + 1)));
+          noteTimings.push(new Timing('piano', Note.simplify(chord.notes[note]), '0:3', this.toTime(measure, note * 0.25 + 1)));
         }
       }
     }
