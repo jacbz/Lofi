@@ -1,0 +1,16 @@
+[
+    {
+        "file": "Cymatics - Eternity Drum Loop 1 - 70 BPM.wav",
+        "sound": "FullDrumLoop",
+        "energy": 0.5,
+        "valence": 0.6,
+        "bpm": 70
+    },
+    {
+        "file": "Cymatics - Eternity Drum Loop 2 - 75 BPM.wav",
+        "sound": "FullDrumLoop",
+        "energy": 0.7,
+        "valence": 0.7,
+        "bpm": 75
+    }
+]

@@ -1,0 +1,30 @@
+[
+    {
+        "file": "Drum Loop 1 no kick.wav",
+        "sound": "DrumLoop",
+        "energy": 0.4,
+        "valence": 0.4,
+        "bpm": 0
+    },
+    {
+        "file": "Drum Loop 1 w kick.wav",
+        "sound": "DrumLoop",
+        "energy": 0.5,
+        "valence": 0.5,
+        "bpm": 0
+    },
+    {
+        "file": "Drum Loop 2 no kick.wav",
+        "sound": "DrumLoop",
+        "energy": 0.3,
+        "valence": 0.3,
+        "bpm": 0
+    },
+    {
+        "file": "Drum Loop 2 w kick.wav",
+        "sound": "DrumLoop",
+        "energy": 0.4,
+        "valence": 0.4,
+        "bpm": 0
+    }
+]
