@@ -1,3 +1,4 @@
+import { Note } from '@tonaljs/tonal';
 import { Time } from 'tone/build/esm/core/type/Units';
 
 /**
@@ -15,10 +16,10 @@ class Track {
   title: string;
 
   /** How energetic the track should be, 0 (less energetic) to 1 (very energetic) */
-  energy: number
+  energy: number;
 
   /** How positive the music should be, 0 (sad) to 1 (cheerful) */
-  valence: number
+  valence: number;
 
   /** Tempo in BPM (beats per minute) */
   bpm: number = 100;
@@ -90,7 +91,10 @@ class InstrumentNote {
 
   public constructor(instrument: string, pitch: string | string[], duration: Time, time: Time) {
     this.instrument = instrument;
-    this.pitch = pitch;
+    this.pitch =
+      typeof pitch === 'string'
+        ? Note.simplify(pitch)
+        : pitch.map((p) => Note.simplify(p));
     this.duration = duration;
     this.time = time;
   }

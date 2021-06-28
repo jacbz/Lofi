@@ -143,7 +143,7 @@ class Producer {
           this.instrumentNotes.push(
             new InstrumentNote(
               i % 2 === 0 ? 'piano' : 'guitar-electric',
-              Note.simplify(chord.notes[note]),
+              chord.notes[note],
               '0:3',
               Producer.toTime(measure, note * 0.25 + 1)
             )
@@ -163,7 +163,7 @@ class Producer {
       this.instrumentNotes.push(
         new InstrumentNote(
           'piano',
-          Note.simplify(i9chord.notes[note]),
+          i9chord.notes[note],
           '1:0',
           Producer.toTime(measureStart, note * 0.25)
         )
@@ -179,7 +179,7 @@ class Producer {
     this.instrumentNotes.push(
       new InstrumentNote(
         'piano',
-        Note.simplify(Note.transpose(`${this.tonic}2`, '-2M')),
+        Note.transpose(`${this.tonic}2`, '-2M'),
         '4n',
         Producer.toTime(measureStart - 1, 3)
       )
@@ -187,7 +187,7 @@ class Producer {
     this.instrumentNotes.push(
       new InstrumentNote(
         'guitar-bass',
-        Note.simplify(Note.transpose(`${this.tonic}1`, '-2M')),
+        Note.transpose(`${this.tonic}1`, '-2M'),
         '4n',
         Producer.toTime(measureStart - 1, 3)
       )

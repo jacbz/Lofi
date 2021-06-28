@@ -36,11 +36,7 @@ player.updateTrackDisplay = (seconds: number) => {
 
 // Input field
 const inputTextarea = document.getElementById('input') as HTMLTextAreaElement;
-inputTextarea.textContent = JSON.stringify(
-  DEFAULT_INPUT_PARAMS,
-  (k, v) => (v instanceof Array ? JSON.stringify(v) : v),
-  2
-);
+inputTextarea.textContent = JSON.stringify(DEFAULT_INPUT_PARAMS, null, 2);
 
 // Play button
 const playButton = document.getElementById('play-button');
