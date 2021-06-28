@@ -18,11 +18,9 @@ class Producer {
 
   chordProgression: number[];
 
-  introLength: number;
-
-  numberOfIterations = 6;
-
   numMeasures: number;
+
+  introLength: number;
 
   mainLength: number;
 
@@ -60,18 +58,13 @@ class Producer {
     this.valence = params.valence;
     this.chordProgression = params.chordProgression;
 
-    this.introLength = 0;
-    this.numberOfIterations = 6;
-    this.mainLength = params.chordProgression.length * this.numberOfIterations;
-    this.outroLength = 1;
+    this.instruments.push('guitar-bass', 'piano', 'guitar-electric');
+    this.introLength = this.produceIntro();
+    this.mainLength = this.produceMain();
+    this.outroLength = this.produceOutro();
 
     this.numMeasures = this.introLength + this.mainLength + this.outroLength;
-
-    this.instruments.push('guitar-bass', 'piano', 'guitar-electric');
     this.produceFx();
-    this.produceIntro();
-    this.produceMain();
-    this.produceOutro();
 
     const bpm = 70;
     const title = `Lofi track in ${this.tonic} ${this.mode}`;
@@ -99,25 +92,30 @@ class Producer {
       this.energy + this.valence
     );
     this.samples.push(['vinyl', randomVinyl]);
-    this.sampleLoops.push(new SampleLoop('vinyl', randomVinyl, '0:0', `${this.numMeasures}:0`));
+    // end half a measure before the end
+    this.sampleLoops.push(new SampleLoop('vinyl', randomVinyl, '0:0', `${this.numMeasures - 0.5}:0`));
   }
 
-  produceIntro() {
-    const measureEnd = this.introLength;
+  produceIntro(): number {
+    const measureEnd = 0;
     // silent intro (except fx)
+    return measureEnd;
   }
 
-  produceMain() {
+  produceMain(): number {
+    const numberOfIterations = 6;
+    const length = this.chordProgression.length * numberOfIterations;
+
     // measure where the main part starts
     const measureStart = this.introLength;
     // measure where the main part ends
-    const measureEnd = this.introLength + this.mainLength;
+    const measureEnd = this.introLength + length;
 
     // drumbeat
     this.samples.push(['drumloop2', 0]);
     this.sampleLoops.push(new SampleLoop('drumloop2', 0, `${measureStart}:0`, `${measureEnd}:0`));
 
-    for (let i = 0; i < this.numberOfIterations; i += 1) {
+    for (let i = 0; i < numberOfIterations; i += 1) {
       for (let chordNo = 0; chordNo < this.chordProgression.length; chordNo += 1) {
         const measure = measureStart + i * this.chordProgression.length + chordNo;
         const chordIndex = this.chordProgression[chordNo] - 1;
@@ -151,11 +149,15 @@ class Producer {
         }
       }
     }
+
+    return length;
   }
 
-  produceOutro() {
+  produceOutro(): number {
     // measure where the outro part starts
     const measureStart = this.introLength + this.mainLength;
+    // add an empty measure of silence at the end
+    const length = 2;
 
     // end with I9 chord
     const i9chord = Chord.getChord('9', `${this.tonic}2`);
@@ -164,7 +166,7 @@ class Producer {
         new InstrumentNote(
           'piano',
           i9chord.notes[note],
-          '1:0',
+          '0:3',
           Producer.toTime(measureStart, note * 0.25)
         )
       );
@@ -192,6 +194,8 @@ class Producer {
         Producer.toTime(measureStart - 1, 3)
       )
     );
+
+    return length;
   }
 
   /** simplify key signature, e.g. Db major instead of C# major */

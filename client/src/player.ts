@@ -19,6 +19,9 @@ class Player {
   set isPlaying(isPlaying: boolean) {
     this._isPlaying = isPlaying;
     this.onPlayingStateChange(isPlaying);
+    if (this.gain) {
+      this.gain.gain.value = +isPlaying;
+    }
   }
 
   /** Function to update track information in the UI */
@@ -30,6 +33,8 @@ class Player {
   samplePlayers: Map<string, Tone.Player[]>;
 
   instrumentSamplers: Map<string, Tone.Sampler>;
+
+  /** Filters */
 
   compressor: Tone.Compressor;
 
@@ -87,7 +92,6 @@ class Player {
 
   connectFilter(filter: Tone.ToneAudioNode) {
     this.filters.splice(this.filters.indexOf(this.gain), 0, filter);
-    console.log(this.filters);
     for (const player of this.instrumentSamplers.values()) {
       player.disconnect();
       player.chain(...this.filters, Tone.Destination);
@@ -193,7 +197,6 @@ class Player {
   continue() {
     if (this.currentTrack) {
       this.isPlaying = true;
-      this.gain.gain.value = 1;
       Tone.Transport.start();
       this.seek(Tone.Transport.seconds);
     }
@@ -201,7 +204,6 @@ class Player {
 
   pause() {
     this.isPlaying = false;
-    this.gain.gain.value = 0;
     Tone.Transport.pause();
   }
 }
