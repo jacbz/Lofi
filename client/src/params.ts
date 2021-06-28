@@ -1,8 +1,16 @@
-class InputParams {
+export const DEFAULT_INPUT_PARAMS = {
+  key: 8,
+  mode: 6,
+  energy: 0.4,
+  valence: 0.4,
+  chordProgression: [1, 4, 6, 5]
+};
+
+export class InputParams {
   text: string;
 }
 
-class OutputParams {
+export class OutputParams {
   /** Key as a number between 1-12 */
   key: number;
 
@@ -26,5 +34,3 @@ class OutputParams {
 
   chordProgression: number[];
 }
-
-export { InputParams, OutputParams };
