@@ -1,4 +1,5 @@
 import { Chord, Key, Mode, Note, Scale } from '@tonaljs/tonal';
+import { Time } from 'tone/build/esm/core/type/Units';
 import { InstrumentNote, SampleLoop, Track } from './track';
 import { OutputParams } from './params';
 import { LOOPS } from './samples';
@@ -34,10 +35,6 @@ class Producer {
 
   instrumentNotes: InstrumentNote[] = [];
 
-  static toTime(measure: number, beat: number) {
-    return `${measure}:${beat}`;
-  }
-
   produce(params: OutputParams): Track {
     // tonic note, e.g. 'G'
     this.tonic = Scale.get('C chromatic').notes[params.key - 1];
@@ -58,7 +55,6 @@ class Producer {
     this.valence = params.valence;
     this.chordProgression = params.chordProgression;
 
-    this.instruments.push('guitar-bass', 'piano', 'guitar-electric');
     this.introLength = this.produceIntro();
     this.mainLength = this.produceMain();
     this.outroLength = this.produceOutro();
@@ -84,16 +80,18 @@ class Producer {
     return track;
   }
 
-  produceFx() {
-    // vinyl crackle
-    const randomVinyl = Producer.randomFromInterval(
-      0,
-      LOOPS.get('vinyl').size - 1,
-      this.energy + this.valence
-    );
-    this.samples.push(['vinyl', randomVinyl]);
-    // end half a measure before the end
-    this.sampleLoops.push(new SampleLoop('vinyl', randomVinyl, '0:0', `${this.numMeasures - 0.5}:0`));
+  addNote(instrument: string, pitch: string | string[], duration: Time, time: Time) {
+    if (!this.instruments.some((i) => i === instrument)) {
+      this.instruments.push(instrument);
+    }
+    this.instrumentNotes.push(new InstrumentNote(instrument, pitch, duration, time));
+  }
+
+  addLoop(sample: string, sampleIndex: number, startTime: Time, stopTime: Time) {
+    if (!this.samples.some(([s, i]) => s === sample && i === sampleIndex)) {
+      this.samples.push([sample, sampleIndex]);
+    }
+    this.sampleLoops.push(new SampleLoop(sample, sampleIndex, startTime, stopTime));
   }
 
   produceIntro(): number {
@@ -112,8 +110,7 @@ class Producer {
     const measureEnd = this.introLength + length;
 
     // drumbeat
-    this.samples.push(['drumloop2', 0]);
-    this.sampleLoops.push(new SampleLoop('drumloop2', 0, `${measureStart}:0`, `${measureEnd}:0`));
+    this.addLoop('drumloop2', 0, `${measureStart}:0`, `${measureEnd}:0`);
 
     for (let i = 0; i < numberOfIterations; i += 1) {
       for (let chordNo = 0; chordNo < this.chordProgression.length; chordNo += 1) {
@@ -128,24 +125,12 @@ class Producer {
 
         // bass line: on the first beat of every measure
         const rootNote = Mode.notes(this.mode, `${this.tonic}1`)[chordIndex];
-        const bassTiming = new InstrumentNote(
-          'guitar-bass',
-          rootNote,
-          '1m',
-          Producer.toTime(measure, 0)
-        );
-        this.instrumentNotes.push(bassTiming);
+        this.addNote('guitar-bass', rootNote, '1m', `${measure}:0`);
 
         // arpeggiated chords on the second beat
         for (let note = 0; note < 4; note += 1) {
-          this.instrumentNotes.push(
-            new InstrumentNote(
-              i % 2 === 0 ? 'piano' : 'guitar-electric',
-              chord.notes[note],
-              '0:3',
-              Producer.toTime(measure, note * 0.25 + 1)
-            )
-          );
+          const instrument = i % 2 === 0 ? 'piano' : 'guitar-electric';
+          this.addNote(instrument, chord.notes[note], '0:3', `${measure}:${note * 0.25 + 1}`);
         }
       }
     }
@@ -162,40 +147,29 @@ class Producer {
     // end with I9 chord
     const i9chord = Chord.getChord('9', `${this.tonic}2`);
     for (let note = 0; note < i9chord.notes.length; note += 1) {
-      this.instrumentNotes.push(
-        new InstrumentNote(
-          'piano',
-          i9chord.notes[note],
-          '0:3',
-          Producer.toTime(measureStart, note * 0.25)
-        )
-      );
+      this.addNote('piano', i9chord.notes[note], '0:3', `${measureStart}:${note * 0.25}`);
     }
 
     // ending bass note
-    this.instrumentNotes.push(
-      new InstrumentNote('guitar-bass', `${this.tonic}1`, '1m', Producer.toTime(measureStart, 0))
-    );
+    this.addNote('guitar-bass', `${this.tonic}1`, '1m', `${measureStart}:${0}`);
 
     // leading tone for resolution
-    this.instrumentNotes.push(
-      new InstrumentNote(
-        'piano',
-        Note.transpose(`${this.tonic}2`, '-2M'),
-        '4n',
-        Producer.toTime(measureStart - 1, 3)
-      )
-    );
-    this.instrumentNotes.push(
-      new InstrumentNote(
-        'guitar-bass',
-        Note.transpose(`${this.tonic}1`, '-2M'),
-        '4n',
-        Producer.toTime(measureStart - 1, 3)
-      )
-    );
+    const resolutionNoteTime = `${measureStart - 1}:${3}`;
+    this.addNote('piano', Note.transpose(`${this.tonic}2`, '-2M'), '4n', resolutionNoteTime);
+    this.addNote('guitar-bass', Note.transpose(`${this.tonic}1`, '-2M'), '4n', resolutionNoteTime);
 
     return length;
+  }
+
+  produceFx() {
+    // vinyl crackle
+    const randomVinyl = Producer.randomFromInterval(
+      0,
+      LOOPS.get('vinyl').size - 1,
+      this.energy + this.valence
+    );
+    // end half a measure before the end
+    this.addLoop('vinyl', randomVinyl, '0:0', `${this.numMeasures - 0.5}:0`);
   }
 
   /** simplify key signature, e.g. Db major instead of C# major */

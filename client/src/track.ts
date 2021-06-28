@@ -50,7 +50,7 @@ class Track {
 }
 
 /**
- * Specifies a loop with a Tone.js start time and end time
+ * Specifies a sample loop with a Tone.js start time and end time
  */
 class SampleLoop {
   /** Name of the sample group */
@@ -77,10 +77,10 @@ class SampleLoop {
  * Precise timing of a single note played by an instrument
  */
 class InstrumentNote {
-  /** Name of the instrument */
+  /** Name of the instrument that should play the note */
   instrument: string;
 
-  /** Pitch(es) of the instrument, e.g. D#1 or [C, E, G] */
+  /** Pitch(es) to play, e.g. 'D#1' or ['C', 'E', 'G'] */
   pitch: string | string[];
 
   /** Duration in Tone.js time */

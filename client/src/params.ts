@@ -1,8 +1,10 @@
-export const DEFAULT_INPUT_PARAMS = {
+export const DEFAULT_OUTPUT_PARAMS = {
   key: 8,
+  // key: Math.floor(Math.random() * 12 + 1),
   mode: 6,
-  energy: 0.4,
-  valence: 0.4,
+  // mode: Math.random() < 0.5 ? 6 : 1,
+  energy: Math.random(),
+  valence: Math.random(),
   chordProgression: [1, 4, 6, 5]
 };
 

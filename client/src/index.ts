@@ -1,5 +1,5 @@
 import * as Tone from 'tone';
-import { DEFAULT_INPUT_PARAMS, OutputParams } from './params';
+import { DEFAULT_OUTPUT_PARAMS, OutputParams } from './params';
 import Player from './player';
 import Producer from './producer';
 
@@ -36,7 +36,7 @@ player.updateTrackDisplay = (seconds: number) => {
 
 // Input field
 const inputTextarea = document.getElementById('input') as HTMLTextAreaElement;
-inputTextarea.textContent = JSON.stringify(DEFAULT_INPUT_PARAMS, null, 2);
+inputTextarea.textContent = JSON.stringify(DEFAULT_OUTPUT_PARAMS, null, 2);
 
 // Play button
 const playButton = document.getElementById('play-button');
@@ -99,14 +99,12 @@ const adjustFilters = () => {
   }
   console.log(output);
 };
-
 document.getElementById('connecteq').addEventListener('click', () => {
   player.connectFilter(player.equalizer);
 });
 document.getElementById('connectdistortion').addEventListener('click', () => {
   player.connectFilter(player.distortion);
 });
-
 for (const el of document.getElementById('filter').querySelectorAll('input')) {
   el.addEventListener('input', adjustFilters);
 }
