@@ -87,9 +87,9 @@ const adjustFilters = () => {
   player.reverb.decay = value('reverbdecay');
   player.reverb.preDelay = value('reverbpredelay');
   player.reverb.wet.value = value('reverbwet');
-  player.chebyshev.order = value('chebyshev');
   player.distortion.distortion = value('distortion');
-  player.bitcrusher.bits.value = value('bitcrusher');
+  player.chebyshev.order = value('chebyshev');
+  // player.bitcrusher.bits.value = value('bitcrusher');
   player.gain.gain.value = value('gain');
 
   const output = new Map();

@@ -35,11 +35,11 @@
       <div>-30<input type="range" min="-30" max="0" value="0" class="slider" id="compressorthreshold">0</div>
       Compressor ratio: The gain reduction ratio.
       <div>1<input type="range" min="1" max="20" value="1" class="slider" id="compressorratio">20</div>
-      LPF frequency: The cutoff frequency of the filter.
+      LPF frequency: cuts off frequencies higher than this
       <div>0<input type="range" min="0" max="5000" value="5000" class="slider" id="lpffrequency">5000</div>
       LPF Q: Quality of the filter
       <div>0<input type="range" min="0" max="10" step="0.1" value="0" class="slider" id="lpfq">10</div>
-      HPF frequency: The cutoff frequency of the filter.
+      HPF frequency: cuts off frequencies lower than this
       <div>0<input type="range" min="0" max="5000" value="0" class="slider" id="hpffrequency">5000</div>
       HPF Q: Quality of the filter
       <div>0<input type="range" min="0" max="10" step="0.1" value="0" class="slider" id="hpfq">10</div>
@@ -59,8 +59,8 @@
       <div>1<input type="range" min="1" max="10" value="1" step="1" class="slider" id="chebyshev">10</div>
       Distortion
       <div>0<input type="range" min="0" max="1" step="0.01" value="0" class="slider" id="distortion">1<button id="connectdistortion">Connect distortion</button></div>
-      Bitcrusher: down-samples the incoming signal to a different bit depth
-      <div>1<input type="range" min="1" max="16" step="1" value="16" class="slider" id="bitcrusher">16</div>
+      <!-- Bitcrusher: down-samples the incoming signal to a different bit depth
+      <div>1<input type="range" min="1" max="16" step="1" value="16" class="slider" id="bitcrusher">16</div> -->
       Gain
       <div>0<input type="range" min="0" max="5" step="0.1" value="1" class="slider" id="gain">5</div>
     </div>   

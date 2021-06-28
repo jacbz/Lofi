@@ -69,7 +69,7 @@ class Player {
       preDelay: 0
     });
     this.chebyshev = new Tone.Chebyshev(1);
-    this.bitcrusher = new Tone.BitCrusher(16);
+    // this.bitcrusher = new Tone.BitCrusher(16);
     this.gain = new Tone.Gain();
 
     this.filters = [
@@ -77,7 +77,7 @@ class Player {
       this.lowPassFilter,
       this.highPassFilter,
       this.reverb,
-      this.bitcrusher,
+      // this.bitcrusher,
       // this.equalizer,
       this.chebyshev,
       // this.distortion,

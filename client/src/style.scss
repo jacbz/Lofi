@@ -80,6 +80,7 @@ button {
   cursor: pointer;
   font-size: 125%;
   background: transparent;
+  border: 1px solid;
 
   &:focus {
     outline: none;
@@ -179,8 +180,9 @@ input[type='range'] {
   background: $ui-background;
   position: absolute;
   display: flex;
+  left: 0;
   flex-direction: column;
-  left: -24px;
   padding: 12px;
-  transform: scale(0.85);
+  font-size: 90%;
+  backdrop-filter: blur(6px);
 }
