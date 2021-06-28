@@ -1,0 +1,100 @@
+[
+  {
+    "file": "Cymatics - Eternity Hihat Loop 1 - 80 BPM.wav",
+    "sound": "HiHatLoop",
+    "energy": 0.5,
+    "valence": 0.5,
+    "bpm": 80
+  },
+  {
+    "file": "Cymatics - Eternity Hihat Loop 4 - 82 BPM.wav",
+    "sound": "HiHatLoop",
+    "energy": 0.5,
+    "valence": 0.6,
+    "bpm": 82
+  },
+  {
+    "file": "Cymatics - Eternity Hihat Loop 5 - 85 BPM.wav",
+    "sound": "HiHatLoop",
+    "energy": 0.5,
+    "valence": 0.5,
+    "bpm": 85
+  },
+  {
+    "file": "Cymatics - Eternity Hihat Loop 6 - 86 BPM.wav",
+    "sound": "HiHatLoop",
+    "energy": 0.6,
+    "valence": 0.7,
+    "bpm": 86
+  },
+  {
+    "file": "Cymatics - Eternity Hihat Loop 8 - 90 BPM.wav",
+    "sound": "HiHatLoop",
+    "energy": 0.5,
+    "valence": 0.5,
+    "bpm": 90
+  },
+  {
+    "file": "Cymatics - Lofi Hihat Loop 1 - 70 BPM.wav",
+    "sound": "HiHatLoop",
+    "energy": 0.6,
+    "valence": 0.7,
+    "bpm": 70
+  },
+  {
+    "file": "Cymatics - Lofi Hihat Loop 2 - 75 BPM.wav",
+    "sound": "HiHatLoop",
+    "energy": 0.7,
+    "valence": 0.7,
+    "bpm": 75
+  },
+  {
+    "file": "Cymatics - Lofi Hihat Loop 6 - 80 BPM.wav",
+    "sound": "HiHatLoop",
+    "energy": 0.6,
+    "valence": 0.7,
+    "bpm": 80
+  },
+  {
+    "file": "Cymatics - Lofi Hihat Loop 11 - 85 BPM.wav",
+    "sound": "HiHatLoop",
+    "energy": 0.7,
+    "valence": 0.8,
+    "bpm": 85
+  },
+  {
+    "file": "Cymatics - Lofi Hihat Loop 20 - 130 BPM.wav",
+    "sound": "HiHatLoop",
+    "energy": 0.7,
+    "valence": 0.6,
+    "bpm": 130
+  },
+  {
+    "file": "Cymatics - Lofi Hihat Loop 21 - 140 BPM.wav",
+    "sound": "HiHatLoop",
+    "energy": 0.8,
+    "valence": 0.5,
+    "bpm": 140
+  },
+  {
+    "file": "Cymatics - Lofi Hihat Loop 23 - 145 BPM.wav",
+    "sound": "HiHatLoop",
+    "energy": 0.7,
+    "valence": 0.6,
+    "bpm": 145
+  },
+  {
+    "file": "Cymatics - Lofi Hihat Loop 24 - 160 BPM.wav",
+    "sound": "HiHatLoop",
+    "energy": 0.6,
+    "valence": 0.5,
+    "bpm": 160
+  },
+  {
+    "file": "Cymatics - Lofi Hihat Loop 28 - 180 BPM.wav",
+    "sound": "HiHatLoop",
+    "energy": 0.8,
+    "valence": 0.7,
+    "bpm": 180
+  }
+]
