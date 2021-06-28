@@ -69,3 +69,43 @@ playButton.addEventListener('click', async () => {
     player.continue();
   }
 });
+
+// filter panel
+function value(id: string) {
+  return (document.getElementById(id) as HTMLInputElement).valueAsNumber;
+}
+const adjustFilters = () => {
+  player.compressor.threshold.value = value('compressorthreshold');
+  player.compressor.ratio.value = value('compressorratio');
+  player.lowPassFilter.frequency.value = value('lpffrequency');
+  player.lowPassFilter.Q.value = value('lpfq');
+  player.highPassFilter.frequency.value = value('hpffrequency');
+  player.highPassFilter.Q.value = value('hpfq');
+  player.equalizer.low.value = value('eqlow');
+  player.equalizer.mid.value = value('eqmid');
+  player.equalizer.high.value = value('eqhigh');
+  player.reverb.decay = value('reverbdecay');
+  player.reverb.preDelay = value('reverbpredelay');
+  player.reverb.wet.value = value('reverbwet');
+  player.chebyshev.order = value('chebyshev');
+  player.distortion.distortion = value('distortion');
+  player.bitcrusher.bits.value = value('bitcrusher');
+  player.gain.gain.value = value('gain');
+
+  const output = new Map();
+  for (const el of document.getElementById('filter').querySelectorAll('input')) {
+    output.set(el.id, el.valueAsNumber);
+  }
+  console.log(output);
+};
+
+document.getElementById('connecteq').addEventListener('click', () => {
+  player.connectFilter(player.equalizer);
+});
+document.getElementById('connectdistortion').addEventListener('click', () => {
+  player.connectFilter(player.distortion);
+});
+
+for (const el of document.getElementById('filter').querySelectorAll('input')) {
+  el.addEventListener('input', adjustFilters);
+}

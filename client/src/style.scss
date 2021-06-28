@@ -79,6 +79,7 @@ button {
   display: block;
   cursor: pointer;
   font-size: 125%;
+  background: transparent;
 
   &:focus {
     outline: none;
@@ -172,4 +173,14 @@ input[type='range'] {
   &::-moz-range-thumb {
     @include slider-thumb;
   }
+}
+
+#filter {
+  background: $ui-background;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  left: -24px;
+  padding: 12px;
+  transform: scale(0.85);
 }

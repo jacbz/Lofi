@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import * as Tone from 'tone';
 import { Track } from './track';
 import * as Samples from './samples';
@@ -28,6 +27,80 @@ class Player {
   /** Function to call when isPlaying changes */
   onPlayingStateChange: (isPlaying: boolean) => void;
 
+  samplePlayers: Map<string, Tone.Player[]>;
+
+  instrumentSamplers: Map<string, Tone.Sampler>;
+
+  compressor: Tone.Compressor;
+
+  lowPassFilter: Tone.Filter;
+
+  highPassFilter: Tone.Filter;
+
+  equalizer: Tone.EQ3;
+
+  distortion: Tone.Distortion;
+
+  reverb: Tone.Reverb;
+
+  chebyshev: Tone.Chebyshev;
+
+  bitcrusher: Tone.BitCrusher;
+
+  gain: Tone.Gain;
+
+  filters: Tone.ToneAudioNode[];
+
+  initFilters() {
+    this.compressor = new Tone.Compressor(0, 1);
+    this.lowPassFilter = new Tone.Filter({
+      type: 'lowpass',
+      frequency: 5000
+    });
+    this.highPassFilter = new Tone.Filter({
+      type: 'highpass',
+      frequency: 0
+    });
+    this.equalizer = new Tone.EQ3(0, 0, 0);
+    this.distortion = new Tone.Distortion(0);
+    this.reverb = new Tone.Reverb({
+      decay: 0.001,
+      wet: 0,
+      preDelay: 0
+    });
+    this.chebyshev = new Tone.Chebyshev(1);
+    this.bitcrusher = new Tone.BitCrusher(16);
+    this.gain = new Tone.Gain();
+
+    this.filters = [
+      this.compressor,
+      this.lowPassFilter,
+      this.highPassFilter,
+      this.reverb,
+      this.bitcrusher,
+      // this.equalizer,
+      this.chebyshev,
+      // this.distortion,
+      this.gain
+    ];
+  }
+
+  connectFilter(filter: Tone.ToneAudioNode) {
+    this.filters.splice(this.filters.indexOf(this.gain), 0, filter);
+    console.log(this.filters);
+    for (const player of this.instrumentSamplers.values()) {
+      player.disconnect();
+      player.chain(...this.filters, Tone.Destination);
+    }
+    for (const player of this.samplePlayers.values()) {
+      for (const player2 of player.values()) {
+        if (!player2) return;
+        player2.disconnect();
+        player2.chain(...this.filters, Tone.Destination);
+      }
+    }
+  }
+
   async play() {
     if (!this.currentTrack) {
       return;
@@ -37,8 +110,10 @@ class Player {
     Tone.Transport.cancel();
     Tone.Transport.bpm.value = this.currentTrack.bpm;
 
-    const samplePlayers: Map<string, Tone.Player[]> = new Map();
-    const instrumentSamplers: Map<string, Tone.Sampler> = new Map();
+    this.samplePlayers = new Map();
+    this.instrumentSamplers = new Map();
+
+    this.initFilters();
 
     // load samples
     for (const [sampleGroupName, sampleIndex] of this.currentTrack.samples) {
@@ -50,12 +125,15 @@ class Player {
         fadeIn: '4n',
         fadeOut: '4n',
         // TODO: don't change pitch
-        playbackRate: sampleGroup.bpm ? this.currentTrack.bpm / sampleGroup.bpm : 1.0
-      }).toDestination().sync();
-      if (!samplePlayers.has(sampleGroupName)) {
-        samplePlayers.set(sampleGroupName, Array(sampleGroup.size));
+        playbackRate: sampleGroup.bpm ? this.currentTrack.bpm / sampleGroup.bpm[sampleIndex] : 1.0
+      })
+        .chain(...this.filters, Tone.Destination)
+        .sync();
+
+      if (!this.samplePlayers.has(sampleGroupName)) {
+        this.samplePlayers.set(sampleGroupName, Array(sampleGroup.size));
       }
-      samplePlayers.get(sampleGroupName)[sampleIndex] = player;
+      this.samplePlayers.get(sampleGroupName)[sampleIndex] = player;
     }
 
     // load instruments
@@ -65,21 +143,26 @@ class Player {
         urls: instrument.map,
         baseUrl: `${Samples.SAMPLES_BASE_URL}/instruments/${instrument.name}/`,
         volume: instrument.volume
-      }).toDestination().sync();
-      instrumentSamplers.set(instrumentName, sampler);
+      })
+        .chain(...this.filters, Tone.Destination)
+        .sync();
+      this.instrumentSamplers.set(instrumentName, sampler);
     }
 
     // wait until all samples are loaded
     await Tone.loaded();
+    await this.reverb.generate();
 
     for (const sampleLoop of this.currentTrack.sampleLoops) {
-      const samplePlayer = samplePlayers.get(sampleLoop.sampleGroupName)[sampleLoop.sampleIndex];
+      const samplePlayer = this.samplePlayers.get(sampleLoop.sampleGroupName)[
+        sampleLoop.sampleIndex
+      ];
       samplePlayer.start(sampleLoop.startTime);
       samplePlayer.stop(sampleLoop.stopTime);
     }
 
     for (const noteTiming of this.currentTrack.instrumentNotes) {
-      const instrumentSampler = instrumentSamplers.get(noteTiming.instrument);
+      const instrumentSampler = this.instrumentSamplers.get(noteTiming.instrument);
       instrumentSampler.triggerAttackRelease(
         noteTiming.pitch,
         noteTiming.duration,
@@ -110,6 +193,7 @@ class Player {
   continue() {
     if (this.currentTrack) {
       this.isPlaying = true;
+      this.gain.gain.value = 1;
       Tone.Transport.start();
       this.seek(Tone.Transport.seconds);
     }
@@ -117,6 +201,7 @@ class Player {
 
   pause() {
     this.isPlaying = false;
+    this.gain.gain.value = 0;
     Tone.Transport.pause();
   }
 }

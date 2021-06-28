@@ -29,8 +29,43 @@
         <span id="total-time">00:00</span>
       </span>
     </div>
-    
+
+    <div id="filter" style="z-index: 300;">
+      Compressor threshold (dB): Compression above this point.
+      <div>-30<input type="range" min="-30" max="0" value="0" class="slider" id="compressorthreshold">0</div>
+      Compressor ratio: The gain reduction ratio.
+      <div>1<input type="range" min="1" max="20" value="1" class="slider" id="compressorratio">20</div>
+      LPF frequency: The cutoff frequency of the filter.
+      <div>0<input type="range" min="0" max="5000" value="5000" class="slider" id="lpffrequency">5000</div>
+      LPF Q: Quality of the filter
+      <div>0<input type="range" min="0" max="10" step="0.1" value="0" class="slider" id="lpfq">10</div>
+      HPF frequency: The cutoff frequency of the filter.
+      <div>0<input type="range" min="0" max="5000" value="0" class="slider" id="hpffrequency">5000</div>
+      HPF Q: Quality of the filter
+      <div>0<input type="range" min="0" max="10" step="0.1" value="0" class="slider" id="hpfq">10</div>
+      Equalizer low (dB)
+      <div>-30<input type="range" min="-30" max="0" value="0" class="slider" id="eqlow">0</div>
+      Equalizer mid (dB)
+      <div>-30<input type="range" min="-30" max="0" value="0" class="slider" id="eqmid">0</div>
+      Equalizer high (dB)
+      <div>-30<input type="range" min="-30" max="0" value="0" class="slider" id="eqhigh">0<button id="connecteq">Connect EQ</button></div>
+      Reverb decay: The amount of time it will reverberate for.
+      <div>0<input type="range" min="0.001" max="4" step="0.1" value="0" class="slider" id="reverbdecay">4</div>
+      Reverb pre-lecay
+      <div>0<input type="range" min="0" max="4" step="0.1" value="0" class="slider" id="reverbpredelay">4</div>
+      Reverb wet
+      <div>0<input type="range" min="0" max="1" step="0.01" value="0" class="slider" id="reverbwet">1</div>
+      Chebyshev
+      <div>1<input type="range" min="1" max="10" value="1" step="1" class="slider" id="chebyshev">10</div>
+      Distortion
+      <div>0<input type="range" min="0" max="1" step="0.01" value="0" class="slider" id="distortion">1<button id="connectdistortion">Connect distortion</button></div>
+      Bitcrusher: down-samples the incoming signal to a different bit depth
+      <div>1<input type="range" min="1" max="16" step="1" value="16" class="slider" id="bitcrusher">16</div>
+      Gain
+      <div>0<input type="range" min="0" max="5" step="0.1" value="1" class="slider" id="gain">5</div>
+    </div>   
   </div>
+
 </body>
 
 <footer>

@@ -10,13 +10,19 @@ class SampleGroup {
 
   urls: string[];
 
-  bpm: number;
+  bpm: number[];
 
   volume: number;
 
   size: number;
 
-  public constructor(name: string, category: string, urls: string[], bpm: number, volume: number) {
+  public constructor(
+    name: string,
+    category: string,
+    urls: string[],
+    bpm: number[],
+    volume: number
+  ) {
     this.name = name;
     this.category = category;
     this.urls = urls;

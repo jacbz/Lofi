@@ -60,7 +60,7 @@ class Producer {
     this.valence = params.valence;
     this.chordProgression = params.chordProgression;
 
-    this.introLength = 1;
+    this.introLength = 0;
     this.numberOfIterations = 6;
     this.mainLength = params.chordProgression.length * this.numberOfIterations;
     this.outroLength = 1;
@@ -73,6 +73,7 @@ class Producer {
     this.produceMain();
     this.produceOutro();
 
+    const bpm = 70;
     const title = `Lofi track in ${this.tonic} ${this.mode}`;
     const track = new Track({
       title,
@@ -81,7 +82,7 @@ class Producer {
       energy: this.energy,
       valence: this.valence,
       numMeasures: this.numMeasures,
-      bpm: 80,
+      bpm,
       samples: this.samples,
       sampleLoops: this.sampleLoops,
       instruments: this.instruments,
@@ -113,8 +114,8 @@ class Producer {
     const measureEnd = this.introLength + this.mainLength;
 
     // drumbeat
-    this.samples.push(['drumloop1', 0]);
-    this.sampleLoops.push(new SampleLoop('drumloop1', 0, `${measureStart}:0`, `${measureEnd}:0`));
+    this.samples.push(['drumloop2', 0]);
+    this.sampleLoops.push(new SampleLoop('drumloop2', 0, `${measureStart}:0`, `${measureEnd}:0`));
 
     for (let i = 0; i < this.numberOfIterations; i += 1) {
       for (let chordNo = 0; chordNo < this.chordProgression.length; chordNo += 1) {

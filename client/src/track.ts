@@ -1,6 +1,5 @@
-import { Mode, Chord } from '@tonaljs/tonal/dist/index';
-import * as Tone from 'tone';
 import { Time } from 'tone/build/esm/core/type/Units';
+
 /**
  * A Track contains the elements that make up a lo-fi track.
  * Every Track has time signature 4/4.
