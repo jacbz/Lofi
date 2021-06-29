@@ -1,6 +1,6 @@
 export const DEFAULT_OUTPUT_PARAMS = {
-  key: 8,
-  // key: Math.floor(Math.random() * 12 + 1),
+  // key: 8,
+  key: Math.floor(Math.random() * 12 + 1),
   mode: 6,
   // mode: Math.random() < 0.5 ? 6 : 1,
   energy: Math.random(),

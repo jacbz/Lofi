@@ -1,4 +1,4 @@
-import { Note } from '@tonaljs/tonal';
+import * as Tonal from '@tonaljs/tonal';
 import { Time } from 'tone/build/esm/core/type/Units';
 
 /**
@@ -93,8 +93,8 @@ class InstrumentNote {
     this.instrument = instrument;
     this.pitch =
       typeof pitch === 'string'
-        ? Note.simplify(pitch)
-        : pitch.map((p) => Note.simplify(p));
+        ? Tonal.Note.simplify(pitch)
+        : pitch.map((p) => Tonal.Note.simplify(p));
     this.duration = duration;
     this.time = time;
   }

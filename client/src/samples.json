@@ -25,6 +25,7 @@
   "instruments": [
     {
       "name": "piano",
+      "comment": "Salamander grand piano",
       "map": {
         "A4": "A4v6.mp3",
         "A7": "A7v6.mp3",
@@ -50,6 +51,34 @@
       }
     },
     {
+      "name": "piano2",
+      "comment": "Lower fidelity",
+      "volume": -8,
+      "map": {
+        "A4": "A3.mp3",
+        "A7": "A6.mp3",
+        "C3": "C2.mp3",
+        "C6": "C5.mp3",
+        "D#4": "Ds3.mp3",
+        "D#7": "Ds6.mp3",
+        "F#3": "Fs2.mp3",
+        "F#6": "Fs5.mp3",
+        "A5": "A4.mp3",
+        "C4": "C3.mp3",
+        "C7": "C6.mp3",
+        "D#5": "Ds4.mp3",
+        "F#4": "Fs3.mp3",
+        "F#7": "Fs6.mp3",
+        "A3": "A2.mp3",
+        "A6": "A5.mp3",
+        "C5": "C4.mp3",
+        "C8": "C8.mp3",
+        "D#3": "Ds2.mp3",
+        "D#6": "Ds5.mp3",
+        "F#5": "Fs4.mp3"
+      }
+    },
+    {
       "name": "guitar-bass",
       "map": {
         "E1": "E.mp3",
@@ -59,7 +88,7 @@
     },
     {
       "name": "guitar-electric",
-      "volume": -8,
+      "volume": -10,
       "map": {
         "A2": "A2.mp3",
         "A3": "A3.mp3",

@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
-import { Track } from './track';
 import * as Samples from './samples';
+import { Track } from './track';
 
 /**
  * Player

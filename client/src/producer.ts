@@ -1,8 +1,10 @@
-import { Chord, Key, Mode, Note, Scale } from '@tonaljs/tonal';
+import * as Tone from 'tone';
+import * as Tonal from '@tonaljs/tonal';
 import { Time } from 'tone/build/esm/core/type/Units';
 import { InstrumentNote, SampleLoop, Track } from './track';
 import { OutputParams } from './params';
 import { LOOPS } from './samples';
+import { Chord, octShift } from './music';
 
 class Producer {
   tonic: string;
@@ -18,6 +20,8 @@ class Producer {
   chordsInScale: string[];
 
   chordProgression: number[];
+
+  chordProgressionChords: Chord[];
 
   numMeasures: number;
 
@@ -36,24 +40,36 @@ class Producer {
   instrumentNotes: InstrumentNote[] = [];
 
   produce(params: OutputParams): Track {
+    const bpm = 70;
+    Tone.Transport.bpm.value = bpm;
+
     // tonic note, e.g. 'G'
-    this.tonic = Scale.get('C chromatic').notes[params.key - 1];
+    this.tonic = Tonal.Scale.get('C chromatic').notes[params.key - 1];
 
     // musical mode, e.g. 'ionian'
-    this.mode = Mode.names()[params.mode - 1];
+    this.mode = Tonal.Mode.names()[params.mode - 1];
 
     this.simplifyKeySignature();
 
     // array of notes, e.g. ["C", "D", "E", "F", "G", "A", "B"]
-    this.notesInScale = Mode.notes(this.mode, this.tonic);
+    this.notesInScale = Tonal.Mode.notes(this.mode, this.tonic);
 
     // array of triads, e.g. ["C", "Dm", "Em", "F", "G", "Am", "Bdim"]
-    this.chordsInScale = Mode.seventhChords(this.mode, this.tonic);
-    console.log(this.chordsInScale);
+    this.chordsInScale = Tonal.Mode.seventhChords(this.mode, this.tonic);
 
     this.energy = params.energy;
     this.valence = params.valence;
     this.chordProgression = params.chordProgression;
+    this.chordProgressionChords = this.chordProgression.map((c, chordNo) => {
+      const chordIndex = this.chordProgression[chordNo] - 1;
+      const chordString = this.chordsInScale[chordIndex];
+      // e.g. Chord.getChord("maj7", "G4")
+      return Tonal.Chord.getChord(
+        Tonal.Chord.get(chordString).aliases[0],
+        `${this.notesInScale[chordIndex]}3`
+      );
+    });
+    console.log(this.chordProgressionChords);
 
     this.introLength = this.produceIntro();
     this.mainLength = this.produceMain();
@@ -62,7 +78,6 @@ class Producer {
     this.numMeasures = this.introLength + this.mainLength + this.outroLength;
     this.produceFx();
 
-    const bpm = 70;
     const title = `Lofi track in ${this.tonic} ${this.mode}`;
     const track = new Track({
       title,
@@ -95,8 +110,10 @@ class Producer {
   }
 
   produceIntro(): number {
-    const measureEnd = 0;
-    // silent intro (except fx)
+    const measureEnd = 3;
+    this.chordProgressionChords.forEach((chord, chordNo) => {
+      this.addArpeggio('guitar-electric', chord.notes, chordNo === this.chordProgression.length - 1 ? '1:1' : '0:2', '64n', `1:${chordNo}`);
+    });
     return measureEnd;
   }
 
@@ -113,26 +130,15 @@ class Producer {
     this.addLoop('drumloop2', 0, `${measureStart}:0`, `${measureEnd}:0`);
 
     for (let i = 0; i < numberOfIterations; i += 1) {
-      for (let chordNo = 0; chordNo < this.chordProgression.length; chordNo += 1) {
+      this.chordProgressionChords.forEach((chord, chordNo) => {
         const measure = measureStart + i * this.chordProgression.length + chordNo;
-        const chordIndex = this.chordProgression[chordNo] - 1;
-        const chordString = this.chordsInScale[chordIndex];
-        // e.g. Chord.getChord("maj7", "G4")
-        const chord = Chord.getChord(
-          Chord.get(chordString).aliases[0],
-          `${this.notesInScale[chordIndex]}3`
-        );
-
         // bass line: on the first beat of every measure
-        const rootNote = Mode.notes(this.mode, `${this.tonic}1`)[chordIndex];
+        const rootNote = octShift(`${chord.tonic}`, -1);
         this.addNote('guitar-bass', rootNote, '1m', `${measure}:0`);
 
         // arpeggiated chords on the second beat
-        for (let note = 0; note < 4; note += 1) {
-          const instrument = i % 2 === 0 ? 'piano' : 'guitar-electric';
-          this.addNote(instrument, chord.notes[note], '0:3', `${measure}:${note * 0.25 + 1}`);
-        }
-      }
+        this.addArpeggio('piano', chord.notes, '0:3', '16n', `${measure}:1`);
+      });
     }
 
     return length;
@@ -145,18 +151,16 @@ class Producer {
     const length = 2;
 
     // end with I9 chord
-    const i9chord = Chord.getChord('9', `${this.tonic}2`);
-    for (let note = 0; note < i9chord.notes.length; note += 1) {
-      this.addNote('piano', i9chord.notes[note], '0:3', `${measureStart}:${note * 0.25}`);
-    }
+    const i9chord = Tonal.Chord.getChord('9', `${this.tonic}2`);
+    this.addArpeggio('piano', i9chord.notes, '1:2', '16n', `${measureStart}:0`);
 
     // ending bass note
     this.addNote('guitar-bass', `${this.tonic}1`, '1m', `${measureStart}:${0}`);
 
     // leading tone for resolution
     const resolutionNoteTime = `${measureStart - 1}:${3}`;
-    this.addNote('piano', Note.transpose(`${this.tonic}2`, '-2M'), '4n', resolutionNoteTime);
-    this.addNote('guitar-bass', Note.transpose(`${this.tonic}1`, '-2M'), '4n', resolutionNoteTime);
+    this.addNote('piano', Tonal.Note.transpose(`${this.tonic}2`, '-2M'), '4n', resolutionNoteTime);
+    this.addNote('guitar-bass', Tonal.Note.transpose(`${this.tonic}1`, '-2M'), '4n', resolutionNoteTime);
 
     return length;
   }
@@ -176,22 +180,43 @@ class Producer {
   simplifyKeySignature() {
     if (this.mode === 'ionian') {
       this.mode = 'major';
-      const enharmonic = Note.enharmonic(this.tonic);
-      const enharmonicKey = Key.majorKey(enharmonic);
-      if (Key.majorKey(this.tonic).keySignature.length >= enharmonicKey.keySignature.length) {
+      const enharmonic = Tonal.Note.enharmonic(this.tonic);
+      const enharmonicKey = Tonal.Key.majorKey(enharmonic);
+      if (Tonal.Key.majorKey(this.tonic).keySignature.length >= enharmonicKey.keySignature.length) {
         this.tonic = enharmonic;
       }
     }
     if (this.mode === 'aeolian') {
       this.mode = 'minor';
-      const enharmonic = Note.enharmonic(this.tonic);
-      const enharmonicKey = Key.majorKey(enharmonic);
-      if (Key.minorKey(this.tonic).keySignature.length >= enharmonicKey.keySignature.length) {
+      const enharmonic = Tonal.Note.enharmonic(this.tonic);
+      const enharmonicKey = Tonal.Key.majorKey(enharmonic);
+      if (Tonal.Key.minorKey(this.tonic).keySignature.length >= enharmonicKey.keySignature.length) {
         this.tonic = enharmonic;
       }
     }
   }
 
+  /** Adds a rolling arpeggio to the note list */
+  addArpeggio(
+    instrument: string,
+    notes: string[],
+    totalDuration: Time,
+    singleNoteUnit: string,
+    startTime: Time
+  ) {
+    notes.forEach((note, i) => {
+      const noteDuration = {} as any;
+      noteDuration[singleNoteUnit] = i;
+      this.addNote(
+        instrument,
+        note,
+        Tone.Time(totalDuration).toSeconds() - Tone.Time(noteDuration).toSeconds(),
+        Tone.Time(startTime).toSeconds() + Tone.Time(noteDuration).toSeconds()
+      );
+    });
+  }
+
+  /** Returns a quasi-random number between min-max based on given seed number */
   static randomFromInterval(min: number, max: number, seed: number) {
     return Math.floor(this.random(seed) * (max - min + 1) + min);
   }

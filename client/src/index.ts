@@ -1,7 +1,7 @@
 import * as Tone from 'tone';
-import { DEFAULT_OUTPUT_PARAMS, OutputParams } from './params';
 import Player from './player';
 import Producer from './producer';
+import { DEFAULT_OUTPUT_PARAMS, OutputParams } from './params';
 
 const player = new Player();
 
