@@ -15,6 +15,7 @@
     "comma-dangle": ["error", "never"],
     "import/extensions": "off",
     "max-classes-per-file": "off",
+    "no-console": "off",
     "no-underscore-dangle": "off",
     "no-unused-vars": "off",
     "no-use-before-define": "off",

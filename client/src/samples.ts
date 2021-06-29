@@ -16,12 +16,15 @@ class SampleGroup {
 
   size: number;
 
+  energyMap: number[][];
+
   public constructor(
     name: string,
     category: string,
     urls: string[],
     bpm: number[],
-    volume: number
+    volume: number,
+    energyMap: number[][]
   ) {
     this.name = name;
     this.category = category;
@@ -29,6 +32,7 @@ class SampleGroup {
     this.bpm = bpm;
     this.volume = DRUM_LOOP_DEFAULT_VOLUME + volume;
     this.size = urls.length;
+    this.energyMap = energyMap;
   }
 
   getSampleUrl(index: number) {
@@ -52,7 +56,8 @@ export const LOOPS: Map<string, SampleGroup> = sampleConfig.loops.reduce((map, s
       sampleGroup.category,
       sampleGroup.urls,
       sampleGroup.bpm,
-      sampleGroup.volume
+      sampleGroup.volume,
+      sampleGroup.energyMap
     )
   );
   return map;
@@ -65,3 +70,16 @@ export const SAMPLE_INSTRUMENTS: Map<string, SampleInstrument> = sampleConfig.in
   },
   new Map()
 );
+
+export const selectDrumbeat = (bpm: number, energy: number): [string, number] => {
+  let bpmGroup = Math.round(bpm / 5) * 5;
+  if (bpmGroup < 70) bpmGroup = 70;
+  if (bpmGroup > 100) bpmGroup = 100;
+  const sampleGroup = `drumloop${bpmGroup}`;
+
+  const index = LOOPS.get(sampleGroup).energyMap.findIndex(
+    (range) => range[0] <= energy && range[1] >= energy
+  );
+
+  return [sampleGroup, index];
+};

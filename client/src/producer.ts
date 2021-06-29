@@ -3,7 +3,7 @@ import * as Tonal from '@tonaljs/tonal';
 import { Time } from 'tone/build/esm/core/type/Units';
 import { InstrumentNote, SampleLoop, Track } from './track';
 import { OutputParams } from './params';
-import { LOOPS } from './samples';
+import { LOOPS, selectDrumbeat } from './samples';
 import { addTime, Chord, octShift, subtractTime } from './music';
 
 class Producer {
@@ -96,39 +96,29 @@ class Producer {
     return track;
   }
 
-  addNote(instrument: string, pitch: string | string[], duration: Time, time: Time) {
-    if (!this.instruments.some((i) => i === instrument)) {
-      this.instruments.push(instrument);
-    }
-    this.instrumentNotes.push(new InstrumentNote(instrument, pitch, duration, time));
-  }
-
-  addLoop(sample: string, sampleIndex: number, startTime: Time, stopTime: Time) {
-    if (!this.samples.some(([s, i]) => s === sample && i === sampleIndex)) {
-      this.samples.push([sample, sampleIndex]);
-    }
-    this.sampleLoops.push(new SampleLoop(sample, sampleIndex, startTime, stopTime));
-  }
-
   produceIntro(): number {
-    const measureEnd = 3;
+    // one empty measure, arpeggios, followed by one empty measure
+    const length = 1 + Math.ceil(this.chordProgressionChords.length / 4) + 1;
     this.chordProgressionChords.forEach((chord, chordNo) => {
-      this.addArpeggio('guitar-electric', chord.notes, chordNo === this.chordProgression.length - 1 ? '1:1' : '0:2', '64n', `1:${chordNo}`);
+      // hold the last arpeggio longer
+      const duration = chordNo === this.chordProgression.length - 1 ? '1:1' : '0:2';
+      this.addArpeggio('guitar-electric', chord.notes, duration, '64n', `1:${chordNo}`);
     });
-    return measureEnd;
+    return length;
   }
 
   produceMain(): number {
     const numberOfIterations = 6;
     const length = this.chordProgression.length * numberOfIterations;
 
-    // measure where the main part starts
+    // the measure where the main part starts
     const measureStart = this.introLength;
-    // measure where the main part ends
+    // the measure where the main part ends
     const measureEnd = this.introLength + length;
 
     // drumbeat
-    this.addLoop('drumloop2', 0, `${measureStart}:0`, `${measureEnd}:0`);
+    const drumbeat = selectDrumbeat(this.bpm, this.energy);
+    this.addLoop(drumbeat[0], drumbeat[1], `${measureStart}:0`, `${measureEnd}:0`);
 
     for (let i = 0; i < numberOfIterations; i += 1) {
       this.chordProgressionChords.forEach((chord, chordNo) => {
@@ -146,22 +136,23 @@ class Producer {
   }
 
   produceOutro(): number {
-    // measure where the outro part starts
+    // the measure where the outro part starts
     const measureStart = this.introLength + this.mainLength;
     // add an empty measure of silence at the end
     const length = 2;
+
+    // leading tone for resolution
+    const resolutionNoteTime = `${measureStart - 1}:${3}`;
+    const resolutionNote = Tonal.Note.transpose(`${this.tonic}2`, '-2M');
+    this.addNote('piano', resolutionNote, '4n', resolutionNoteTime);
+    this.addNote('guitar-bass', octShift(resolutionNote, -1), '4n', resolutionNoteTime);
 
     // end with I9 chord
     const i9chord = Tonal.Chord.getChord('9', `${this.tonic}2`);
     this.addArpeggio('piano', i9chord.notes, '1:2', '16n', `${measureStart}:0`);
 
     // ending bass note
-    this.addNote('guitar-bass', `${this.tonic}1`, '1m', `${measureStart}:${0}`);
-
-    // leading tone for resolution
-    const resolutionNoteTime = `${measureStart - 1}:${3}`;
-    this.addNote('piano', Tonal.Note.transpose(`${this.tonic}2`, '-2M'), '4n', resolutionNoteTime);
-    this.addNote('guitar-bass', Tonal.Note.transpose(`${this.tonic}1`, '-2M'), '4n', resolutionNoteTime);
+    this.addNote('guitar-bass', `${this.tonic}1`, '1m', `${measureStart}:0`);
 
     return length;
   }
@@ -195,6 +186,20 @@ class Producer {
         this.tonic = enharmonic;
       }
     }
+  }
+
+  addLoop(sample: string, sampleIndex: number, startTime: Time, stopTime: Time) {
+    if (!this.samples.some(([s, i]) => s === sample && i === sampleIndex)) {
+      this.samples.push([sample, sampleIndex]);
+    }
+    this.sampleLoops.push(new SampleLoop(sample, sampleIndex, startTime, stopTime));
+  }
+
+  addNote(instrument: string, pitch: string | string[], duration: Time, time: Time) {
+    if (!this.instruments.some((i) => i === instrument)) {
+      this.instruments.push(instrument);
+    }
+    this.instrumentNotes.push(new InstrumentNote(instrument, pitch, duration, time));
   }
 
   /** Adds a rolling arpeggio to the note list */

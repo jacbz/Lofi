@@ -1,5 +1,5 @@
 /**
- * Helper classes for music
+ * Helper classes and functions for music
  */
 import * as Tone from 'tone';
 import { Time } from 'tone/build/esm/core/type/Units';

@@ -1,18 +1,76 @@
 {
   "loops": [
     {
-      "name": "drumloop1",
+      "name": "drumloop70",
       "category": "drums",
-      "urls": [ "Loop1.wav" ],
-      "bpm": [80],
-      "volume": 0
+      "urls": [ "drumloop70_1.mp3", "drumloop70_2.mp3", "drumloop70_3.mp3" ],
+      "bpm": [70, 70, 70],
+      "volume": 0,
+      "energyMap": [
+        [0, 0.9],
+        [0.9, 0.95],
+        [0.95, 1.0]
+      ]
     },
     {
-      "name": "drumloop2",
+      "name": "drumloop75",
       "category": "drums",
-      "urls": [ "Loop2.wav" ],
-      "bpm": [70],
-      "volume": 0
+      "urls": [ "drumloop75_1.mp3", "drumloop75_2.mp3", "drumloop75_3.mp3", "drumloop75_4.mp3", "drumloop75_5.mp3", "drumloop75_6.mp3" ],
+      "bpm": [75, 75, 75, 75, 75, 75],
+      "volume": 0,
+      "energyMap": [
+        [0, 1]
+      ]
+    },
+    {
+      "name": "drumloop80",
+      "category": "drums",
+      "urls": [ "drumloop80_1.mp3", "drumloop80_2.mp3", "drumloop80_3.mp3", "drumloop80_4.mp3", "drumloop80_5.mp3" ],
+      "bpm": [ 80, 80, 80, 80, 80 ],
+      "volume": 0,
+      "energyMap": [
+        [0, 1]
+      ]
+    },
+    {
+      "name": "drumloop85",
+      "category": "drums",
+      "urls": [ "drumloop85_1.mp3", "drumloop85_2.mp3", "drumloop85_3.mp3", "drumloop85_4.mp3", "drumloop85_5.mp3", "drumloop86.mp3", "drumloop87.mp3" ],
+      "bpm": [ 85, 85, 85, 85, 85, 86, 87 ],
+      "volume": 0,
+      "energyMap": [
+        [0, 1]
+      ]
+    },
+    {
+      "name": "drumloop90",
+      "category": "drums",
+      "urls": [ "drumloop88.mp3", "drumloop90_1.mp3", "drumloop90_2.mp3", "drumloop90_3.mp3", "drumloop90_4.mp3", "drumloop92.mp3" ],
+      "bpm": [ 88, 90, 90, 90, 90, 92 ],
+      "volume": 0,
+      "energyMap": [
+        [0, 1]
+      ]
+    },
+    {
+      "name": "drumloop95",
+      "category": "drums",
+      "urls": [ "drumloop95_1.mp3", "drumloop95_2.mp3", "drumloop95_3.mp3", "drumloop95_4.mp3" ],
+      "bpm": [ 95, 95, 95, 95 ],
+      "volume": 0,
+      "energyMap": [
+        [0, 1]
+      ]
+    },
+    {
+      "name": "drumloop100",
+      "category": "drums",
+      "urls": [ "drumloop100.mp3" ],
+      "bpm": [ 100 ],
+      "volume": 0,
+      "energyMap": [
+        [0, 1]
+      ]
     },
     {
       "name": "vinyl",
