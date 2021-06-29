@@ -4,7 +4,7 @@ import { Time } from 'tone/build/esm/core/type/Units';
 import { InstrumentNote, SampleLoop, Track } from './track';
 import { OutputParams } from './params';
 import { LOOPS } from './samples';
-import { Chord, octShift } from './music';
+import { addTime, Chord, octShift, subtractTime } from './music';
 
 class Producer {
   tonic: string;
@@ -23,6 +23,8 @@ class Producer {
 
   chordProgressionChords: Chord[];
 
+  bpm: number;
+
   numMeasures: number;
 
   introLength: number;
@@ -40,8 +42,7 @@ class Producer {
   instrumentNotes: InstrumentNote[] = [];
 
   produce(params: OutputParams): Track {
-    const bpm = 70;
-    Tone.Transport.bpm.value = bpm;
+    this.bpm = 70;
 
     // tonic note, e.g. 'G'
     this.tonic = Tonal.Scale.get('C chromatic').notes[params.key - 1];
@@ -86,7 +87,7 @@ class Producer {
       energy: this.energy,
       valence: this.valence,
       numMeasures: this.numMeasures,
-      bpm,
+      bpm: this.bpm,
       samples: this.samples,
       sampleLoops: this.sampleLoops,
       instruments: this.instruments,
@@ -210,8 +211,8 @@ class Producer {
       this.addNote(
         instrument,
         note,
-        Tone.Time(totalDuration).toSeconds() - Tone.Time(noteDuration).toSeconds(),
-        Tone.Time(startTime).toSeconds() + Tone.Time(noteDuration).toSeconds()
+        subtractTime(totalDuration, noteDuration),
+        addTime(startTime, noteDuration)
       );
     });
   }
