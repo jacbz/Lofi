@@ -42,7 +42,8 @@ class Producer {
   instrumentNotes: InstrumentNote[] = [];
 
   produce(params: OutputParams): Track {
-    this.bpm = 70;
+    // must be 70, 75, 80, 85, 90, 95 or 100
+    this.bpm = 75;
 
     // tonic note, e.g. 'G'
     this.tonic = Tonal.Scale.get('C chromatic').notes[params.key - 1];

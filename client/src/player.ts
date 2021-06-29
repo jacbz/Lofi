@@ -127,9 +127,7 @@ class Player {
         volume: sampleGroup.volume,
         loop: true,
         fadeIn: '4n',
-        fadeOut: '4n',
-        // TODO: don't change pitch
-        playbackRate: sampleGroup.bpm ? this.currentTrack.bpm / sampleGroup.bpm[sampleIndex] : 1.0
+        fadeOut: '4n'
       })
         .chain(...this.filters, Tone.Destination)
         .sync();
