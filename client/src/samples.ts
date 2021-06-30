@@ -1,7 +1,7 @@
 import sampleConfig from './samples.json';
 
 export const SAMPLES_BASE_URL = './samples';
-export const DRUM_LOOP_DEFAULT_VOLUME = -10;
+export const DRUM_LOOP_DEFAULT_VOLUME = -6;
 
 class SampleGroup {
   name: string;

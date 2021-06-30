@@ -57,7 +57,7 @@ class Player {
   filters: Tone.ToneAudioNode[];
 
   initFilters() {
-    this.compressor = new Tone.Compressor(0, 1);
+    this.compressor = new Tone.Compressor(-15, 3);
     this.lowPassFilter = new Tone.Filter({
       type: 'lowpass',
       frequency: 5000
@@ -90,6 +90,16 @@ class Player {
     ];
   }
 
+  static initDrumFilters() {
+    return [
+      new Tone.Filter({
+        type: 'lowpass',
+        frequency: 2400,
+        Q: 1.0
+      })
+    ];
+  }
+
   connectFilter(filter: Tone.ToneAudioNode) {
     this.filters.splice(this.filters.indexOf(this.gain), 0, filter);
     for (const player of this.instrumentSamplers.values()) {
@@ -118,10 +128,15 @@ class Player {
     this.instrumentSamplers = new Map();
 
     this.initFilters();
+    const drumFilters = Player.initDrumFilters();
 
     // load samples
     for (const [sampleGroupName, sampleIndex] of this.currentTrack.samples) {
       const sampleGroup = Samples.LOOPS.get(sampleGroupName);
+      const filters =
+        sampleGroup.category === 'drums'
+          ? [...drumFilters, ...this.filters]
+          : this.filters;
       const player = new Tone.Player({
         url: sampleGroup.getSampleUrl(sampleIndex),
         volume: sampleGroup.volume,
@@ -129,7 +144,8 @@ class Player {
         fadeIn: '4n',
         fadeOut: '4n'
       })
-        .chain(...this.filters, Tone.Destination)
+        .chain(...filters)
+        .toDestination()
         .sync();
 
       if (!this.samplePlayers.has(sampleGroupName)) {
@@ -146,7 +162,8 @@ class Player {
         baseUrl: `${Samples.SAMPLES_BASE_URL}/instruments/${instrument.name}/`,
         volume: instrument.volume
       })
-        .chain(...this.filters, Tone.Destination)
+        .chain(...this.filters)
+        .toDestination()
         .sync();
       this.instrumentSamplers.set(instrumentName, sampler);
     }
