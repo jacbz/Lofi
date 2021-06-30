@@ -156,7 +156,12 @@ export const getInstrumentFilters = (instrument: Instrument) => {
     }
 
     case Instrument.ElectricGuitar: {
-      return [];
+      return [
+        new Tone.Filter({
+          type: 'highpass',
+          frequency: 350,
+          Q: 1.0
+        })];
     }
 
     case Instrument.BassGuitar: {
