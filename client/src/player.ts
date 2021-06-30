@@ -1,9 +1,10 @@
 import * as Tone from 'tone';
+import { getInstrumentFilters, getInstrumentSampler, Instrument } from './instruments';
 import * as Samples from './samples';
 import { Track } from './track';
 
 /**
- * Player
+ * The Player plays a Track through Tone.js.
  */
 class Player {
   /** Current track. Can be undefined */
@@ -32,7 +33,7 @@ class Player {
 
   samplePlayers: Map<string, Tone.Player[]>;
 
-  instrumentSamplers: Map<string, Tone.Sampler>;
+  instrumentSamplers: Map<Instrument, Tone.Sampler>;
 
   /** Filters */
 
@@ -54,9 +55,9 @@ class Player {
 
   gain: Tone.Gain;
 
-  filters: Tone.ToneAudioNode[];
+  defaultFilters: Tone.ToneAudioNode[];
 
-  initFilters() {
+  initDefaultFilters() {
     this.compressor = new Tone.Compressor(-15, 3);
     this.lowPassFilter = new Tone.Filter({
       type: 'lowpass',
@@ -77,7 +78,7 @@ class Player {
     // this.bitcrusher = new Tone.BitCrusher(16);
     this.gain = new Tone.Gain();
 
-    this.filters = [
+    this.defaultFilters = [
       this.compressor,
       this.lowPassFilter,
       this.highPassFilter,
@@ -90,27 +91,17 @@ class Player {
     ];
   }
 
-  static initDrumFilters() {
-    return [
-      new Tone.Filter({
-        type: 'lowpass',
-        frequency: 2400,
-        Q: 1.0
-      })
-    ];
-  }
-
   connectFilter(filter: Tone.ToneAudioNode) {
-    this.filters.splice(this.filters.indexOf(this.gain), 0, filter);
+    this.defaultFilters.splice(this.defaultFilters.indexOf(this.gain), 0, filter);
     for (const player of this.instrumentSamplers.values()) {
       player.disconnect();
-      player.chain(...this.filters, Tone.Destination);
+      player.chain(...this.defaultFilters, Tone.Destination);
     }
     for (const player of this.samplePlayers.values()) {
       for (const player2 of player.values()) {
         if (!player2) return;
         player2.disconnect();
-        player2.chain(...this.filters, Tone.Destination);
+        player2.chain(...this.defaultFilters, Tone.Destination);
       }
     }
   }
@@ -127,16 +118,11 @@ class Player {
     this.samplePlayers = new Map();
     this.instrumentSamplers = new Map();
 
-    this.initFilters();
-    const drumFilters = Player.initDrumFilters();
+    this.initDefaultFilters();
 
     // load samples
     for (const [sampleGroupName, sampleIndex] of this.currentTrack.samples) {
-      const sampleGroup = Samples.LOOPS.get(sampleGroupName);
-      const filters =
-        sampleGroup.category === 'drums'
-          ? [...drumFilters, ...this.filters]
-          : this.filters;
+      const sampleGroup = Samples.SAMPLEGROUPS.get(sampleGroupName);
       const player = new Tone.Player({
         url: sampleGroup.getSampleUrl(sampleIndex),
         volume: sampleGroup.volume,
@@ -144,8 +130,7 @@ class Player {
         fadeIn: '4n',
         fadeOut: '4n'
       })
-        .chain(...filters)
-        .toDestination()
+        .chain(...sampleGroup.getFilters(), ...this.defaultFilters, Tone.Destination)
         .sync();
 
       if (!this.samplePlayers.has(sampleGroupName)) {
@@ -155,17 +140,11 @@ class Player {
     }
 
     // load instruments
-    for (const instrumentName of this.currentTrack.instruments) {
-      const instrument = Samples.SAMPLE_INSTRUMENTS.get(instrumentName);
-      const sampler = new Tone.Sampler({
-        urls: instrument.map,
-        baseUrl: `${Samples.SAMPLES_BASE_URL}/instruments/${instrument.name}/`,
-        volume: instrument.volume
-      })
-        .chain(...this.filters)
-        .toDestination()
+    for (const instrument of this.currentTrack.instruments) {
+      const sampler = getInstrumentSampler(instrument)
+        .chain(...getInstrumentFilters(instrument), ...this.defaultFilters, Tone.Destination)
         .sync();
-      this.instrumentSamplers.set(instrumentName, sampler);
+      this.instrumentSamplers.set(instrument, sampler);
     }
 
     // wait until all samples are loaded

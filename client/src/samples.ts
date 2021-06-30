@@ -1,3 +1,4 @@
+import * as Tone from 'tone';
 import sampleConfig from './samples.json';
 
 export const SAMPLES_BASE_URL = './samples';
@@ -34,17 +35,22 @@ class SampleGroup {
   getSampleUrl(index: number) {
     return `${SAMPLES_BASE_URL}/loops/${this.category}/${this.name}/${this.urls[index]}`;
   }
+
+  getFilters() {
+    if (this.category === 'drums') {
+      return [
+        new Tone.Filter({
+          type: 'lowpass',
+          frequency: 2400,
+          Q: 1.0
+        })
+      ];
+    }
+    return [];
+  }
 }
 
-class SampleInstrument {
-  name: String;
-
-  volume: number;
-
-  map: any;
-}
-
-export const LOOPS: Map<string, SampleGroup> = sampleConfig.loops.reduce((map, sampleGroup) => {
+export const SAMPLEGROUPS: Map<string, SampleGroup> = sampleConfig.reduce((map, sampleGroup) => {
   map.set(
     sampleGroup.name,
     new SampleGroup(
@@ -58,18 +64,10 @@ export const LOOPS: Map<string, SampleGroup> = sampleConfig.loops.reduce((map, s
   return map;
 }, new Map());
 
-export const SAMPLE_INSTRUMENTS: Map<string, SampleInstrument> = sampleConfig.instruments.reduce(
-  (map, instrument) => {
-    map.set(instrument.name, instrument);
-    return map;
-  },
-  new Map()
-);
-
 export const selectDrumbeat = (bpm: number, energy: number): [string, number] => {
   const sampleGroup = `drumloop${bpm}`;
 
-  const index = LOOPS.get(sampleGroup).energyRanges.findIndex(
+  const index = SAMPLEGROUPS.get(sampleGroup).energyRanges.findIndex(
     (range) => range[0] <= energy && range[1] >= energy
   );
 

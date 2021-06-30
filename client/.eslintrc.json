@@ -19,6 +19,7 @@
     "no-underscore-dangle": "off",
     "no-unused-vars": "off",
     "no-use-before-define": "off",
+    "no-shadow": "off",
     "no-param-reassign": 0,
     "object-curly-newline": [
       "error",

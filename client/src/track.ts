@@ -1,5 +1,6 @@
 import * as Tonal from '@tonaljs/tonal';
 import { Time } from 'tone/build/esm/core/type/Units';
+import { Instrument } from './instruments';
 
 /**
  * A Track contains the elements that make up a lo-fi track.
@@ -39,7 +40,7 @@ class Track {
   sampleLoops: SampleLoop[];
 
   /** Instruments to use, by name */
-  instruments: string[];
+  instruments: Instrument[];
 
   /** Timings of notes */
   instrumentNotes: InstrumentNote[];
@@ -77,8 +78,8 @@ class SampleLoop {
  * Precise timing of a single note played by an instrument
  */
 class InstrumentNote {
-  /** Name of the instrument that should play the note */
-  instrument: string;
+  /** Instrument that should play the note */
+  instrument: Instrument;
 
   /** Pitch(es) to play, e.g. 'D#1' or ['C', 'E', 'G'] */
   pitch: string | string[];
@@ -89,7 +90,7 @@ class InstrumentNote {
   /** Onset time in Tone.js */
   time: Time;
 
-  public constructor(instrument: string, pitch: string | string[], duration: Time, time: Time) {
+  public constructor(instrument: Instrument, pitch: string | string[], duration: Time, time: Time) {
     this.instrument = instrument;
     this.pitch =
       typeof pitch === 'string'

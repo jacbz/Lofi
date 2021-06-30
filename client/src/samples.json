@@ -1,202 +1,98 @@
-{
-  "loops": [
-    {
-      "name": "drumloop70",
-      "category": "drums",
-      "urls": [ "drumloop70_1.mp3", "drumloop70_2.mp3", "drumloop70_3.mp3" ],
-      "comment": "Drum loops for 70 BPM",
-      "volume": 0,
-      "energyRanges": [
-        [0, 0.9],
-        [0.9, 0.95],
-        [0.95, 1.0]
-      ]
-    },
-    {
-      "name": "drumloop75",
-      "category": "drums",
-      "urls": [ "drumloop75_1.mp3", "drumloop75_2.mp3", "drumloop75_3.mp3", "drumloop75_4.mp3", "drumloop75_5.mp3" ],
-      "comment": "Drum loops for 75 BPM",
-      "volume": 0,
-      "energyRanges": [
-        [0, 0.2],
-        [0.2, 0.5],
-        [0.5, 0.7],
-        [0.7, 0.85],
-        [0.85, 1]
-      ]
-    },
-    {
-      "name": "drumloop80",
-      "category": "drums",
-      "urls": [ "drumloop80_1.mp3", "drumloop80_2.mp3", "drumloop80_3.mp3", "drumloop80_4.mp3", "drumloop80_5.mp3" ],
-      "comment": "Drum loops for 80 BPM",
-      "volume": 0,
-      "energyRanges": [
-        [0, 0.4],
-        [0.4, 0.6],
-        [0.6, 0.8],
-        [0.8, 0.9],
-        [0.9, 1]
+[
+  {
+    "name": "drumloop70",
+    "category": "drums",
+    "urls": [ "drumloop70_1.mp3", "drumloop70_2.mp3", "drumloop70_3.mp3" ],
+    "comment": "Drum loops for 70 BPM",
+    "volume": 0,
+    "energyRanges": [
+      [0, 0.9],
+      [0.9, 0.95],
+      [0.95, 1.0]
     ]
-    },
-    {
-      "name": "drumloop85",
-      "category": "drums",
-      "urls": [ "drumloop85_1.mp3", "drumloop85_2.mp3", "drumloop85_3.mp3", "drumloop85_4.mp3", "drumloop85_5.mp3" ],
-      "comment": "Drum loops for 85 BPM",
-      "volume": 0,
-      "energyRanges": [
-        [0, 0.25],
-        [0.25, 0.5],
-        [0.5, 0.55],
-        [0.85, 0.95],
-        [0.95, 1]
-      ]
-    },
-    {
-      "name": "drumloop90",
-      "category": "drums",
-      "urls": [ "drumloop90_1.mp3", "drumloop90_2.mp3", "drumloop90_3.mp3", "drumloop90_4.mp3" ],
-      "comment": "Drum loops for 90 BPM",
-      "volume": 0,
-      "energyRanges": [
-        [0, 0.3],
-        [0.65, 0.85],
-        [0.9, 0.95],
-        [0.95, 1]
-      ]
-    },
-    {
-      "name": "drumloop95",
-      "category": "drums",
-      "urls": [ "drumloop95_1.mp3", "drumloop95_2.mp3", "drumloop95_3.mp3", "drumloop95_4.mp3" ],
-      "volume": 0,
-      "energyRanges": [
-        [0, 0.35],
-        [0.35, 0.7],
-        [0.7, 0.85],
-        [0.85, 1]
-      ]
-    },
-    {
-      "name": "drumloop100",
-      "category": "drums",
-      "urls": [ "drumloop100.mp3" ],
-      "comment": "Drum loops for 100 BPM",
-      "volume": 0,
-      "energyRanges": [
-        [0, 1]
-      ]
-    },
-    {
-      "name": "vinyl",
-      "category": "fx",
-      "comment": "Vinyl scratches; selected randomly",
-      "urls": [ "vinyl1.mp3", "vinyl2.mp3", "vinyl3.mp3", "vinyl4.mp3", "vinyl5.mp3", "vinyl6.mp3", "vinyl7.mp3", "vinyl8.mp3", "vinyl9.mp3", "vinyl10.mp3", "vinyl11.mp3", "vinyl12.mp3", "vinyl13.mp3", "vinyl14.mp3", "vinyl15.mp3", "vinyl16.mp3", "vinyl17.mp3", "vinyl18.mp3", "vinyl19.mp3", "vinyl20.mp3", "vinyl21.mp3", "vinyl22.mp3", "vinyl23.mp3", "vinyl24.mp3", "vinyl25.mp3", "vinyl26.mp3", "vinyl27.mp3", "vinyl28.mp3", "vinyl29.mp3", "vinyl30.mp3", "vinyl31.mp3", "vinyl32.mp3"],
-      "volume": 0
-    }
-  ],
-  "instruments": [
-    {
-      "name": "piano",
-      "comment": "Salamander grand piano",
-      "map": {
-        "A2": "A2.mp3",
-        "A3": "A3.mp3",
-        "A4": "A4.mp3",
-        "A5": "A5.mp3",
-        "A6": "A6.mp3",
-        "A7": "A7.mp3",
-        "C2": "C2.mp3",
-        "C3": "C3.mp3",
-        "C4": "C4.mp3",
-        "C5": "C5.mp3",
-        "C6": "C6.mp3",
-        "C7": "C7.mp3",
-        "C8": "C8.mp3",
-        "D#2": "Ds2.mp3",
-        "D#3": "Ds3.mp3",
-        "D#4": "Ds4.mp3",
-        "D#5": "Ds5.mp3",
-        "D#6": "Ds6.mp3",
-        "D#7": "Ds7.mp3",
-        "F#2": "Fs2.mp3",
-        "F#3": "Fs3.mp3",
-        "F#4": "Fs4.mp3",
-        "F#5": "Fs5.mp3",
-        "F#6": "Fs6.mp3",
-        "F#7": "Fs7.mp3"
-      }
-    },
-    {
-      "name": "piano2",
-      "comment": "Lower fidelity",
-      "volume": -8,
-      "map": {
-        "A4": "A3.mp3",
-        "A7": "A6.mp3",
-        "C3": "C2.mp3",
-        "C6": "C5.mp3",
-        "D#4": "Ds3.mp3",
-        "D#7": "Ds6.mp3",
-        "F#3": "Fs2.mp3",
-        "F#6": "Fs5.mp3",
-        "A5": "A4.mp3",
-        "C4": "C3.mp3",
-        "C7": "C6.mp3",
-        "D#5": "Ds4.mp3",
-        "F#4": "Fs3.mp3",
-        "F#7": "Fs6.mp3",
-        "A3": "A2.mp3",
-        "A6": "A5.mp3",
-        "C5": "C4.mp3",
-        "C8": "C8.mp3",
-        "D#3": "Ds2.mp3",
-        "D#6": "Ds5.mp3",
-        "F#5": "Fs4.mp3"
-      }
-    },
-    {
-      "name": "guitar-bass",
-      "map": {
-        "E1": "E.mp3",
-        "A1": "A.mp3",
-        "C2": "C.mp3"
-      }
-    },
-    {
-      "name": "guitar-electric",
-      "volume": -10,
-      "map": {
-        "A2": "A2.mp3",
-        "A3": "A3.mp3",
-        "A4": "A4.mp3",
-        "A5": "A5.mp3",
-        "C3": "C3.mp3",
-        "C4": "C4.mp3",
-        "C5": "C5.mp3",
-        "C6": "C6.mp3",
-        "C#2": "Cs2.mp3",
-        "D#3": "Ds3.mp3",
-        "D#4": "Ds4.mp3",
-        "D#5": "Ds5.mp3",
-        "E2": "E2.mp3",
-        "F#2": "Fs2.mp3",
-        "F#3": "Fs3.mp3",
-        "F#4": "Fs4.mp3",
-        "F#5": "Fs5.mp3"
-      }
-    },
-    {
-      "name": "bass",
-      "map": {
-        "C1": "C.mp3",
-        "D#1": "Ds.mp3",
-        "E1": "E.mp3",
-        "F1": "F.mp3",
-        "G1": "G.mp3"
-      }
-    }
+  },
+  {
+    "name": "drumloop75",
+    "category": "drums",
+    "urls": [ "drumloop75_1.mp3", "drumloop75_2.mp3", "drumloop75_3.mp3", "drumloop75_4.mp3", "drumloop75_5.mp3" ],
+    "comment": "Drum loops for 75 BPM",
+    "volume": 0,
+    "energyRanges": [
+      [0, 0.2],
+      [0.2, 0.5],
+      [0.5, 0.7],
+      [0.7, 0.85],
+      [0.85, 1]
+    ]
+  },
+  {
+    "name": "drumloop80",
+    "category": "drums",
+    "urls": [ "drumloop80_1.mp3", "drumloop80_2.mp3", "drumloop80_3.mp3", "drumloop80_4.mp3", "drumloop80_5.mp3" ],
+    "comment": "Drum loops for 80 BPM",
+    "volume": 0,
+    "energyRanges": [
+      [0, 0.4],
+      [0.4, 0.6],
+      [0.6, 0.8],
+      [0.8, 0.9],
+      [0.9, 1]
   ]
-}
+  },
+  {
+    "name": "drumloop85",
+    "category": "drums",
+    "urls": [ "drumloop85_1.mp3", "drumloop85_2.mp3", "drumloop85_3.mp3", "drumloop85_4.mp3", "drumloop85_5.mp3" ],
+    "comment": "Drum loops for 85 BPM",
+    "volume": 0,
+    "energyRanges": [
+      [0, 0.25],
+      [0.25, 0.5],
+      [0.5, 0.55],
+      [0.85, 0.95],
+      [0.95, 1]
+    ]
+  },
+  {
+    "name": "drumloop90",
+    "category": "drums",
+    "urls": [ "drumloop90_1.mp3", "drumloop90_2.mp3", "drumloop90_3.mp3", "drumloop90_4.mp3" ],
+    "comment": "Drum loops for 90 BPM",
+    "volume": 0,
+    "energyRanges": [
+      [0, 0.3],
+      [0.65, 0.85],
+      [0.9, 0.95],
+      [0.95, 1]
+    ]
+  },
+  {
+    "name": "drumloop95",
+    "category": "drums",
+    "urls": [ "drumloop95_1.mp3", "drumloop95_2.mp3", "drumloop95_3.mp3", "drumloop95_4.mp3" ],
+    "volume": 0,
+    "energyRanges": [
+      [0, 0.35],
+      [0.35, 0.7],
+      [0.7, 0.85],
+      [0.85, 1]
+    ]
+  },
+  {
+    "name": "drumloop100",
+    "category": "drums",
+    "urls": [ "drumloop100.mp3" ],
+    "comment": "Drum loops for 100 BPM",
+    "volume": 0,
+    "energyRanges": [
+      [0, 1]
+    ]
+  },
+  {
+    "name": "vinyl",
+    "category": "fx",
+    "comment": "Vinyl scratches; selected randomly",
+    "urls": [ "vinyl1.mp3", "vinyl2.mp3", "vinyl3.mp3", "vinyl4.mp3", "vinyl5.mp3", "vinyl6.mp3", "vinyl7.mp3", "vinyl8.mp3", "vinyl9.mp3", "vinyl10.mp3", "vinyl11.mp3", "vinyl12.mp3", "vinyl13.mp3", "vinyl14.mp3", "vinyl15.mp3", "vinyl16.mp3", "vinyl17.mp3", "vinyl18.mp3", "vinyl19.mp3", "vinyl20.mp3", "vinyl21.mp3", "vinyl22.mp3", "vinyl23.mp3", "vinyl24.mp3", "vinyl25.mp3", "vinyl26.mp3", "vinyl27.mp3", "vinyl28.mp3", "vinyl29.mp3", "vinyl30.mp3", "vinyl31.mp3", "vinyl32.mp3"],
+    "volume": 0
+  }
+]

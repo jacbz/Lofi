@@ -1,11 +1,15 @@
-import * as Tone from 'tone';
 import * as Tonal from '@tonaljs/tonal';
 import { Time } from 'tone/build/esm/core/type/Units';
 import { InstrumentNote, SampleLoop, Track } from './track';
 import { OutputParams } from './params';
-import { LOOPS, selectDrumbeat } from './samples';
 import { addTime, Chord, octShift, subtractTime } from './music';
+import { SAMPLEGROUPS, selectDrumbeat } from './samples';
+import { Instrument } from './instruments';
 
+/**
+ * The producer takes OutputParams to produce a Track.
+ * The production process is deterministic, i.e. the same input will always yield the same output.
+ */
 class Producer {
   tonic: string;
 
@@ -37,7 +41,7 @@ class Producer {
 
   sampleLoops: SampleLoop[] = [];
 
-  instruments: string[] = [];
+  instruments: Instrument[] = [];
 
   instrumentNotes: InstrumentNote[] = [];
 
@@ -103,7 +107,7 @@ class Producer {
     this.chordProgressionChords.forEach((chord, chordNo) => {
       // hold the last arpeggio longer
       const duration = chordNo === this.chordProgression.length - 1 ? '1:1' : '0:2';
-      this.addArpeggio('guitar-electric', chord.notes, duration, '64n', `1:${chordNo}`);
+      this.addArpeggio(Instrument.ElectricGuitar, chord.notes, duration, '64n', `1:${chordNo}`);
     });
     return length;
   }
@@ -126,10 +130,10 @@ class Producer {
         const measure = measureStart + i * this.chordProgression.length + chordNo;
         // bass line: on the first beat of every measure
         const rootNote = octShift(`${chord.tonic}`, -1);
-        this.addNote('guitar-bass', rootNote, '1m', `${measure}:0`);
+        this.addNote(Instrument.BassGuitar, rootNote, '1m', `${measure}:0`);
 
         // arpeggiated chords on the second beat
-        this.addArpeggio('piano', chord.notes, '0:3', '16n', `${measure}:1`);
+        this.addArpeggio(Instrument.Piano, chord.notes, '0:3', '16n', `${measure}:1`);
       });
     }
 
@@ -145,15 +149,15 @@ class Producer {
     // leading tone for resolution
     const resolutionNoteTime = `${measureStart - 1}:${3}`;
     const resolutionNote = Tonal.Note.transpose(`${this.tonic}2`, '-2M');
-    this.addNote('piano', resolutionNote, '4n', resolutionNoteTime);
-    this.addNote('guitar-bass', octShift(resolutionNote, -1), '4n', resolutionNoteTime);
+    this.addNote(Instrument.Piano, resolutionNote, '4n', resolutionNoteTime);
+    this.addNote(Instrument.BassGuitar, octShift(resolutionNote, -1), '4n', resolutionNoteTime);
 
     // end with I9 chord
     const i9chord = Tonal.Chord.getChord('9', `${this.tonic}2`);
-    this.addArpeggio('piano', i9chord.notes, '1:2', '16n', `${measureStart}:0`);
+    this.addArpeggio(Instrument.Piano, i9chord.notes, '1:2', '16n', `${measureStart}:0`);
 
     // ending bass note
-    this.addNote('guitar-bass', `${this.tonic}1`, '1m', `${measureStart}:0`);
+    this.addNote(Instrument.BassGuitar, `${this.tonic}1`, '1m', `${measureStart}:0`);
 
     return length;
   }
@@ -162,7 +166,7 @@ class Producer {
     // vinyl crackle
     const randomVinyl = Producer.randomFromInterval(
       0,
-      LOOPS.get('vinyl').size - 1,
+      SAMPLEGROUPS.get('vinyl').size - 1,
       this.energy + this.valence
     );
     // end half a measure before the end
@@ -196,7 +200,7 @@ class Producer {
     this.sampleLoops.push(new SampleLoop(sample, sampleIndex, startTime, stopTime));
   }
 
-  addNote(instrument: string, pitch: string | string[], duration: Time, time: Time) {
+  addNote(instrument: Instrument, pitch: string | string[], duration: Time, time: Time) {
     if (!this.instruments.some((i) => i === instrument)) {
       this.instruments.push(instrument);
     }
@@ -205,7 +209,7 @@ class Producer {
 
   /** Adds a rolling arpeggio to the note list */
   addArpeggio(
-    instrument: string,
+    instrument: Instrument,
     notes: string[],
     totalDuration: Time,
     singleNoteUnit: string,
