@@ -2,7 +2,7 @@ import * as Tone from 'tone';
 import sampleConfig from './samples.json';
 
 export const SAMPLES_BASE_URL = './samples';
-export const DRUM_LOOP_DEFAULT_VOLUME = -6;
+export const DRUM_LOOP_DEFAULT_VOLUME = -8;
 
 class SampleGroup {
   name: string;
@@ -42,7 +42,7 @@ class SampleGroup {
         new Tone.Filter({
           type: 'lowpass',
           frequency: 2400,
-          Q: 1.0
+          Q: 0.5
         })
       ];
     }

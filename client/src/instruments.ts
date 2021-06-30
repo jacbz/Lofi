@@ -141,12 +141,12 @@ export const getInstrumentFilters = (instrument: Instrument) => {
         new Tone.Filter({
           type: 'lowpass',
           frequency: 3600,
-          Q: 1.0
+          Q: 0.5
         }),
         new Tone.Filter({
           type: 'highpass',
           frequency: 700,
-          Q: 1.0
+          Q: 0.5
         })
       ];
     }
@@ -160,7 +160,7 @@ export const getInstrumentFilters = (instrument: Instrument) => {
         new Tone.Filter({
           type: 'highpass',
           frequency: 350,
-          Q: 1.0
+          Q: 0.5
         })];
     }
 
@@ -169,7 +169,7 @@ export const getInstrumentFilters = (instrument: Instrument) => {
         new Tone.Filter({
           type: 'highpass',
           frequency: 300,
-          Q: 1.0
+          Q: 0.5
         })
       ];
     }

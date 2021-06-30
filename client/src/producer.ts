@@ -15,8 +15,10 @@ class Producer {
 
   mode: string;
 
+  /** How energetic the track should be, 0 (less energetic) to 1 (very energetic) */
   energy: number;
 
+  /** How positive the music should be, 0 (sad) to 1 (cheerful) */
   valence: number;
 
   notesInScale: string[];
@@ -47,20 +49,22 @@ class Producer {
 
   produce(params: OutputParams): Track {
     // must be 70, 75, 80, 85, 90, 95 or 100
-    this.bpm = 75;
+    let bpm = Math.round(params.bpm / 5) * 5;
+    if (bpm < 70) bpm = 70;
+    if (bpm > 100) bpm = 100;
+    this.bpm = bpm;
 
     // tonic note, e.g. 'G'
     this.tonic = Tonal.Scale.get('C chromatic').notes[params.key - 1];
 
     // musical mode, e.g. 'ionian'
     this.mode = Tonal.Mode.names()[params.mode - 1];
-
     this.simplifyKeySignature();
 
     // array of notes, e.g. ["C", "D", "E", "F", "G", "A", "B"]
     this.notesInScale = Tonal.Mode.notes(this.mode, this.tonic);
 
-    // array of triads, e.g. ["C", "Dm", "Em", "F", "G", "Am", "Bdim"]
+    // array of seventh chords, e.g. ["C7", "Dm7", "Em7", "F7", "G7", "Am7", "Bdim7"]
     this.chordsInScale = Tonal.Mode.seventhChords(this.mode, this.tonic);
 
     this.energy = params.energy;
@@ -89,8 +93,6 @@ class Producer {
       title,
       mode: this.mode,
       key: this.tonic,
-      energy: this.energy,
-      valence: this.valence,
       numMeasures: this.numMeasures,
       bpm: this.bpm,
       samples: this.samples,

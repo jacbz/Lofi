@@ -27,7 +27,7 @@ export class Chord {
 /** Shifts a given note by a number of octaves */
 export const octShift = (note: string, octaves: number) => {
   const n = Tonal.Note.get(note);
-  return Tonal.Note.get(`${n.pc}${n.oct + octaves}`).name;
+  return `${n.pc}${n.oct + octaves}`;
 };
 
 /** Adds two Tone.js Time objects together */

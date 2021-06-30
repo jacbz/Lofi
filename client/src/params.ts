@@ -3,6 +3,7 @@ export const DEFAULT_OUTPUT_PARAMS = {
   key: Math.floor(Math.random() * 12 + 1),
   mode: 6,
   // mode: Math.random() < 0.5 ? 6 : 1,
+  bpm: 80,
   energy: Math.random(),
   valence: Math.random(),
   chordProgression: [1, 4, 6, 5]
@@ -27,6 +28,9 @@ export class OutputParams {
    * 7: Locrian
    */
   mode: number;
+
+  /** Beats per minute */
+  bpm: number;
 
   /** How energetic the track should be, 0 (less energetic) to 1 (very energetic) */
   energy: number;
