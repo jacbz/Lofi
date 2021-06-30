@@ -1,5 +1,5 @@
 /**
- * Helper classes and functions for music
+ * Helper classes and functions
  */
 import * as Tone from 'tone';
 import { Time } from 'tone/build/esm/core/type/Units';
@@ -41,4 +41,14 @@ export const subtractTime = (time1: Time, time2: Time) => {
   return Tone.Time(time).toBarsBeatsSixteenths();
 };
 
-export default Chord;
+/** Returns a quasi-random number between min-max based on given seed number */
+export const randomFromInterval = (min: number, max: number, seed: number) => {
+  const randomNumber = random(seed);
+  return Math.floor(randomNumber * (max - min + 1) + min);
+};
+
+/** Returns a quasi-random number between 0-1 based on given seed number */
+export const random = (seed: number) => {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+};

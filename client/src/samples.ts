@@ -1,8 +1,9 @@
 import * as Tone from 'tone';
+import { randomFromInterval } from './helper';
 import sampleConfig from './samples.json';
 
 export const SAMPLES_BASE_URL = './samples';
-export const DRUM_LOOP_DEFAULT_VOLUME = -8;
+export const SAMPLE_DEFAULT_VOLUME = -8;
 
 class SampleGroup {
   name: string;
@@ -27,9 +28,14 @@ class SampleGroup {
     this.name = name;
     this.category = category;
     this.urls = urls;
-    this.volume = DRUM_LOOP_DEFAULT_VOLUME + volume;
+    this.volume = SAMPLE_DEFAULT_VOLUME + volume;
     this.size = urls.length;
     this.energyRanges = energyRanges;
+  }
+
+  /** Gets a random sample index, based on a seed number */
+  getRandomSample(seed: number) {
+    return randomFromInterval(0, this.size - 1, seed);
   }
 
   getSampleUrl(index: number) {

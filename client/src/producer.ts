@@ -2,7 +2,7 @@ import * as Tonal from '@tonaljs/tonal';
 import { Time } from 'tone/build/esm/core/type/Units';
 import { InstrumentNote, SampleLoop, Track } from './track';
 import { OutputParams } from './params';
-import { addTime, Chord, octShift, subtractTime } from './music';
+import { addTime, Chord, octShift, subtractTime } from './helper';
 import { SAMPLEGROUPS, selectDrumbeat } from './samples';
 import { Instrument } from './instruments';
 
@@ -165,14 +165,17 @@ class Producer {
   }
 
   produceFx() {
-    // vinyl crackle
-    const randomVinyl = Producer.randomFromInterval(
-      0,
-      SAMPLEGROUPS.get('vinyl').size - 1,
-      this.energy + this.valence
-    );
-    // end half a measure before the end
-    this.addLoop('vinyl', randomVinyl, '0:0', `${this.numMeasures - 0.5}:0`);
+    if (this.valence < 0.2) {
+      // add rain
+      const randomRain = SAMPLEGROUPS.get('rain').getRandomSample(this.valence);
+      // end half a measure before the end
+      this.addLoop('rain', randomRain, '0:0', `${this.numMeasures - 0.5}:0`);
+    } else {
+      // add vinyl crackle
+      const randomVinyl = SAMPLEGROUPS.get('vinyl').getRandomSample(this.valence + this.energy);
+      // end half a measure before the end
+      this.addLoop('vinyl', randomVinyl, '0:0', `${this.numMeasures - 0.5}:0`);
+    }
   }
 
   /** simplify key signature, e.g. Db major instead of C# major */
@@ -227,17 +230,6 @@ class Producer {
         addTime(startTime, noteDuration)
       );
     });
-  }
-
-  /** Returns a quasi-random number between min-max based on given seed number */
-  static randomFromInterval(min: number, max: number, seed: number) {
-    return Math.floor(this.random(seed) * (max - min + 1) + min);
-  }
-
-  /** Returns a quasi-random number between 0-1 based on given seed number */
-  static random(seed: number) {
-    const x = Math.sin(seed) * 10000;
-    return x - Math.floor(x);
   }
 }
 
