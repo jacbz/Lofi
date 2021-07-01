@@ -1,12 +1,17 @@
-export const DEFAULT_OUTPUT_PARAMS = {
-  // key: 8,
-  key: Math.floor(Math.random() * 12 + 1),
-  mode: 6,
-  // mode: Math.random() < 0.5 ? 6 : 1,
-  bpm: 80,
-  energy: Math.random(),
-  valence: Math.random(),
-  chordProgression: [1, 4, 6, 5]
+import { randomFromInterval } from './helper';
+
+export const getRandomInputParams = () => {
+  const params = {
+    // key: 8,
+    key: randomFromInterval(1, 12),
+    mode: 6,
+    // mode: Math.random() < 0.5 ? 6 : 1,
+    bpm: randomFromInterval(70, 90),
+    energy: Math.random(),
+    valence: Math.random(),
+    chordProgression: [1, 4, 6, 5]
+  };
+  return JSON.stringify(params, null, 2);
 };
 
 export class InputParams {

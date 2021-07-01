@@ -79,7 +79,6 @@ class Producer {
         `${this.notesInScale[chordIndex]}3`
       );
     });
-    console.log(this.chordProgressionChords);
 
     this.introLength = this.produceIntro();
     this.mainLength = this.produceMain();

@@ -42,8 +42,8 @@ export const subtractTime = (time1: Time, time2: Time) => {
 };
 
 /** Returns a quasi-random number between min-max based on given seed number */
-export const randomFromInterval = (min: number, max: number, seed: number) => {
-  const randomNumber = random(seed);
+export const randomFromInterval = (min: number, max: number, seed?: number) => {
+  const randomNumber = seed ? random(seed) : Math.random();
   return Math.floor(randomNumber * (max - min + 1) + min);
 };
 

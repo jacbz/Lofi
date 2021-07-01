@@ -7,8 +7,17 @@ import { Track } from './track';
  * The Player plays a Track through Tone.js.
  */
 class Player {
+  playlist: Track[] = [];
+
+  currentPlayingIndex: number;
+
   /** Current track. Can be undefined */
-  currentTrack: Track;
+  get currentTrack() {
+    if (this.currentPlayingIndex !== undefined) {
+      return this.playlist[this.currentPlayingIndex];
+    }
+    return undefined;
+  }
 
   /** Whether the player is currently playing */
   private _isPlaying: boolean = false;
@@ -24,6 +33,9 @@ class Player {
       this.gain.gain.value = +isPlaying;
     }
   }
+
+  /** Function to update the playlist in the UI */
+  updatePlaylistDisplay: () => void;
 
   /** Function to update track information in the UI */
   updateTrackDisplay: (seconds: number) => void;
@@ -106,13 +118,26 @@ class Player {
     }
   }
 
+  async addToPlaylist(track: Track) {
+    this.playlist.push(track);
+    await this.playTrack(track);
+  }
+
+  async playTrack(track: Track) {
+    this.currentPlayingIndex = this.playlist.indexOf(track);
+    this.updatePlaylistDisplay();
+    this.stop();
+    await this.play();
+  }
+
   async play() {
     if (!this.currentTrack) {
       return;
     }
     this.isPlaying = true;
 
-    Tone.Transport.cancel();
+    await Tone.start();
+    Tone.Transport.seconds = 0;
     Tone.Transport.bpm.value = this.currentTrack.bpm;
 
     this.samplePlayers = new Map();
@@ -173,8 +198,7 @@ class Player {
       this.updateTrackDisplay(seconds);
 
       if (this.currentTrack.length - seconds < 0) {
-        Tone.Transport.stop();
-        this.isPlaying = false;
+        this.playNext();
       }
     }, 0.1);
 
@@ -199,6 +223,20 @@ class Player {
   pause() {
     this.isPlaying = false;
     Tone.Transport.pause();
+  }
+
+  stop() {
+    this.instrumentSamplers?.forEach((s) => s.dispose());
+    this.samplePlayers?.forEach((s) => s.forEach((t) => t.dispose()));
+    this.isPlaying = false;
+  }
+
+  playNext() {
+    this.stop();
+    const index = this.playlist.indexOf(this.currentTrack);
+    if (index < this.playlist.length - 1) {
+      this.playTrack(this.playlist[index + 1]);
+    }
   }
 }
 

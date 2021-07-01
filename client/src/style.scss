@@ -29,21 +29,91 @@ body {
   text-align: center;
 }
 
-#center-panel {
+.panel {
+  background: $ui-background;
+  border-radius: 6px;
+  backdrop-filter: blur(6px);
+}
+
+#center {
   position: absolute;
   left: 0;
   right: 0;
   margin: auto;
   top: 50%;
+  width: 600px;
   transform: translateY(-50%);
-  width: 500px;
-  background: $ui-background;
-  border-radius: 6px;
-  backdrop-filter: blur(6px);
-  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 12px;
+}
+
+#input-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+}
+
+#player-panel {
+  display: flex;
+  flex-direction: row;
+  
+  #now-playing {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px;
+    border-right: 1px solid $ui-background;
+
+    @keyframes rotation {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(359deg);
+      }
+    }
+
+    #cover {
+      padding: 12px;
+      user-select: none;
+
+      #vinyl {
+        max-width: 100%;
+        max-height: 100%;
+        animation: rotation 30s infinite linear;
+
+        &.paused {
+          animation-play-state: paused;
+        }
+      }
+    }
+  }
+
+  #playlist {
+    flex: 1.33;
+    max-height: 45vh;
+    overflow-y: auto;
+
+    .track {
+      padding: 8px;
+      border-bottom: 1px solid $ui-background;
+      cursor: pointer;
+
+
+      &:hover {
+        background: rgba(0,0,0,0.1);
+      }
+      
+      &.playing {
+        background: rgba(0,0,0,0.15);
+      }
+    }
+
+  }
+
 }
 
 footer {
@@ -74,10 +144,16 @@ button {
   cursor: pointer;
   font-size: 125%;
   background: transparent;
-  border: 1px solid;
+  border: 1px solid white;
+  transition: background 0.25s, color 0.25s;
 
   &:focus {
     outline: none;
+  }
+
+  &:hover {
+    background: white;
+    color: black;
   }
 }
 
@@ -177,6 +253,6 @@ input[type='range'] {
   left: 0;
   flex-direction: column;
   padding: 12px;
-  font-size: 90%;
+  font-size: 75%;
   backdrop-filter: blur(6px);
 }

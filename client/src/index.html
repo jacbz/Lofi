@@ -8,18 +8,43 @@
 
 <body>
   <div id="header">LOFI</div>
-  <div id="center-panel">
-    <textarea rows="10" id="input" spellcheck="false"></textarea>
-    <button id="play-button">
-      <div id="play-button-icon"></div>
-    </button>
-    <span id="title">&nbsp;</span>
-    <input type="range" min="0" max="0" step="0.1" value="0" class="slider" id="seekbar">
-    <span>
-      <span id="time">00:00</span>
-      /
-      <span id="total-time">00:00</span>
-    </span>
+  <div id="center">
+    <div id="input-panel" class="panel">
+      <textarea rows="6" id="input" spellcheck="false"></textarea>
+      <button id="add-button">Add to playlist</button>
+    </div>
+
+    <div id="player-panel" class="panel">
+      <div id="now-playing">
+        <div id="cover">
+          <img id="vinyl" class="paused" src="vinyl.svg"></img>
+        </div>
+        <span id="title">&nbsp;</span>
+        <input type="range" min="0" max="0" step="0.1" value="0" class="slider" id="seekbar">
+        <span>
+          <span id="time">00:00</span>
+          /
+          <span id="total-time">00:00</span>
+        </span>
+        <button id="play-button">
+          <div id="play-button-icon"></div>
+        </button>
+      </div>
+      <template id="playlist-entry">
+        <div class="track">
+          <span>
+            <span class="track-name">Test</span>
+            ·
+            <span class="track-duration">1:23</span>
+          </span>
+        </div>
+      </template>
+      <div id="playlist">
+        
+
+      </div>
+     
+    </div>
   </div>
 
   <div id="filter" style="z-index: 300;">

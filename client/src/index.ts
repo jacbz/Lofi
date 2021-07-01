@@ -1,7 +1,6 @@
-import * as Tone from 'tone';
 import Player from './player';
 import Producer from './producer';
-import { DEFAULT_OUTPUT_PARAMS, OutputParams } from './params';
+import { getRandomInputParams, OutputParams } from './params';
 
 const player = new Player();
 
@@ -36,34 +35,64 @@ player.updateTrackDisplay = (seconds: number) => {
 
 // Input field
 const inputTextarea = document.getElementById('input') as HTMLTextAreaElement;
-inputTextarea.textContent = JSON.stringify(DEFAULT_OUTPUT_PARAMS, null, 2);
+inputTextarea.textContent = getRandomInputParams();
+
+// Add button
+const addButton = document.getElementById('add-button');
+addButton.addEventListener('click', async () => {
+  let params: OutputParams;
+  try {
+    params = JSON.parse(inputTextarea.value);
+    console.log(params);
+    inputTextarea.textContent = getRandomInputParams();
+  } catch (e) {
+    window.alert('Could not parse JSON');
+    return;
+  }
+  const producer = new Producer();
+  const track = producer.produce(params);
+  await player.addToPlaylist(track);
+});
+
+// Playlist
+const playlistContainer = document.getElementById('playlist');
+const updatePlaylistDisplay = () => {
+  playlistContainer.innerHTML = '';
+  for (const track of player.playlist) {
+    const template = document.getElementById('playlist-entry') as HTMLTemplateElement;
+    const trackElement = (template.content.cloneNode(true) as HTMLElement).querySelector('.track') as HTMLDivElement;
+
+    const name = trackElement.querySelector('.track-name');
+    name.textContent = track.title;
+    const duration = trackElement.querySelector('.track-duration');
+    duration.textContent = formatTime(track.length);
+
+    if (track === player.currentTrack) {
+      trackElement.classList.add('playing');
+    }
+    trackElement.addEventListener('click', async () => {
+      player.playTrack(track);
+    });
+
+    playlistContainer.appendChild(trackElement);
+  }
+};
+player.updatePlaylistDisplay = updatePlaylistDisplay;
 
 // Play button
 const playButton = document.getElementById('play-button');
+const vinyl = document.getElementById('vinyl');
 const updatePlayingState = (isPlaying: boolean) => {
   if (isPlaying) {
     playButton.classList.toggle('paused', true);
+    vinyl.classList.toggle('paused', false);
   } else {
     playButton.classList.toggle('paused', false);
+    vinyl.classList.toggle('paused', true);
   }
 };
 player.onPlayingStateChange = updatePlayingState;
 playButton.addEventListener('click', async () => {
-  await Tone.start();
-  if (!player.currentTrack) {
-    let params: OutputParams;
-    try {
-      params = JSON.parse(inputTextarea.value);
-    } catch (e) {
-      window.alert('Could not parse JSON');
-      return;
-    }
-    const producer = new Producer();
-    const track = producer.produce(params);
-    player.currentTrack = track;
-    await player.play();
-    return;
-  }
   if (player.isPlaying) {
     player.pause();
   } else {
@@ -71,7 +100,7 @@ playButton.addEventListener('click', async () => {
   }
 });
 
-// filter panel
+// Filter panel
 function value(id: string) {
   return (document.getElementById(id) as HTMLInputElement).valueAsNumber;
 }
