@@ -58,7 +58,7 @@ addButton.addEventListener('click', async () => {
 const playlistContainer = document.getElementById('playlist');
 const updatePlaylistDisplay = () => {
   playlistContainer.innerHTML = '';
-  for (const track of player.playlist) {
+  player.playlist.forEach((track, i) => {
     const template = document.getElementById('playlist-entry') as HTMLTemplateElement;
     const trackElement = (template.content.cloneNode(true) as HTMLElement).querySelector('.track') as HTMLDivElement;
 
@@ -71,11 +71,11 @@ const updatePlaylistDisplay = () => {
       trackElement.classList.add('playing');
     }
     trackElement.addEventListener('click', async () => {
-      player.playTrack(track);
+      player.playTrack(i);
     });
 
     playlistContainer.appendChild(trackElement);
-  }
+  });
 };
 player.updatePlaylistDisplay = updatePlaylistDisplay;
 

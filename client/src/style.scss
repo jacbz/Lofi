@@ -152,11 +152,11 @@ body {
         .track-name:before {      
           content: "";
           width: 12px;
-          height: 12px;
-          background: url('icons/play.svg');
-          background-size: 100%;
+          height: 14px;
+          background: url('icons/play.svg') no-repeat;
           display: inline-block;
           margin-right: 5px;
+          vertical-align: -1px;
         }
       }
     }

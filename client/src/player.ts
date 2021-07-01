@@ -120,11 +120,14 @@ class Player {
 
   async addToPlaylist(track: Track) {
     this.playlist.push(track);
-    await this.playTrack(track);
+    this.updatePlaylistDisplay();
+    if (!this.isPlaying) {
+      await this.playTrack(this.playlist.length - 1);
+    }
   }
 
-  async playTrack(track: Track) {
-    this.currentPlayingIndex = this.playlist.indexOf(track);
+  async playTrack(playlistIndex: number) {
+    this.currentPlayingIndex = playlistIndex;
     this.updatePlaylistDisplay();
     this.stop();
     await this.play();
@@ -232,18 +235,18 @@ class Player {
   }
 
   playPrevious() {
-    this.stop();
-    const index = this.playlist.indexOf(this.currentTrack);
-    if (index > 0) {
-      this.playTrack(this.playlist[index - 1]);
+    if (this.currentPlayingIndex > 0) {
+      this.stop();
+      this.playTrack(this.currentPlayingIndex - 1);
+    } else if (this.currentPlayingIndex === 0) {
+      this.seek(0);
     }
   }
 
   playNext() {
-    this.stop();
-    const index = this.playlist.indexOf(this.currentTrack);
-    if (index < this.playlist.length - 1) {
-      this.playTrack(this.playlist[index + 1]);
+    if (this.currentPlayingIndex < this.playlist.length - 1) {
+      this.stop();
+      this.playTrack(this.currentPlayingIndex + 1);
     }
   }
 }
