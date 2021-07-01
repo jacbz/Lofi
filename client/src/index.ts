@@ -112,6 +112,7 @@ const playNextButton = document.getElementById('play-next-button');
 const repeatButton = document.getElementById('repeat-button');
 const shuffleButton = document.getElementById('shuffle-button');
 const updatePlayingState = (isPlaying: boolean) => {
+  vinyl.style.opacity = '1';
   if (isPlaying) {
     playButton.classList.toggle('paused', true);
     vinyl.classList.toggle('paused', false);

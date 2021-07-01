@@ -140,6 +140,7 @@ class Player {
   async playTrack(playlistIndex: number) {
     this.currentPlayingIndex = playlistIndex;
     this.onTrackChange();
+    this.seek(0);
     this.stop();
     await this.play();
   }
@@ -150,8 +151,15 @@ class Player {
     }
     this.isPlaying = true;
 
+    // wait 500ms before trying to play the track
+    // this is needed due to Tone.js scheduling conflicts if the user rapidly changes the track
+    const trackToPlayIndex = this.currentPlayingIndex;
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    if (trackToPlayIndex !== this.currentPlayingIndex) {
+      return;
+    }
+
     await Tone.start();
-    Tone.Transport.seconds = 0;
     Tone.Transport.bpm.value = this.currentTrack.bpm;
 
     this.samplePlayers = new Map();
@@ -240,6 +248,7 @@ class Player {
   }
 
   stop() {
+    Tone.Transport.cancel();
     Tone.Transport.stop();
     this.instrumentSamplers?.forEach((s) => s.dispose());
     this.samplePlayers?.forEach((s) => s.forEach((t) => t.dispose()));
@@ -258,7 +267,6 @@ class Player {
       }
     }
 
-    this.stop();
     if (nextTrackIndex !== null) {
       this.playTrack(nextTrackIndex);
     }
@@ -283,7 +291,6 @@ class Player {
       nextTrackIndex = 0;
     }
 
-    this.stop();
     if (nextTrackIndex !== null) {
       this.playTrack(nextTrackIndex);
     }
