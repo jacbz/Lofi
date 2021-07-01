@@ -6,10 +6,8 @@ const player = new Player();
 
 /** Formats seconds into an MM:SS string */
 const formatTime = (seconds: number) => {
-  const format = (val: number) => `0${Math.floor(val)}`.slice(-2);
-  const minutes = (seconds % 3600) / 60;
-  if (minutes < 0) return '00:00';
-  return [minutes, seconds % 60].map(format).join(':');
+  if (seconds < 0) return '0:00';
+  return `${Math.floor(seconds / 60)}:${`0${Math.floor(seconds % 60)}`.slice(-2)}`;
 };
 
 // Seekbar
@@ -20,8 +18,13 @@ seekbar.addEventListener('input', () => {
 
 // Track details and time
 const titleLabel = document.getElementById('title');
-const timeLabel = document.getElementById('time');
+const timeLabel = document.getElementById('current-time');
 const totalTimeLabel = document.getElementById('total-time');
+const formatSeekbar = () => {
+  const value = ((seekbar.valueAsNumber - +seekbar.min) / (+seekbar.max - +seekbar.min)) * 100;
+  const color = 'fc5c8c';
+  seekbar.style.background = `linear-gradient(to right, #${color} 0%, #${color} ${value}%, rgba(0, 0, 0, 0.25) ${value}%, rgba(0, 0, 0, 0.25) 100%)`;
+};
 player.updateTrackDisplay = (seconds: number) => {
   titleLabel.textContent = player.currentTrack.title;
   const totalLength = player.currentTrack.length;
@@ -31,6 +34,8 @@ player.updateTrackDisplay = (seconds: number) => {
   // when current time is within 0.1s of total length, display total length
   timeLabel.textContent = formatTime(seconds);
   totalTimeLabel.textContent = formatTime(totalLength);
+
+  formatSeekbar();
 };
 
 // Input field

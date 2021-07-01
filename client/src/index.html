@@ -11,7 +11,7 @@
   <div id="center">
     <div id="input-panel" class="panel">
       <textarea rows="6" id="input" spellcheck="false"></textarea>
-      <button id="add-button">Add to playlist</button>
+      <button id="add-button" class="flat">Add to playlist</button>
     </div>
 
     <div id="player-panel" class="panel">
@@ -37,15 +37,16 @@
           <span id="title">&nbsp;</span>
           <input type="range" min="0" max="0" step="0.1" value="0" class="slider" id="seekbar">
           <div id="subtitle">
-            <div>
-              <span id="time">00:00</span>
-              <span id="slash">/</span>
-              <span id="total-time">00:00</span>
-            </div>
             <div id="subtitle-buttons">
               <button id="repeat-button" class="plain" title="Repeat"></button>
               <button id="shuffle-button" class="plain" title="Shuffle"></button>
             </div>
+            <div id="time">
+              <span id="current-time">0:00</span>
+              <span id="slash">/</span>
+              <span id="total-time">0:00</span>
+            </div>
+            
           </div>
         </div>
         <div id="buttons">
@@ -91,7 +92,7 @@
     Equalizer mid (dB)
     <div>-30<input type="range" min="-30" max="0" value="0" class="slider" id="eqmid">0</div>
     Equalizer high (dB)
-    <div>-30<input type="range" min="-30" max="0" value="0" class="slider" id="eqhigh">0<button id="connecteq">Connect EQ</button></div>
+    <div>-30<input type="range" min="-30" max="0" value="0" class="slider" id="eqhigh">0<button id="connecteq" class="flat">Connect EQ</button></div>
     Reverb decay: The amount of time it will reverberate for.
     <div>0<input type="range" min="0.001" max="4" step="0.1" value="0" class="slider" id="reverbdecay">4</div>
     Reverb pre-lecay
@@ -101,7 +102,7 @@
     Chebyshev
     <div>1<input type="range" min="1" max="10" value="1" step="1" class="slider" id="chebyshev">10</div>
     Distortion
-    <div>0<input type="range" min="0" max="1" step="0.01" value="0" class="slider" id="distortion">1<button id="connectdistortion">Connect distortion</button></div>
+    <div>0<input type="range" min="0" max="1" step="0.01" value="0" class="slider" id="distortion">1<button id="connectdistortion" class="flat">Connect distortion</button></div>
     <!-- Bitcrusher: down-samples the incoming signal to a different bit depth
     <div>1<input type="range" min="1" max="16" step="1" value="16" class="slider" id="bitcrusher">16</div> -->
     Gain

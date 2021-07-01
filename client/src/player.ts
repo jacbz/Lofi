@@ -155,7 +155,7 @@ class Player {
     // this is needed due to Tone.js scheduling conflicts if the user rapidly changes the track
     const trackToPlayIndex = this.currentPlayingIndex;
     await new Promise((resolve) => setTimeout(resolve, 500));
-    if (trackToPlayIndex !== this.currentPlayingIndex) {
+    if (trackToPlayIndex !== this.currentPlayingIndex || !this.isPlaying) {
       return;
     }
 
@@ -293,6 +293,8 @@ class Player {
 
     if (nextTrackIndex !== null) {
       this.playTrack(nextTrackIndex);
+    } else {
+      this.stop();
     }
   }
 
