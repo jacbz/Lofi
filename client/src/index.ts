@@ -5,12 +5,12 @@ import { getRandomInputParams, OutputParams } from './params';
 const player = new Player();
 
 /** Formats seconds into an MM:SS string */
-function formatTime(seconds: number) {
+const formatTime = (seconds: number) => {
   const format = (val: number) => `0${Math.floor(val)}`.slice(-2);
   const minutes = (seconds % 3600) / 60;
   if (minutes < 0) return '00:00';
   return [minutes, seconds % 60].map(format).join(':');
-}
+};
 
 // Seekbar
 const seekbar = document.getElementById('seekbar') as HTMLInputElement;
@@ -55,11 +55,11 @@ addButton.addEventListener('click', async () => {
 });
 
 // Playlist
-const playlistContainer = document.getElementById('playlist');
+const playlistContainer = document.getElementById('playlist-tracks');
 const updatePlaylistDisplay = () => {
   playlistContainer.innerHTML = '';
   player.playlist.forEach((track, i) => {
-    const template = document.getElementById('playlist-entry') as HTMLTemplateElement;
+    const template = document.getElementById('playlist-track') as HTMLTemplateElement;
     const trackElement = (template.content.cloneNode(true) as HTMLElement).querySelector('.track') as HTMLDivElement;
 
     const name = trackElement.querySelector('.track-name');

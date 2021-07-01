@@ -103,9 +103,10 @@ body {
     #buttons {
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      padding: 0px 12px;
+      gap: 16px;
+      padding: 8px;
 
       #play-previous-button {
         background-image: url("icons/previous.svg");        
@@ -119,11 +120,8 @@ body {
 
   #playlist {
     flex: 1.2;
-    max-height: 45vh;
-    overflow-y: auto;
 
-    &:before {
-      content: "NOW PLAYING";
+    #playlist-header {
       display: block;
       text-align: center;
       letter-spacing: 3px;
@@ -131,6 +129,11 @@ body {
       font-size: 80%;
       padding: 4px;
       border-bottom: 1px solid $ui-background;
+    }
+
+    #playlist-tracks {      
+      max-height: 40vh;
+      overflow-y: auto;
     }
 
     .track {
@@ -211,7 +214,6 @@ button.circle {
   width: 46px;
   border-radius: 50%;
   border: 0;
-  margin: 6px auto;
   background-color: $ui-background;
   background-position: center;
   background-repeat: no-repeat;
@@ -263,6 +265,7 @@ textarea {
   }
 }
 
+// input ranges
 input[type='range'] {
   -webkit-appearance: none;
   background: transparent;
@@ -302,6 +305,20 @@ input[type='range'] {
     @include slider-thumb;
   }
 }
+
+
+// scrollbars
+* {
+  scrollbar-width: thin;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: $ui-hover-background;
+  margin: 2px;
+}
+
 
 #filter {
   background: $ui-background;
