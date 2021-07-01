@@ -231,6 +231,14 @@ class Player {
     this.isPlaying = false;
   }
 
+  playPrevious() {
+    this.stop();
+    const index = this.playlist.indexOf(this.currentTrack);
+    if (index > 0) {
+      this.playTrack(this.playlist[index - 1]);
+    }
+  }
+
   playNext() {
     this.stop();
     const index = this.playlist.indexOf(this.currentTrack);

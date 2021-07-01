@@ -90,6 +90,21 @@ body {
         }
       }
     }
+
+    #buttons {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      #play-previous-button {
+        background-image: url("icons/previous.svg");        
+      }
+      
+      #play-next-button {
+        background-image: url("icons/next.svg");        
+      }
+    }
   }
 
   #playlist {
@@ -170,17 +185,25 @@ button {
   }
 }
 
-#play-button {
-  height: 72px;
-  width: 72px;
+button.circle {
+  height: 46px;
+  width: 46px;
   border-radius: 50%;
   border: 0;
   margin: 6px auto;
-  background: $ui-background;
+  background-color: $ui-background;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 20px;
 
   &:hover {
-    background: $ui-hover-background;
+    background-color: $ui-hover-background;
   }
+}
+
+#play-button {
+  height: 72px;
+  width: 72px;
   
   #play-button-icon {
     height: 28px;

@@ -17,7 +17,7 @@
     <div id="player-panel" class="panel">
       <div id="now-playing">
         <div id="cover">
-          <img id="vinyl" class="paused" src="vinyl.svg"></img>
+          <img id="vinyl" class="paused" src="vinyl.svg"/>
         </div>
         <span id="title">&nbsp;</span>
         <input type="range" min="0" max="0" step="0.1" value="0" class="slider" id="seekbar">
@@ -26,9 +26,13 @@
           /
           <span id="total-time">00:00</span>
         </span>
-        <button id="play-button">
-          <div id="play-button-icon"></div>
-        </button>
+        <div id="buttons">
+          <button id="play-previous-button" class="circle"></button>
+          <button id="play-button" class="circle">
+            <div id="play-button-icon"></div>
+          </button>
+          <button id="play-next-button" class="circle"></button>
+        </div>
       </div>
       <template id="playlist-entry">
         <div class="track">

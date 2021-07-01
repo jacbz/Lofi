@@ -81,6 +81,8 @@ player.updatePlaylistDisplay = updatePlaylistDisplay;
 
 // Play button
 const playButton = document.getElementById('play-button');
+const playPreviousButton = document.getElementById('play-previous-button');
+const playNextButton = document.getElementById('play-next-button');
 const vinyl = document.getElementById('vinyl');
 const updatePlayingState = (isPlaying: boolean) => {
   if (isPlaying) {
@@ -98,6 +100,12 @@ playButton.addEventListener('click', async () => {
   } else {
     player.continue();
   }
+});
+playPreviousButton.addEventListener('click', async () => {
+  player.playPrevious();
+});
+playNextButton.addEventListener('click', async () => {
+  player.playNext();
 });
 
 // Filter panel
