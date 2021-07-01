@@ -64,7 +64,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    padding: 12px;
+    padding: 12px 0px;
     border-right: 1px solid $ui-background;
 
     @keyframes rotation {
@@ -77,7 +77,7 @@ body {
     }
 
     #cover {
-      padding: 12px;
+      padding: 12px 24px;
       user-select: none;
 
       #vinyl {
@@ -91,11 +91,21 @@ body {
       }
     }
 
+    #info {
+      display: flex;
+      flex-direction: column;
+      padding: 8px 12px;
+      gap: 4px;
+      border-top: 1px solid $ui-background;
+      border-bottom: 1px solid $ui-background;
+    }
+
     #buttons {
       display: flex;
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
+      padding: 0px 12px;
 
       #play-previous-button {
         background-image: url("icons/previous.svg");        
@@ -108,9 +118,20 @@ body {
   }
 
   #playlist {
-    flex: 1.33;
+    flex: 1.2;
     max-height: 45vh;
     overflow-y: auto;
+
+    &:before {
+      content: "NOW PLAYING";
+      display: block;
+      text-align: center;
+      letter-spacing: 3px;
+      opacity: 0.75;
+      font-size: 80%;
+      padding: 4px;
+      border-bottom: 1px solid $ui-background;
+    }
 
     .track {
       padding: 8px;
@@ -170,7 +191,7 @@ footer {
 button {
   display: block;
   cursor: pointer;
-  font-size: 125%;
+  font-size: 100%;
   background: transparent;
   border: 1px solid white;
   transition: background 0.25s, color 0.25s;
