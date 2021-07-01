@@ -40,6 +40,10 @@
             <div id="subtitle-buttons">
               <button id="repeat-button" class="plain" title="Repeat"></button>
               <button id="shuffle-button" class="plain" title="Shuffle"></button>
+              <div id="volume-panel">
+                <button id="volume-button" class="plain" title="Mute"></button>
+                <input type="range" min="0" max="1.25" step="0.01" value="1" class="slider" id="volume-bar">
+              </div>
             </div>
             <div id="time">
               <span id="current-time">0:00</span>
@@ -105,10 +109,8 @@
     <div>0<input type="range" min="0" max="1" step="0.01" value="0" class="slider" id="distortion">1<button id="connectdistortion" class="flat">Connect distortion</button></div>
     <!-- Bitcrusher: down-samples the incoming signal to a different bit depth
     <div>1<input type="range" min="1" max="16" step="1" value="16" class="slider" id="bitcrusher">16</div> -->
-    Gain
-    <div>0<input type="range" min="0" max="5" step="0.1" value="1" class="slider" id="gain">5</div>
-  </div>   
-
+  </div>
+  <div id="preload-images"></div>
 </body>
 
 <footer>

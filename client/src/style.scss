@@ -187,6 +187,26 @@ body {
             background-image: url("icons/shuffle-active.svg");
           }
         }
+
+        #volume-panel {
+          display: flex;
+          align-items: center;
+
+          &:hover {
+            #volume-bar {
+              visibility: visible;
+              opacity: 1;
+            }
+          }
+          
+          #volume-button {
+            background-image: url("icons/volume.svg");
+    
+            &.muted {
+              background-image: url("icons/volume-muted.svg");
+            }
+          }
+        }
       }
 
     }
@@ -419,6 +439,38 @@ input[type='range'] {
 }
 
 
+#volume-bar {
+  width: 60px;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.2s, opacity 0.2s;
+
+  @mixin slider-track {
+    height: 4px;
+  }
+
+  @mixin slider-thumb {
+    height: 10px;
+    width: 10px;
+    margin-top: -3px;
+  }
+
+  &::-webkit-slider-runnable-track {
+    @include slider-track;
+  }
+  &::-moz-range-track {
+    @include slider-track;
+  }
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    @include slider-thumb;
+  }
+  &::-moz-range-thumb {
+    @include slider-thumb;
+  }
+}
+
+
 // scrollbars
 * {
   scrollbar-width: thin;
@@ -431,7 +483,6 @@ input[type='range'] {
   margin: 2px;
 }
 
-
 #filter {
   background: $ui-background;
   position: absolute;
@@ -442,4 +493,15 @@ input[type='range'] {
   font-size: 75%;
   gap: 6px;
   backdrop-filter: blur(6px);
+}
+
+// preload icons not immediately visible to avoid loading times
+#preload-images {
+  display: hidden; 
+  width: 0;
+  height: 0;
+  background: url('icons/repeat-all.svg'),
+              url('icons/repeat-one.svg'),
+              url('icons/shuffle-active.svg'),
+              url('icons/volume-muted.svg')
 }

@@ -41,6 +41,24 @@ class Player {
   /** Playing queue, used when shuffling */
   shuffleQueue: number[] = [];
 
+  private _muted = false;
+
+  get muted() {
+    return this._muted;
+  }
+
+  set muted(muted: boolean) {
+    this._muted = muted;
+    if (muted) {
+      this.previousGain = this.gain.gain.value;
+      this.gain.gain.value = 0;
+    } else {
+      this.gain.gain.value = this.previousGain;
+    }
+  }
+
+  previousGain: number;
+
   /** Function to update the playlist in the UI */
   updatePlaylistDisplay: () => void;
 
@@ -56,6 +74,8 @@ class Player {
   samplePlayers: Map<string, Tone.Player[]>;
 
   instrumentSamplers: Map<Instrument, Tone.Sampler>;
+
+  gain: Tone.Gain = new Tone.Gain();
 
   /** Filters */
 
@@ -74,8 +94,6 @@ class Player {
   chebyshev: Tone.Chebyshev;
 
   bitcrusher: Tone.BitCrusher;
-
-  gain: Tone.Gain;
 
   defaultFilters: Tone.ToneAudioNode[];
 
@@ -107,9 +125,8 @@ class Player {
       this.reverb,
       // this.bitcrusher,
       // this.equalizer,
-      this.chebyshev,
-      // this.distortion,
-      this.gain
+      this.chebyshev
+      // this.distortion
     ];
   }
 
@@ -117,13 +134,13 @@ class Player {
     this.defaultFilters.splice(this.defaultFilters.indexOf(this.gain), 0, filter);
     for (const player of this.instrumentSamplers.values()) {
       player.disconnect();
-      player.chain(...this.defaultFilters, Tone.Destination);
+      player.chain(...this.defaultFilters, this.gain, Tone.Destination);
     }
     for (const player of this.samplePlayers.values()) {
       for (const player2 of player.values()) {
         if (!player2) return;
         player2.disconnect();
-        player2.chain(...this.defaultFilters, Tone.Destination);
+        player2.chain(...this.defaultFilters, this.gain, Tone.Destination);
       }
     }
   }
@@ -177,7 +194,7 @@ class Player {
         fadeIn: '4n',
         fadeOut: '4n'
       })
-        .chain(...sampleGroup.getFilters(), ...this.defaultFilters, Tone.Destination)
+        .chain(...sampleGroup.getFilters(), ...this.defaultFilters, this.gain, Tone.Destination)
         .sync();
 
       if (!this.samplePlayers.has(sampleGroupName)) {
@@ -189,7 +206,12 @@ class Player {
     // load instruments
     for (const instrument of this.currentTrack.instruments) {
       const sampler = getInstrumentSampler(instrument)
-        .chain(...getInstrumentFilters(instrument), ...this.defaultFilters, Tone.Destination)
+        .chain(
+          ...getInstrumentFilters(instrument),
+          ...this.defaultFilters,
+          this.gain,
+          Tone.Destination
+        )
         .sync();
       this.instrumentSamplers.set(instrument, sampler);
     }

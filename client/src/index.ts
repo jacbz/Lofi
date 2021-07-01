@@ -20,10 +20,9 @@ seekbar.addEventListener('input', () => {
 const titleLabel = document.getElementById('title');
 const timeLabel = document.getElementById('current-time');
 const totalTimeLabel = document.getElementById('total-time');
-const formatSeekbar = () => {
-  const value = ((seekbar.valueAsNumber - +seekbar.min) / (+seekbar.max - +seekbar.min)) * 100;
-  const color = 'fc5c8c';
-  seekbar.style.background = `linear-gradient(to right, #${color} 0%, #${color} ${value}%, rgba(0, 0, 0, 0.25) ${value}%, rgba(0, 0, 0, 0.25) 100%)`;
+const formatInputRange = (input: HTMLInputElement, color: string) => {
+  const value = ((input.valueAsNumber - +input.min) / (+input.max - +input.min)) * 100;
+  input.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${value}%, rgba(0, 0, 0, 0.25) ${value}%, rgba(0, 0, 0, 0.25) 100%)`;
 };
 player.updateTrackDisplay = (seconds: number) => {
   titleLabel.textContent = player.currentTrack.title;
@@ -35,7 +34,7 @@ player.updateTrackDisplay = (seconds: number) => {
   timeLabel.textContent = formatTime(seconds);
   totalTimeLabel.textContent = formatTime(totalLength);
 
-  formatSeekbar();
+  formatInputRange(seekbar, '#fc5c8c');
 };
 
 // Input field
@@ -116,6 +115,8 @@ const playPreviousButton = document.getElementById('play-previous-button');
 const playNextButton = document.getElementById('play-next-button');
 const repeatButton = document.getElementById('repeat-button');
 const shuffleButton = document.getElementById('shuffle-button');
+const volumeButton = document.getElementById('volume-button');
+const volumeBar = document.getElementById('volume-bar') as HTMLInputElement;
 const updatePlayingState = (isPlaying: boolean) => {
   vinyl.style.opacity = '1';
   if (isPlaying) {
@@ -164,6 +165,19 @@ shuffleButton.addEventListener('click', async () => {
   player.shuffle = !player.shuffle;
   shuffleButton.classList.toggle('active', player.shuffle);
 });
+volumeButton.addEventListener('click', async () => {
+  player.gain.gain.value = volumeBar.valueAsNumber;
+  player.muted = !player.muted;
+  volumeButton.classList.toggle('muted', player.muted);
+});
+volumeBar.addEventListener('input', () => {
+  if (player.muted) {
+    volumeButton.click();
+  }
+  player.gain.gain.value = volumeBar.valueAsNumber;
+  formatInputRange(volumeBar, '#fff');
+});
+formatInputRange(volumeBar, '#fff');
 
 // Filter panel
 function value(id: string) {
@@ -185,7 +199,6 @@ const adjustFilters = () => {
   player.distortion.distortion = value('distortion');
   player.chebyshev.order = value('chebyshev');
   // player.bitcrusher.bits.value = value('bitcrusher');
-  player.gain.gain.value = value('gain');
 
   const output = new Map();
   for (const el of document.getElementById('filter').querySelectorAll('input')) {
