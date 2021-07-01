@@ -34,6 +34,8 @@ class Player {
     }
   }
 
+  repeat: RepeatMode = RepeatMode.NONE;
+
   shuffle = false;
 
   /** Playing queue, used when shuffling */
@@ -235,31 +237,51 @@ class Player {
   }
 
   stop() {
+    Tone.Transport.stop();
     this.instrumentSamplers?.forEach((s) => s.dispose());
     this.samplePlayers?.forEach((s) => s.forEach((t) => t.dispose()));
     this.isPlaying = false;
   }
 
   playPrevious() {
+    let nextTrackIndex = null;
     if (this.currentPlayingIndex > 0) {
-      this.stop();
-      this.playTrack(this.currentPlayingIndex - 1);
+      nextTrackIndex = this.currentPlayingIndex - 1;
     } else if (this.currentPlayingIndex === 0) {
-      this.seek(0);
+      if (this.repeat === RepeatMode.ALL) {
+        nextTrackIndex = this.playlist.length - 1;
+      } else {
+        this.seek(0);
+      }
+    }
+
+    this.stop();
+    if (nextTrackIndex !== null) {
+      this.playTrack(nextTrackIndex);
     }
   }
 
   playNext() {
+    if (this.repeat === RepeatMode.ONE) {
+      this.seek(0);
+      return;
+    }
+
     let nextTrackIndex = null;
     if (this.shuffle) {
       if (this.shuffleQueue.length === 0) this.fillShuffleQueue();
       nextTrackIndex = this.shuffleQueue.shift();
     } else if (this.currentPlayingIndex < this.playlist.length - 1) {
       nextTrackIndex = this.currentPlayingIndex + 1;
+    } else if (
+      this.currentPlayingIndex === this.playlist.length - 1 &&
+      this.repeat === RepeatMode.ALL
+    ) {
+      nextTrackIndex = 0;
     }
 
+    this.stop();
     if (nextTrackIndex !== null) {
-      this.stop();
       this.playTrack(nextTrackIndex);
     }
   }
@@ -273,6 +295,12 @@ class Player {
       [this.shuffleQueue[i], this.shuffleQueue[j]] = [this.shuffleQueue[j], this.shuffleQueue[i]];
     }
   }
+}
+
+export enum RepeatMode {
+  NONE,
+  ALL,
+  ONE
 }
 
 export default Player;

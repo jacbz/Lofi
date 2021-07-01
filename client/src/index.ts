@@ -1,4 +1,4 @@
-import Player from './player';
+import Player, { RepeatMode } from './player';
 import Producer from './producer';
 import { getRandomInputParams, OutputParams } from './params';
 
@@ -83,6 +83,7 @@ player.updatePlaylistDisplay = updatePlaylistDisplay;
 const playButton = document.getElementById('play-button');
 const playPreviousButton = document.getElementById('play-previous-button');
 const playNextButton = document.getElementById('play-next-button');
+const repeatButton = document.getElementById('repeat-button');
 const shuffleButton = document.getElementById('shuffle-button');
 const vinyl = document.getElementById('vinyl');
 const updatePlayingState = (isPlaying: boolean) => {
@@ -107,6 +108,26 @@ playPreviousButton.addEventListener('click', async () => {
 });
 playNextButton.addEventListener('click', async () => {
   player.playNext();
+});
+repeatButton.addEventListener('click', async () => {
+  switch (player.repeat) {
+    case RepeatMode.ALL: {
+      player.repeat = RepeatMode.ONE;
+      repeatButton.classList.remove('repeat-all');
+      repeatButton.classList.add('repeat-one');
+      break;
+    }
+    case RepeatMode.ONE: {
+      player.repeat = RepeatMode.NONE;
+      repeatButton.classList.remove('repeat-one');
+      break;
+    }
+    default: {
+      player.repeat = RepeatMode.ALL;
+      repeatButton.classList.add('repeat-all');
+      break;
+    }
+  }
 });
 shuffleButton.addEventListener('click', async () => {
   player.shuffle = !player.shuffle;

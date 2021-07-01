@@ -108,13 +108,31 @@ body {
         justify-content: space-between;
       }
 
-      #shuffle-button {
-        background-image: url("icons/shuffle.svg");
+      #subtitle-buttons {
+        display: flex;
+        gap: 6px;
+          
+        #repeat-button {
+          background-image: url("icons/repeat.svg");
+  
+          &.repeat-all {
+            background-image: url("icons/repeat-all.svg");
+          }
+  
+          &.repeat-one {
+            background-image: url("icons/repeat-one.svg");
+          }
+        }
 
-        &.active {
-          background-image: url("icons/shuffle-active.svg");
+        #shuffle-button {
+          background-image: url("icons/shuffle.svg");
+  
+          &.active {
+            background-image: url("icons/shuffle-active.svg");
+          }
         }
       }
+
     }
 
     #buttons {
