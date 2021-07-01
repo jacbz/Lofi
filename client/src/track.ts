@@ -39,6 +39,9 @@ class Track {
   /** Timings of notes */
   instrumentNotes: InstrumentNote[];
 
+  /** Color of cover */
+  color: string;
+
   public constructor(init?: Partial<Track>) {
     Object.assign(this, init);
   }

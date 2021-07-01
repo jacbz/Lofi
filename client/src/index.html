@@ -17,7 +17,21 @@
     <div id="player-panel" class="panel">
       <div id="now-playing">
         <div id="cover">
-          <img id="vinyl" class="paused" src="vinyl.svg"/>
+          <div id="vinyl" class="paused">
+            <svg id="vinyl-center" viewBox="0 0 52 52">
+              <defs>
+                <path id="tophalf" d="M 8 32 a 14 14 0 0 1 36 0" />
+                <path id="lowerhalf" d="M 2 26 a 24 24 0 0 0 48 0" />
+              </defs>
+              <circle cx="26" cy="26" r="26" fill="#eee" id="vinyl-color" />
+              <circle cx="26" cy="26" r="2" fill="black" />
+              <text text-anchor="middle">
+                <textPath xlink:href="#tophalf" startOffset="50%" id="vinyl-top-text">LOFI</textPath>
+                <textPath xlink:href="#lowerhalf" startOffset="50%" id="vinyl-bottom-text"></textPath>
+              </text>
+            </svg>
+          </div>    
+        
         </div>
         <div id="info">
           <span id="title">&nbsp;</span>

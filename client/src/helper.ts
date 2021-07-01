@@ -52,3 +52,8 @@ export const random = (seed: number) => {
   const x = Math.sin(seed) * 10000;
   return x - Math.floor(x);
 };
+
+/** Generates a random pastel color based on seed */
+export const randomColor = (seed: number) => `hsl(${360 * random(seed)},${
+  25 + 70 * random(seed + 1)}%,${
+  85 + 10 * random(seed + 2)}%)`;

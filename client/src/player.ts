@@ -47,6 +47,9 @@ class Player {
   /** Function to update track information in the UI */
   updateTrackDisplay: (seconds: number) => void;
 
+  /** Function to call when the track changes */
+  onTrackChange: () => void;
+
   /** Function to call when isPlaying changes */
   onPlayingStateChange: (isPlaying: boolean) => void;
 
@@ -136,7 +139,7 @@ class Player {
 
   async playTrack(playlistIndex: number) {
     this.currentPlayingIndex = playlistIndex;
-    this.updatePlaylistDisplay();
+    this.onTrackChange();
     this.stop();
     await this.play();
   }

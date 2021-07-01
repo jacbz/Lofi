@@ -2,7 +2,7 @@ import * as Tonal from '@tonaljs/tonal';
 import { Time } from 'tone/build/esm/core/type/Units';
 import { InstrumentNote, SampleLoop, Track } from './track';
 import { OutputParams } from './params';
-import { addTime, Chord, octShift, subtractTime } from './helper';
+import { addTime, Chord, octShift, randomColor, subtractTime } from './helper';
 import { SAMPLEGROUPS, selectDrumbeat } from './samples';
 import { Instrument } from './instruments';
 
@@ -97,7 +97,8 @@ class Producer {
       samples: this.samples,
       sampleLoops: this.sampleLoops,
       instruments: this.instruments,
-      instrumentNotes: this.instrumentNotes
+      instrumentNotes: this.instrumentNotes,
+      color: randomColor(this.energy + this.valence)
     });
     return track;
   }

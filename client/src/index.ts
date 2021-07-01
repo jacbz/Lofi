@@ -79,13 +79,38 @@ const updatePlaylistDisplay = () => {
 };
 player.updatePlaylistDisplay = updatePlaylistDisplay;
 
+// On track change
+const vinyl = document.getElementById('vinyl');
+const vinylColor = document.getElementById('vinyl-color');
+const vinylBottomText = document.getElementById('vinyl-bottom-text');
+const onTrackChange = () => {
+  const trackElements = playlistContainer.querySelectorAll('.track');
+  player.playlist.forEach((track, i) => {
+    const trackElement = trackElements[i];
+    trackElement.classList.toggle('playing', player.currentTrack === track);
+  });
+
+  if (player.currentTrack) {
+    vinylBottomText.textContent = `${player.currentTrack.key} ${player.currentTrack.mode}`;
+    vinylColor.setAttribute('fill', player.currentTrack.color);
+  } else {
+    vinylBottomText.textContent = '';
+    vinylColor.setAttribute('fill', '#eee');
+  }
+
+  /* reset vinyl animation by triggering reflow */
+  vinyl.style.animation = 'none';
+  const _ = vinyl.offsetHeight;
+  vinyl.style.animation = null;
+};
+player.onTrackChange = onTrackChange;
+
 // Player controls
 const playButton = document.getElementById('play-button');
 const playPreviousButton = document.getElementById('play-previous-button');
 const playNextButton = document.getElementById('play-next-button');
 const repeatButton = document.getElementById('repeat-button');
 const shuffleButton = document.getElementById('shuffle-button');
-const vinyl = document.getElementById('vinyl');
 const updatePlayingState = (isPlaying: boolean) => {
   if (isPlaying) {
     playButton.classList.toggle('paused', true);
