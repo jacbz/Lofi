@@ -1,8 +1,26 @@
 import Player, { RepeatMode } from './player';
 import Producer from './producer';
 import { getRandomInputParams, OutputParams } from './params';
+import { decompress } from './helper';
 
 const player = new Player();
+
+// load playlist in URL if possible
+const queryString = window.location.search;
+if (queryString.length > 0) {
+  const compressed = queryString.substring(1);
+  try {
+    const decompressed = decompress(compressed);
+    const outputParams: OutputParams[] = JSON.parse(decompressed);
+    const playlist = outputParams.map((params) => {
+      const producer = new Producer();
+      return producer.produce(params);
+    });
+    player.playlist = playlist;
+  } catch (e) {
+    console.log('Error parsing', compressed);
+  }
+}
 
 /** Formats seconds into an MM:SS string */
 const formatTime = (seconds: number) => {
@@ -82,6 +100,7 @@ const updatePlaylistDisplay = () => {
   });
 };
 player.updatePlaylistDisplay = updatePlaylistDisplay;
+updatePlaylistDisplay();
 
 // On track change
 const vinyl = document.getElementById('vinyl');
@@ -178,6 +197,12 @@ volumeBar.addEventListener('input', () => {
   formatInputRange(volumeBar, '#fff');
 });
 formatInputRange(volumeBar, '#fff');
+
+// Export
+const exportButton = document.getElementById('export-button');
+exportButton.addEventListener('click', async () => {
+  player.exportPlaylist();
+});
 
 // Filter panel
 function value(id: string) {

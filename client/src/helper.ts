@@ -4,6 +4,7 @@
 import * as Tone from 'tone';
 import { Time } from 'tone/build/esm/core/type/Units';
 import * as Tonal from '@tonaljs/tonal';
+import { gzip, ungzip } from 'pako';
 
 /** Wraps inaccessible Tonal.Chord class */
 export class Chord {
@@ -54,6 +55,8 @@ export const random = (seed: number) => {
 };
 
 /** Generates a random pastel color based on seed */
-export const randomColor = (seed: number) => `hsl(${360 * random(seed)},${
-  25 + 70 * random(seed + 1)}%,${
-  85 + 10 * random(seed + 2)}%)`;
+export const randomColor = (seed: number) => `hsl(${360 * random(seed)},${25 + 70 * random(seed + 1)}%,${85 + 10 * random(seed + 2)}%)`;
+
+export const compress = (input: string) => btoa(String.fromCharCode.apply(null, gzip(input)));
+
+export const decompress = (input: string) => ungzip(Uint8Array.from(atob(input), (c) => c.charCodeAt(0)), { to: 'string' });

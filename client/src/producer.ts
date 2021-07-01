@@ -98,7 +98,8 @@ class Producer {
       sampleLoops: this.sampleLoops,
       instruments: this.instruments,
       instrumentNotes: this.instrumentNotes,
-      color: randomColor(this.energy + this.valence)
+      color: randomColor(this.energy + this.valence),
+      outputParams: params
     });
     return track;
   }

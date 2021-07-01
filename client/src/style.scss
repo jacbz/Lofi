@@ -220,11 +220,11 @@ body {
       padding: 8px;
 
       #play-previous-button {
-        background-image: url("icons/previous.svg");        
+        background-image: url("icons/previous.svg");
       }
       
       #play-next-button {
-        background-image: url("icons/next.svg");        
+        background-image: url("icons/next.svg");
       }      
 
       #play-button {
@@ -266,6 +266,14 @@ body {
       padding: 8px;
       border-bottom: 1px solid $ui-background;
       user-select: none;
+      position: relative;
+
+      #export-button {
+        position: absolute;
+        top: 2px;
+        right: 4px;
+        background-image: url("icons/export.svg");
+      }
     }
 
     #playlist-tracks {      

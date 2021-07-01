@@ -2,6 +2,7 @@ import * as Tone from 'tone';
 import { getInstrumentFilters, getInstrumentSampler, Instrument } from './instruments';
 import * as Samples from './samples';
 import { Track } from './track';
+import { compress } from './helper';
 
 /**
  * The Player plays a Track through Tone.js.
@@ -328,6 +329,13 @@ class Player {
       const j = Math.floor(Math.random() * (i + 1));
       [this.shuffleQueue[i], this.shuffleQueue[j]] = [this.shuffleQueue[j], this.shuffleQueue[i]];
     }
+  }
+
+  exportPlaylist() {
+    const json = JSON.stringify(this.playlist.map((t) => t.outputParams));
+    const compressed = compress(json);
+    const url = `${window.location.origin}${window.location.pathname}?${compressed}`.replace('home.in.tum.de/~zhangja/lofi', 'lofi.jacobzhang.de');
+    window.prompt('Your playlist can be accessed here:', url);
   }
 }
 

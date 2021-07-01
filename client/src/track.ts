@@ -1,6 +1,7 @@
 import * as Tonal from '@tonaljs/tonal';
 import { Time } from 'tone/build/esm/core/type/Units';
 import { Instrument } from './instruments';
+import { OutputParams } from './params';
 
 /**
  * A Track contains the elements that make up a lo-fi track.
@@ -41,6 +42,9 @@ class Track {
 
   /** Color of cover */
   color: string;
+
+  /** The output params that generated this track */
+  outputParams: OutputParams;
 
   public constructor(init?: Partial<Track>) {
     Object.assign(this, init);
