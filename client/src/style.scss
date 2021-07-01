@@ -102,6 +102,9 @@ body {
       border-bottom: 1px solid $ui-background;
       cursor: pointer;
 
+      .track-duration {
+        opacity: 0.75;
+      }
 
       &:hover {
         background: rgba(0,0,0,0.1);
@@ -109,6 +112,16 @@ body {
       
       &.playing {
         background: rgba(0,0,0,0.15);
+
+        .track-name:before {      
+          content: "";
+          width: 12px;
+          height: 12px;
+          background: url('icons/play.svg');
+          background-size: 100%;
+          display: inline-block;
+          margin-right: 5px;
+        }
       }
     }
 
