@@ -331,11 +331,10 @@ class Player {
     }
   }
 
-  exportPlaylist() {
+  getExportUrl() {
     const json = JSON.stringify(this.playlist.map((t) => t.outputParams));
     const compressed = compress(json);
-    const url = `${window.location.origin}${window.location.pathname}?${compressed}`.replace('home.in.tum.de/~zhangja/lofi', 'lofi.jacobzhang.de');
-    window.prompt('Your playlist can be accessed here:', url);
+    return `${window.location.origin}${window.location.pathname}?${compressed}`.replace('home.in.tum.de/~zhangja/lofi', 'lofi.jacobzhang.de');
   }
 }
 

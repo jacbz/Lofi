@@ -259,20 +259,48 @@ body {
     #playlist-header {
       display: block;
       text-align: center;
-      letter-spacing: 3px;
-      opacity: 0.75;
-      font-size: 80%;
-      font-weight: 500;
-      padding: 8px;
       border-bottom: 1px solid $ui-background;
-      user-select: none;
       position: relative;
+
+      #playlist-header-text, #export-panel-header-text {
+        letter-spacing: 3px;
+        font-size: 80%;
+        font-weight: 500;
+        user-select: none;
+        padding: 8px;
+      }
 
       #export-button {
         position: absolute;
         top: 2px;
         right: 4px;
         background-image: url("icons/export.svg");
+      }
+
+      #export-panel {
+        position: absolute;
+        top: 0;
+        left: calc(100% + 12px);
+        z-index: 100;
+        width: 250px;
+        transition: visibility 0.2s, opacity 0.2s;
+        visibility: hidden;
+        opacity: 0;
+
+        #export-panel-header-text {
+          border-bottom: 1px solid $ui-background;
+        }
+
+        input {
+          padding: 4px;
+        }
+
+        #export-panel-content {
+          padding: 8px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
       }
     }
 
@@ -393,10 +421,12 @@ button.circle {
 }
 
 textarea {
-  background: transparent;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Courier New', Courier, monospace;
+}
+
+textarea, input:not([type]) {
   background: $ui-background;
   border: 0;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Courier New', Courier, monospace;
   resize: none;
 
   &:focus, &:hover {

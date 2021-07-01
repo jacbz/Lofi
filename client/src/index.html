@@ -15,7 +15,7 @@
     </div>
 
     <div id="player-panel" class="panel">
-      <div id="now-playing">
+      <div id="now-playing">        
         <div id="cover">
           <div id="vinyl" class="paused" style="opacity: 0.5">
             <svg id="vinyl-center" viewBox="0 0 52 52">
@@ -71,9 +71,17 @@
         </div>
       </template>
       <div id="playlist">
+        
         <div id="playlist-header">
-          NOW PLAYING
+          <div id="playlist-header-text">NOW PLAYING</div>
           <button id="export-button" class="plain" title="Share this playlist"></button>
+          <div id="export-panel" class="panel">
+            <div id="export-panel-header-text">SHARE THIS PLAYLIST</div>
+            <div id="export-panel-content">
+              <input id="export-url-input">
+              <button id="copy-button" class="flat">Copy</button>
+            </div>
+          </div>
         </div>
         <div id="playlist-tracks"></div>
       </div>

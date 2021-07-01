@@ -200,8 +200,26 @@ formatInputRange(volumeBar, '#fff');
 
 // Export
 const exportButton = document.getElementById('export-button');
+const exportPanel = document.getElementById('export-panel');
+const exportUrlInput = document.getElementById('export-url-input') as HTMLInputElement;
+const copyButton = document.getElementById('copy-button');
 exportButton.addEventListener('click', async () => {
-  player.exportPlaylist();
+  exportPanel.style.visibility = 'visible';
+  exportPanel.style.opacity = '1';
+  const url = player.getExportUrl();
+  exportUrlInput.value = url;
+  // wait for panel to become visible before we can select the text field
+  setTimeout(() => {
+    exportUrlInput.select();
+  }, 50);
+});
+exportUrlInput.addEventListener('click', async () => {
+  exportUrlInput.select();
+});
+copyButton.addEventListener('click', async () => {
+  document.execCommand('copy');
+  exportPanel.style.visibility = 'hidden';
+  exportPanel.style.opacity = '0';
 });
 
 // Filter panel
