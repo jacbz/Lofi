@@ -34,6 +34,11 @@ class Player {
     }
   }
 
+  shuffle = false;
+
+  /** Playing queue, used when shuffling */
+  shuffleQueue: number[] = [];
+
   /** Function to update the playlist in the UI */
   updatePlaylistDisplay: () => void;
 
@@ -124,6 +129,7 @@ class Player {
     if (!this.isPlaying) {
       await this.playTrack(this.playlist.length - 1);
     }
+    this.fillShuffleQueue();
   }
 
   async playTrack(playlistIndex: number) {
@@ -244,9 +250,27 @@ class Player {
   }
 
   playNext() {
-    if (this.currentPlayingIndex < this.playlist.length - 1) {
+    let nextTrackIndex = null;
+    if (this.shuffle) {
+      if (this.shuffleQueue.length === 0) this.fillShuffleQueue();
+      nextTrackIndex = this.shuffleQueue.shift();
+    } else if (this.currentPlayingIndex < this.playlist.length - 1) {
+      nextTrackIndex = this.currentPlayingIndex + 1;
+    }
+
+    if (nextTrackIndex !== null) {
       this.stop();
-      this.playTrack(this.currentPlayingIndex + 1);
+      this.playTrack(nextTrackIndex);
+    }
+  }
+
+  fillShuffleQueue() {
+    this.shuffleQueue = [...Array(this.playlist.length).keys()];
+
+    // shuffle
+    for (let i = this.shuffleQueue.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.shuffleQueue[i], this.shuffleQueue[j]] = [this.shuffleQueue[j], this.shuffleQueue[i]];
     }
   }
 }

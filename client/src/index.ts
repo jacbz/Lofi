@@ -79,10 +79,11 @@ const updatePlaylistDisplay = () => {
 };
 player.updatePlaylistDisplay = updatePlaylistDisplay;
 
-// Play button
+// Player controls
 const playButton = document.getElementById('play-button');
 const playPreviousButton = document.getElementById('play-previous-button');
 const playNextButton = document.getElementById('play-next-button');
+const shuffleButton = document.getElementById('shuffle-button');
 const vinyl = document.getElementById('vinyl');
 const updatePlayingState = (isPlaying: boolean) => {
   if (isPlaying) {
@@ -106,6 +107,10 @@ playPreviousButton.addEventListener('click', async () => {
 });
 playNextButton.addEventListener('click', async () => {
   player.playNext();
+});
+shuffleButton.addEventListener('click', async () => {
+  player.shuffle = !player.shuffle;
+  shuffleButton.classList.toggle('active', player.shuffle);
 });
 
 // Filter panel

@@ -22,11 +22,14 @@
         <div id="info">
           <span id="title">&nbsp;</span>
           <input type="range" min="0" max="0" step="0.1" value="0" class="slider" id="seekbar">
-          <span>
-            <span id="time">00:00</span>
-            /
-            <span id="total-time">00:00</span>
-          </span>
+          <div id="subtitle">
+            <div>
+              <span id="time">00:00</span>
+              <span id="slash">/</span>
+              <span id="total-time">00:00</span>
+            </div>
+            <button id="shuffle-button" class="plain" title="Shuffle"></button>
+          </div>
         </div>
         <div id="buttons">
           <button id="play-previous-button" class="circle"></button>
