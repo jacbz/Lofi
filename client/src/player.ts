@@ -163,6 +163,7 @@ class Player {
     await this.play();
   }
 
+  /** Sets up Tone.Transport for a track and starts playback */
   async play() {
     if (!this.currentTrack) {
       return;
@@ -242,7 +243,7 @@ class Player {
     Tone.Transport.scheduleRepeat((time) => {
       const seconds = Tone.Transport.getSecondsAtTime(time);
       this.updateTrackDisplay(seconds);
-      this.updateAudioWebApiPosition();
+      this.updateAudioWebApiPosition(seconds);
 
       if (this.currentTrack.length - seconds < 0) {
         this.playNext();
@@ -273,6 +274,8 @@ class Player {
       this.isPlaying = true;
       Tone.Transport.start();
       this.seek(Tone.Transport.seconds);
+    } else if (this.playlist.length > 0) {
+      this.playTrack(0);
     }
   }
 
@@ -375,14 +378,14 @@ class Player {
         { src: './background.jpg', type: 'image/jpg' }
       ]
     });
-    this.updateAudioWebApiPosition();
+    this.updateAudioWebApiPosition(0);
   }
 
-  updateAudioWebApiPosition() {
+  updateAudioWebApiPosition(seconds: number) {
     if (!('mediaSession' in navigator) || !this.currentTrack) return;
     navigator.mediaSession.setPositionState({
       duration: this.currentTrack.length,
-      position: Math.max(0, Tone.Transport.seconds)
+      position: Math.max(0, Math.min(this.currentTrack.length, seconds))
     });
   }
 }

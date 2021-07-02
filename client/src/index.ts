@@ -300,12 +300,12 @@ for (const el of document.getElementById('filter').querySelectorAll('input')) {
 
 // Media Session API
 const actionsAndHandlers = [
-  ['play', () => { player.play(); }],
+  ['play', () => { player.continue(); }],
   ['pause', () => { player.pause(); }],
   ['previoustrack', () => { player.playPrevious(); }],
   ['nexttrack', () => { player.playNext(); }],
-  ['seekbackward', (details: MediaSessionActionDetails) => { player.seek(-details.seekOffset || -10); }],
-  ['seekforward', (details: MediaSessionActionDetails) => { player.seekRelative(details.seekOffset || 10); }],
+  ['seekbackward', (details: MediaSessionActionDetails) => { player.seekRelative(-5); }],
+  ['seekforward', (details: MediaSessionActionDetails) => { player.seekRelative(5); }],
   ['seekto', (details: MediaSessionActionDetails) => { player.seek(details.seekTime); }],
   ['stop', () => { player.unload(); }]
 ];
