@@ -26,7 +26,7 @@ if (queryString.length > 0) {
 
 /** Formats seconds into an MM:SS string */
 const formatTime = (seconds: number) => {
-  if (seconds < 0) return '0:00';
+  if (!seconds || seconds < 0) return '0:00';
   return `${Math.floor(seconds / 60)}:${`0${Math.floor(seconds % 60)}`.slice(-2)}`;
 };
 
@@ -42,18 +42,31 @@ const timeLabel = document.getElementById('current-time');
 const totalTimeLabel = document.getElementById('total-time');
 const formatInputRange = (input: HTMLInputElement, color: string) => {
   const value = ((input.valueAsNumber - +input.min) / (+input.max - +input.min)) * 100;
+  if (!value) {
+    input.style.background = 'rgba(0, 0, 0, 0.25)';
+  }
   input.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${value}%, rgba(0, 0, 0, 0.25) ${value}%, rgba(0, 0, 0, 0.25) 100%)`;
 };
-player.updateTrackDisplay = (seconds: number) => {
-  titleLabel.textContent = player.currentTrack.title;
-  const totalLength = player.currentTrack.length;
-  seekbar.max = `${totalLength}`;
+player.updateTrackDisplay = (seconds?: number) => {
+  if (player.currentTrack) {
+    vinyl.style.opacity = '1';
 
-  seekbar.valueAsNumber = seconds;
-  // when current time is within 0.1s of total length, display total length
-  timeLabel.textContent = formatTime(seconds);
-  totalTimeLabel.textContent = formatTime(totalLength);
+    titleLabel.textContent = player.currentTrack.title;
+    const totalLength = player.currentTrack.length;
+    seekbar.max = `${totalLength}`;
 
+    seekbar.valueAsNumber = +seconds;
+    // when current time is within 0.1s of total length, display total length
+    timeLabel.textContent = formatTime(seconds);
+    totalTimeLabel.textContent = formatTime(totalLength);
+  } else {
+    vinyl.style.opacity = '0.5';
+    titleLabel.textContent = '';
+    seekbar.valueAsNumber = 0;
+    seekbar.max = '0';
+    timeLabel.textContent = '0:00';
+    totalTimeLabel.textContent = '0:00';
+  }
   formatInputRange(seekbar, '#fc5c8c');
 };
 
@@ -77,49 +90,6 @@ addButton.addEventListener('click', async () => {
   const track = producer.produce(params);
   await player.addToPlaylist(track);
 });
-
-// Playlist
-const playlistContainer = document.getElementById('playlist-tracks');
-const updatePlaylistDisplay = () => {
-  playlistContainer.innerHTML = '';
-  player.playlist.forEach((track, i) => {
-    const template = document.getElementById('playlist-track') as HTMLTemplateElement;
-    const trackElement = (template.content.cloneNode(true) as HTMLElement).querySelector(
-      '.track'
-    ) as HTMLDivElement;
-
-    const name = trackElement.querySelector('.track-name');
-    name.textContent = track.title;
-    const duration = trackElement.querySelector('.track-duration');
-    duration.textContent = formatTime(track.length);
-
-    if (track === player.currentTrack) {
-      trackElement.classList.add('playing');
-    }
-    trackElement.addEventListener('click', async () => {
-      player.playTrack(i);
-    });
-
-    playlistContainer.appendChild(trackElement);
-  });
-};
-Sortable.create(playlistContainer, {
-  animation: 200,
-  ghostClass: 'dragging',
-  handle: '.sort-handle',
-  onEnd: (event) => {
-    const element = player.playlist[event.oldIndex];
-    player.playlist.splice(event.oldIndex, 1);
-    player.playlist.splice(event.newIndex, 0, element);
-    if (player.currentPlayingIndex === event.oldIndex) {
-      player.currentPlayingIndex = event.newIndex;
-    }
-    updatePlaylistDisplay();
-    console.log(event, player.playlist);
-  }
-});
-player.updatePlaylistDisplay = updatePlaylistDisplay;
-updatePlaylistDisplay();
 
 // On track change
 const vinyl = document.getElementById('vinyl');
@@ -147,6 +117,55 @@ const onTrackChange = () => {
 };
 player.onTrackChange = onTrackChange;
 
+// Playlist
+const playlistContainer = document.getElementById('playlist-tracks');
+const updatePlaylistDisplay = () => {
+  playlistContainer.innerHTML = '';
+  player.playlist.forEach((track, i) => {
+    const template = document.getElementById('playlist-track') as HTMLTemplateElement;
+    const trackElement = (template.content.cloneNode(true) as HTMLElement).querySelector(
+      '.track'
+    ) as HTMLDivElement;
+
+    const name = trackElement.querySelector('.track-name');
+    name.textContent = track.title;
+    const duration = trackElement.querySelector('.track-duration');
+    duration.textContent = formatTime(track.length);
+
+    if (track === player.currentTrack) {
+      trackElement.classList.add('playing');
+    }
+    trackElement.addEventListener('click', async (e: MouseEvent) => {
+      if ((e.target as HTMLElement).tagName === 'BUTTON') return;
+      player.playTrack(i);
+    });
+
+    const deleteButton = trackElement.querySelector('.delete-button');
+    deleteButton.addEventListener('click', async () => {
+      player.deleteTrack(i);
+    });
+
+    playlistContainer.appendChild(trackElement);
+  });
+};
+player.updatePlaylistDisplay = updatePlaylistDisplay;
+Sortable.create(playlistContainer, {
+  animation: 250,
+  ghostClass: 'dragging',
+  handle: '.sort-handle',
+  onEnd: (event) => {
+    const element = player.playlist[event.oldIndex];
+    player.playlist.splice(event.oldIndex, 1);
+    player.playlist.splice(event.newIndex, 0, element);
+    if (player.currentPlayingIndex === event.oldIndex) {
+      player.currentPlayingIndex = event.newIndex;
+    }
+    updatePlaylistDisplay();
+    console.log(event, player.playlist);
+  }
+});
+updatePlaylistDisplay();
+
 // Player controls
 const playButton = document.getElementById('play-button');
 const playPreviousButton = document.getElementById('play-previous-button');
@@ -156,7 +175,6 @@ const shuffleButton = document.getElementById('shuffle-button');
 const volumeButton = document.getElementById('volume-button');
 const volumeBar = document.getElementById('volume-bar') as HTMLInputElement;
 const updatePlayingState = (isPlaying: boolean) => {
-  vinyl.style.opacity = '1';
   if (isPlaying) {
     playButton.classList.toggle('paused', true);
     vinyl.classList.toggle('paused', false);

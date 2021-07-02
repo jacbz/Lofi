@@ -133,7 +133,7 @@ body {
       #title {
         font-weight: 500;
         text-align: center;
-        margin-bottom: 2px;
+        height: 18px;
       }
 
       #time {
@@ -310,11 +310,12 @@ body {
     }
 
     .track {
-      padding: 12px 10px;
+      padding: 10px;
       border-bottom: 1px solid $ui-background;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
+      align-items: center;
 
       .track-name {
         font-weight: 500;
@@ -332,7 +333,7 @@ body {
       &:hover {
         background: rgba(0,0,0,0.1);
 
-        .sort-handle {          
+        .track-actions {          
           visibility: visible;
           opacity: 1;
         }
@@ -352,15 +353,25 @@ body {
         }
       }
 
-      .sort-handle {
-        background-image: url("icons/sorthandle.svg");
-        width: 36px;
-        background-size: 24px;
-        background-position: center;
-        background-repeat: no-repeat;
+      .track-actions {
         visibility: hidden;
         opacity: 0;
-      }
+        transition: visibility 0.2s, opacity 0.2s;
+        display: flex;
+        gap: 8px;
+
+        .delete-button {
+          background-image: url("icons/delete.svg");
+        }
+  
+        .sort-handle {
+          background-image: url("icons/sorthandle.svg");
+          width: 24px;
+          background-size: 24px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+      }  
     }
 
   }
@@ -496,7 +507,6 @@ input[type='range'] {
     @include slider-thumb;
   }
 }
-
 
 #volume-bar {
   width: 60px;

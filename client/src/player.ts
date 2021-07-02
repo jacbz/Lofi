@@ -64,7 +64,7 @@ class Player {
   updatePlaylistDisplay: () => void;
 
   /** Function to update track information in the UI */
-  updateTrackDisplay: (seconds: number) => void;
+  updateTrackDisplay: (seconds?: number) => void;
 
   /** Function to call when the track changes */
   onTrackChange: () => void;
@@ -329,6 +329,18 @@ class Player {
       const j = Math.floor(Math.random() * (i + 1));
       [this.shuffleQueue[i], this.shuffleQueue[j]] = [this.shuffleQueue[j], this.shuffleQueue[i]];
     }
+  }
+
+  deleteTrack(index: number) {
+    this.playlist.splice(index, 1);
+    if (index === this.currentPlayingIndex) {
+      this.stop();
+      this.currentPlayingIndex = undefined;
+      this.updateTrackDisplay();
+    } else if (index < this.currentPlayingIndex) {
+      this.currentPlayingIndex -= 1;
+    }
+    this.updatePlaylistDisplay();
   }
 
   getExportUrl() {
