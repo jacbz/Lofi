@@ -34,12 +34,12 @@ body {
   border-radius: 6px;
 }
 
-@supports (backdrop-filter: blur(6px)) {
+@supports (backdrop-filter: blur(8px)) {
   .panel {
-    backdrop-filter: blur(6px);
+    backdrop-filter: blur(8px);
   }
 }
-@supports not (backdrop-filter: blur(6px)) {
+@supports not (backdrop-filter: blur(8px)) {
   // todo: workaround for backdrop-filter on Firefox
 }
 

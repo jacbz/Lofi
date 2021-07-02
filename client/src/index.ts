@@ -36,15 +36,17 @@ seekbar.addEventListener('input', () => {
   timeLabel.textContent = formatTime(seekbar.valueAsNumber);
   formatInputRange(seekbar, '#fc5c8c');
 });
-
 let wasPaused = false;
+let seekbarDragging = false;
 seekbar.addEventListener('mousedown', () => {
+  seekbarDragging = true;
   wasPaused = !player.isPlaying;
   if (!wasPaused) {
     player.pause();
   }
 });
 seekbar.addEventListener('mouseup', () => {
+  seekbarDragging = false;
   player.seek(seekbar.valueAsNumber);
   if (!wasPaused) {
     player.play();
@@ -64,6 +66,9 @@ const formatInputRange = (input: HTMLInputElement, color: string) => {
   input.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${value}%, rgba(0, 0, 0, 0.25) ${value}%, rgba(0, 0, 0, 0.25) 100%)`;
 };
 player.updateTrackDisplay = (seconds?: number) => {
+  // don't update display while seekbar is being dragged
+  if (seekbarDragging) return;
+
   if (player.currentTrack) {
     vinyl.style.opacity = '1';
 
@@ -188,6 +193,7 @@ const repeatButton = document.getElementById('repeat-button');
 const shuffleButton = document.getElementById('shuffle-button');
 const volumeButton = document.getElementById('volume-button');
 const volumeBar = document.getElementById('volume-bar') as HTMLInputElement;
+player.getGain = () => volumeBar.valueAsNumber;
 const updatePlayingState = () => {
   if (player.isPlaying) {
     playButton.classList.toggle('paused', true);
@@ -205,6 +211,9 @@ playButton.addEventListener('click', async () => {
     player.pause();
   } else {
     player.play();
+    if (!player.muted) {
+      player.gain.gain.value = volumeBar.valueAsNumber;
+    }
   }
 });
 playPreviousButton.addEventListener('click', async () => {
@@ -246,7 +255,9 @@ volumeBar.addEventListener('input', () => {
   if (player.muted) {
     volumeButton.click();
   }
-  player.gain.gain.value = volumeBar.valueAsNumber;
+  if (player.isPlaying) {
+    player.gain.gain.value = volumeBar.valueAsNumber;
+  }
   formatInputRange(volumeBar, '#fff');
 });
 formatInputRange(volumeBar, '#fff');

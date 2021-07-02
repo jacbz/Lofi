@@ -31,7 +31,7 @@ class Player {
     this._isPlaying = isPlaying;
     this.onPlayingStateChange();
     if (this.gain) {
-      this.gain.gain.value = +isPlaying;
+      this.gain.gain.value = isPlaying ? this.getGain() : 0;
     }
   }
 
@@ -50,15 +50,11 @@ class Player {
 
   set muted(muted: boolean) {
     this._muted = muted;
-    if (muted) {
-      this.previousGain = this.gain.gain.value;
-      this.gain.gain.value = 0;
-    } else {
-      this.gain.gain.value = this.previousGain;
-    }
+    this.gain.gain.value = muted ? 0 : this.getGain();
   }
 
-  previousGain: number;
+  /** Function to get the gain from the UI */
+  getGain: () => number;
 
   /** Function to update the playlist in the UI */
   updatePlaylistDisplay: () => void;
