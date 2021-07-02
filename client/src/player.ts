@@ -80,91 +80,92 @@ class Player {
 
   /** Filters */
 
-  compressor: Tone.Compressor;
+  // compressor: Tone.Compressor;
 
-  lowPassFilter: Tone.Filter;
+  // lowPassFilter: Tone.Filter;
 
-  highPassFilter: Tone.Filter;
+  // highPassFilter: Tone.Filter;
 
-  equalizer: Tone.EQ3;
+  // equalizer: Tone.EQ3;
 
-  distortion: Tone.Distortion;
+  // distortion: Tone.Distortion;
 
-  reverb: Tone.Reverb;
+  // reverb: Tone.Reverb;
 
-  chebyshev: Tone.Chebyshev;
+  // chebyshev: Tone.Chebyshev;
 
-  bitcrusher: Tone.BitCrusher;
+  // bitcrusher: Tone.BitCrusher;
 
-  defaultFilters: Tone.ToneAudioNode[];
+  // defaultFilters: Tone.ToneAudioNode[];
 
-  initDefaultFilters() {
-    this.compressor = new Tone.Compressor(-15, 3);
-    this.lowPassFilter = new Tone.Filter({
-      type: 'lowpass',
-      frequency: 5000
-    });
-    this.highPassFilter = new Tone.Filter({
-      type: 'highpass',
-      frequency: 0
-    });
-    this.equalizer = new Tone.EQ3(0, 0, 0);
-    this.distortion = new Tone.Distortion(0);
-    this.reverb = new Tone.Reverb({
-      decay: 0.001,
-      wet: 0,
-      preDelay: 0
-    });
-    this.chebyshev = new Tone.Chebyshev(1);
-    // this.bitcrusher = new Tone.BitCrusher(16);
-    this.gain = new Tone.Gain();
+  // initDefaultFilters() {
+  //   this.compressor = new Tone.Compressor(-15, 3);
+  //   this.lowPassFilter = new Tone.Filter({
+  //     type: 'lowpass',
+  //     frequency: 5000
+  //   });
+  //   this.highPassFilter = new Tone.Filter({
+  //     type: 'highpass',
+  //     frequency: 0
+  //   });
+  //   this.equalizer = new Tone.EQ3(0, 0, 0);
+  //   this.distortion = new Tone.Distortion(0);
+  //   this.reverb = new Tone.Reverb({
+  //     decay: 0.001,
+  //     wet: 0,
+  //     preDelay: 0
+  //   });
+  //   this.chebyshev = new Tone.Chebyshev(1);
+  //   // this.bitcrusher = new Tone.BitCrusher(16);
 
-    this.defaultFilters = [
-      this.compressor,
-      this.lowPassFilter,
-      this.highPassFilter,
-      this.reverb,
-      // this.bitcrusher,
-      // this.equalizer,
-      this.chebyshev
-      // this.distortion
-    ];
-  }
+  //   this.defaultFilters = [
+  //     this.compressor,
+  //     this.lowPassFilter,
+  //     this.highPassFilter,
+  //     this.reverb,
+  //     // this.bitcrusher,
+  //     // this.equalizer,
+  //     this.chebyshev
+  //     // this.distortion
+  //   ];
+  // }
 
-  connectFilter(filter: Tone.ToneAudioNode) {
-    this.defaultFilters.splice(this.defaultFilters.indexOf(this.gain), 0, filter);
-    for (const player of this.instrumentSamplers.values()) {
-      player.disconnect();
-      player.chain(...this.defaultFilters, this.gain, Tone.Destination);
-    }
-    for (const player of this.samplePlayers.values()) {
-      for (const player2 of player.values()) {
-        if (!player2) return;
-        player2.disconnect();
-        player2.chain(...this.defaultFilters, this.gain, Tone.Destination);
-      }
-    }
-  }
+  // connectFilter(filter: Tone.ToneAudioNode) {
+  //   this.defaultFilters.splice(this.defaultFilters.indexOf(this.gain), 0, filter);
+  //   for (const player of this.instrumentSamplers.values()) {
+  //     player.disconnect();
+  //     player.chain(...this.defaultFilters, this.gain, Tone.Destination);
+  //   }
+  //   for (const player of this.samplePlayers.values()) {
+  //     for (const player2 of player.values()) {
+  //       if (!player2) return;
+  //       player2.disconnect();
+  //       player2.chain(...this.defaultFilters, this.gain, Tone.Destination);
+  //     }
+  //   }
+  // }
 
-  async addToPlaylist(track: Track) {
+  /** Adds a given track to the playlist */
+  addToPlaylist(track: Track) {
     this.playlist.push(track);
     this.updatePlaylistDisplay();
     if (!this.isPlaying) {
-      await this.playTrack(this.playlist.length - 1);
+      this.playTrack(this.playlist.length - 1);
     }
     this.fillShuffleQueue();
   }
 
-  async playTrack(playlistIndex: number) {
+  /** Plays a specific track in the playlist */
+  playTrack(playlistIndex: number) {
     this.currentPlayingIndex = playlistIndex;
     this.onTrackChange();
     this.seek(0);
     this.stop();
-    await this.play();
+    this.load();
   }
 
-  /** Sets up Tone.Transport for a track and starts playback */
-  async play() {
+  /** Sets up Tone.Transport for the current track and starts playback */
+  async load() {
     if (!this.currentTrack) {
       return;
     }
@@ -185,7 +186,7 @@ class Player {
     this.samplePlayers = new Map();
     this.instrumentSamplers = new Map();
 
-    this.initDefaultFilters();
+    // this.initDefaultFilters();
 
     // load samples
     for (const [sampleGroupName, sampleIndex] of this.currentTrack.samples) {
@@ -197,7 +198,7 @@ class Player {
         fadeIn: '4n',
         fadeOut: '4n'
       })
-        .chain(...sampleGroup.getFilters(), ...this.defaultFilters, this.gain, Tone.Destination)
+        .chain(...sampleGroup.getFilters(), this.gain, Tone.Destination)
         .sync();
 
       if (!this.samplePlayers.has(sampleGroupName)) {
@@ -209,19 +210,14 @@ class Player {
     // load instruments
     for (const instrument of this.currentTrack.instruments) {
       const sampler = getInstrumentSampler(instrument)
-        .chain(
-          ...getInstrumentFilters(instrument),
-          ...this.defaultFilters,
-          this.gain,
-          Tone.Destination
-        )
+        .chain(...getInstrumentFilters(instrument), this.gain, Tone.Destination)
         .sync();
       this.instrumentSamplers.set(instrument, sampler);
     }
 
     // wait until all samples are loaded
     await Tone.loaded();
-    await this.reverb.generate();
+    // await this.reverb.generate();
 
     for (const sampleLoop of this.currentTrack.sampleLoops) {
       const samplePlayer = this.samplePlayers.get(sampleLoop.sampleGroupName)[
@@ -250,26 +246,12 @@ class Player {
       }
     }, 0.1);
 
-    Tone.Transport.start();
+    console.log(Tone.Transport.seconds);
+    this.play();
   }
 
-  seek(seconds: number) {
-    if (!this.currentTrack) return;
-    this.instrumentSamplers?.forEach((s) => s.releaseAll());
-    Tone.Transport.seconds = seconds;
-    this.updateTrackDisplay(seconds);
-  }
-
-  seekRelative(seconds: number) {
-    if (!this.currentTrack) return;
-    const position = Math.max(0, Tone.Transport.seconds + seconds);
-    if (position > this.currentTrack.length) {
-      this.stop();
-    }
-    this.seek(position);
-  }
-
-  continue() {
+  /** Starts playback on the current track; the track must have been loaded */
+  play() {
     if (this.currentTrack) {
       this.isPlaying = true;
       Tone.Transport.start();
@@ -279,11 +261,31 @@ class Player {
     }
   }
 
+  /** Seeks to a specific position in the current track */
+  seek(seconds: number) {
+    if (!this.currentTrack) return;
+    this.instrumentSamplers?.forEach((s) => s.releaseAll());
+    Tone.Transport.seconds = seconds;
+    this.updateTrackDisplay(seconds);
+  }
+
+  /** Seeks to a specific position in the current track, relative to the current position */
+  seekRelative(seconds: number) {
+    if (!this.currentTrack) return;
+    const position = Math.max(0, Tone.Transport.seconds + seconds);
+    if (position > this.currentTrack.length) {
+      this.stop();
+    }
+    this.seek(position);
+  }
+
+  /** Pauses the current track */
   pause() {
     this.isPlaying = false;
     Tone.Transport.pause();
   }
 
+  /** Stops the current track, and disposes Tone.js objects */
   stop() {
     Tone.Transport.cancel();
     Tone.Transport.stop();
@@ -300,6 +302,7 @@ class Player {
     navigator.mediaSession.metadata = null;
   }
 
+  /** Plays the previous track */
   playPrevious() {
     let nextTrackIndex = null;
     if (this.currentPlayingIndex > 0) {
@@ -317,6 +320,7 @@ class Player {
     }
   }
 
+  /** Plays the next track */
   playNext() {
     if (this.repeat === RepeatMode.ONE) {
       this.seek(0);
@@ -343,6 +347,7 @@ class Player {
     }
   }
 
+  /** Generates a 'shuffle queue' */
   fillShuffleQueue() {
     this.shuffleQueue = [...Array(this.playlist.length).keys()];
 
@@ -353,6 +358,7 @@ class Player {
     }
   }
 
+  /** Deletes a track from the playlist */
   deleteTrack(index: number) {
     this.playlist.splice(index, 1);
     if (index === this.currentPlayingIndex) {
@@ -363,12 +369,15 @@ class Player {
     this.updatePlaylistDisplay();
   }
 
+  /** Generate a URL that points to the current playlist */
   getExportUrl() {
     const json = JSON.stringify(this.playlist.map((t) => t.outputParams));
     const compressed = compress(json);
-    return `${window.location.origin}${window.location.pathname}?${compressed}`.replace('home.in.tum.de/~zhangja/lofi', 'lofi.jacobzhang.de');
+    return `${window.location.origin}${window.location.pathname}?${compressed}`
+      .replace('home.in.tum.de/~zhangja/lofi', 'lofi.jacobzhang.de');
   }
 
+  /** Set up Media Session API metadata */
   setAudioWebApiMetadata() {
     if (!('mediaSession' in navigator) || !this.currentTrack) return;
     navigator.mediaSession.metadata = new MediaMetadata({
@@ -381,6 +390,7 @@ class Player {
     this.updateAudioWebApiPosition(0);
   }
 
+  /** Set up Media Session API current position */
   updateAudioWebApiPosition(seconds: number) {
     if (!('mediaSession' in navigator) || !this.currentTrack) return;
     navigator.mediaSession.setPositionState({

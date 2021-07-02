@@ -89,7 +89,7 @@ addButton.addEventListener('click', async () => {
   }
   const producer = new Producer();
   const track = producer.produce(params);
-  await player.addToPlaylist(track);
+  player.addToPlaylist(track);
 });
 
 // On track change
@@ -190,7 +190,7 @@ playButton.addEventListener('click', async () => {
   if (player.isPlaying) {
     player.pause();
   } else {
-    player.continue();
+    player.play();
   }
 });
 playPreviousButton.addEventListener('click', async () => {
@@ -262,45 +262,45 @@ copyButton.addEventListener('click', async () => {
 });
 
 // Filter panel
-function value(id: string) {
-  return (document.getElementById(id) as HTMLInputElement).valueAsNumber;
-}
-const adjustFilters = () => {
-  player.compressor.threshold.value = value('compressorthreshold');
-  player.compressor.ratio.value = value('compressorratio');
-  player.lowPassFilter.frequency.value = value('lpffrequency');
-  player.lowPassFilter.Q.value = value('lpfq');
-  player.highPassFilter.frequency.value = value('hpffrequency');
-  player.highPassFilter.Q.value = value('hpfq');
-  player.equalizer.low.value = value('eqlow');
-  player.equalizer.mid.value = value('eqmid');
-  player.equalizer.high.value = value('eqhigh');
-  player.reverb.decay = value('reverbdecay');
-  player.reverb.preDelay = value('reverbpredelay');
-  player.reverb.wet.value = value('reverbwet');
-  player.distortion.distortion = value('distortion');
-  player.chebyshev.order = value('chebyshev');
-  // player.bitcrusher.bits.value = value('bitcrusher');
+// function value(id: string) {
+//   return (document.getElementById(id) as HTMLInputElement).valueAsNumber;
+// }
+// const adjustFilters = () => {
+//   player.compressor.threshold.value = value('compressorthreshold');
+//   player.compressor.ratio.value = value('compressorratio');
+//   player.lowPassFilter.frequency.value = value('lpffrequency');
+//   player.lowPassFilter.Q.value = value('lpfq');
+//   player.highPassFilter.frequency.value = value('hpffrequency');
+//   player.highPassFilter.Q.value = value('hpfq');
+//   player.equalizer.low.value = value('eqlow');
+//   player.equalizer.mid.value = value('eqmid');
+//   player.equalizer.high.value = value('eqhigh');
+//   player.reverb.decay = value('reverbdecay');
+//   player.reverb.preDelay = value('reverbpredelay');
+//   player.reverb.wet.value = value('reverbwet');
+//   player.distortion.distortion = value('distortion');
+//   player.chebyshev.order = value('chebyshev');
+//   // player.bitcrusher.bits.value = value('bitcrusher');
 
-  const output = new Map();
-  for (const el of document.getElementById('filter').querySelectorAll('input')) {
-    output.set(el.id, el.valueAsNumber);
-  }
-  console.log(output);
-};
-document.getElementById('connecteq').addEventListener('click', () => {
-  player.connectFilter(player.equalizer);
-});
-document.getElementById('connectdistortion').addEventListener('click', () => {
-  player.connectFilter(player.distortion);
-});
-for (const el of document.getElementById('filter').querySelectorAll('input')) {
-  el.addEventListener('input', adjustFilters);
-}
+//   const output = new Map();
+//   for (const el of document.getElementById('filter').querySelectorAll('input')) {
+//     output.set(el.id, el.valueAsNumber);
+//   }
+//   console.log(output);
+// };
+// document.getElementById('connecteq').addEventListener('click', () => {
+//   player.connectFilter(player.equalizer);
+// });
+// document.getElementById('connectdistortion').addEventListener('click', () => {
+//   player.connectFilter(player.distortion);
+// });
+// for (const el of document.getElementById('filter').querySelectorAll('input')) {
+//   el.addEventListener('input', adjustFilters);
+// }
 
 // Media Session API
 const actionsAndHandlers = [
-  ['play', () => { player.continue(); }],
+  ['play', () => { player.play(); }],
   ['pause', () => { player.pause(); }],
   ['previoustrack', () => { player.playPrevious(); }],
   ['nexttrack', () => { player.playNext(); }],
