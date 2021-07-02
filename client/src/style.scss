@@ -313,6 +313,8 @@ body {
       padding: 12px 10px;
       border-bottom: 1px solid $ui-background;
       cursor: pointer;
+      display: flex;
+      justify-content: space-between;
 
       .track-name {
         font-weight: 500;
@@ -323,8 +325,17 @@ body {
         opacity: 0.75;
       }
 
+      &.dragging {
+        background: rgba(0,0,0,0.2) !important;
+      }
+
       &:hover {
         background: rgba(0,0,0,0.1);
+
+        .sort-handle {          
+          visibility: visible;
+          opacity: 1;
+        }
       }
       
       &.playing {
@@ -339,6 +350,16 @@ body {
           margin-right: 5px;
           vertical-align: -1px;
         }
+      }
+
+      .sort-handle {
+        background-image: url("icons/sorthandle.svg");
+        width: 36px;
+        background-size: 24px;
+        background-position: center;
+        background-repeat: no-repeat;
+        visibility: hidden;
+        opacity: 0;
       }
     }
 
@@ -541,5 +562,6 @@ input[type='range'] {
   background: url('icons/repeat-all.svg'),
               url('icons/repeat-one.svg'),
               url('icons/shuffle-active.svg'),
-              url('icons/volume-muted.svg')
+              url('icons/volume-muted.svg'),
+              url('icons/play.svg')
 }

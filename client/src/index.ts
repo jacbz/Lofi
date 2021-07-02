@@ -1,3 +1,4 @@
+import Sortable from 'sortablejs';
 import Player, { RepeatMode } from './player';
 import Producer from './producer';
 import { getRandomInputParams, OutputParams } from './params';
@@ -17,6 +18,7 @@ if (queryString.length > 0) {
       return producer.produce(params);
     });
     player.playlist = playlist;
+    window.history.pushState({}, null, '/');
   } catch (e) {
     console.log('Error parsing', compressed);
   }
@@ -82,7 +84,9 @@ const updatePlaylistDisplay = () => {
   playlistContainer.innerHTML = '';
   player.playlist.forEach((track, i) => {
     const template = document.getElementById('playlist-track') as HTMLTemplateElement;
-    const trackElement = (template.content.cloneNode(true) as HTMLElement).querySelector('.track') as HTMLDivElement;
+    const trackElement = (template.content.cloneNode(true) as HTMLElement).querySelector(
+      '.track'
+    ) as HTMLDivElement;
 
     const name = trackElement.querySelector('.track-name');
     name.textContent = track.title;
@@ -99,6 +103,21 @@ const updatePlaylistDisplay = () => {
     playlistContainer.appendChild(trackElement);
   });
 };
+Sortable.create(playlistContainer, {
+  animation: 200,
+  ghostClass: 'dragging',
+  handle: '.sort-handle',
+  onEnd: (event) => {
+    const element = player.playlist[event.oldIndex];
+    player.playlist.splice(event.oldIndex, 1);
+    player.playlist.splice(event.newIndex, 0, element);
+    if (player.currentPlayingIndex === event.oldIndex) {
+      player.currentPlayingIndex = event.newIndex;
+    }
+    updatePlaylistDisplay();
+    console.log(event, player.playlist);
+  }
+});
 player.updatePlaylistDisplay = updatePlaylistDisplay;
 updatePlaylistDisplay();
 
