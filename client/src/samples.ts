@@ -10,27 +10,24 @@ class SampleGroup {
 
   category: string;
 
-  urls: string[];
-
   volume: number;
 
-  size: number;
-
   energyRanges: number[][];
+
+  size: number;
 
   public constructor(
     name: string,
     category: string,
-    urls: string[],
-    volume: number,
-    energyRanges: number[][]
+    size: number,
+    energyRanges: number[][],
+    volume: number
   ) {
     this.name = name;
     this.category = category;
-    this.urls = urls;
     this.volume = SAMPLE_DEFAULT_VOLUME + volume;
-    this.size = urls.length;
     this.energyRanges = energyRanges;
+    this.size = size;
   }
 
   /** Gets a random sample index, based on a seed number */
@@ -39,7 +36,7 @@ class SampleGroup {
   }
 
   getSampleUrl(index: number) {
-    return `${SAMPLES_BASE_URL}/loops/${this.category}/${this.name}/${this.urls[index]}`;
+    return `${SAMPLES_BASE_URL}/loops/${this.category}/${this.name}/${this.name}_${index + 1}.mp3`;
   }
 
   getFilters() {
@@ -62,9 +59,9 @@ export const SAMPLEGROUPS: Map<string, SampleGroup> = sampleConfig.reduce((map, 
     new SampleGroup(
       sampleGroup.name,
       sampleGroup.category,
-      sampleGroup.urls,
-      sampleGroup.volume,
-      sampleGroup.energyRanges
+      sampleGroup.size,
+      sampleGroup.energyRanges,
+      sampleGroup.volume
     )
   );
   return map;

@@ -2,9 +2,9 @@
   {
     "name": "drumloop70",
     "category": "drums",
-    "urls": [ "drumloop70_1.mp3", "drumloop70_2.mp3", "drumloop70_3.mp3" ],
     "comment": "Drum loops for 70 BPM",
     "volume": 0,
+    "size": 3,
     "energyRanges": [
       [0, 0.9],
       [0.9, 0.95],
@@ -14,9 +14,9 @@
   {
     "name": "drumloop75",
     "category": "drums",
-    "urls": [ "drumloop75_1.mp3", "drumloop75_2.mp3", "drumloop75_3.mp3", "drumloop75_4.mp3", "drumloop75_5.mp3" ],
     "comment": "Drum loops for 75 BPM",
     "volume": 0,
+    "size": 5,
     "energyRanges": [
       [0, 0.2],
       [0.2, 0.5],
@@ -28,9 +28,9 @@
   {
     "name": "drumloop80",
     "category": "drums",
-    "urls": [ "drumloop80_1.mp3", "drumloop80_2.mp3", "drumloop80_3.mp3", "drumloop80_4.mp3", "drumloop80_5.mp3" ],
     "comment": "Drum loops for 80 BPM",
     "volume": 0,
+    "size": 5,
     "energyRanges": [
       [0, 0.4],
       [0.4, 0.6],
@@ -42,9 +42,9 @@
   {
     "name": "drumloop85",
     "category": "drums",
-    "urls": [ "drumloop85_1.mp3", "drumloop85_2.mp3", "drumloop85_3.mp3", "drumloop85_4.mp3", "drumloop85_5.mp3", "drumloop85_6.mp3" ],
     "comment": "Drum loops for 85 BPM",
     "volume": 0,
+    "size": 6,
     "energyRanges": [
       [0, 0.45],
       [0.45, 0.6],
@@ -57,9 +57,9 @@
   {
     "name": "drumloop90",
     "category": "drums",
-    "urls": [ "drumloop90_1.mp3", "drumloop90_2.mp3", "drumloop90_3.mp3", "drumloop90_4.mp3", "drumloop90_5.mp3" ],
     "comment": "Drum loops for 90 BPM",
     "volume": 0,
+    "size": 5,
     "energyRanges": [
       [0, 0.4],
       [0.4, 0.8],
@@ -71,8 +71,8 @@
   {
     "name": "drumloop95",
     "category": "drums",
-    "urls": [ "drumloop95_1.mp3", "drumloop95_2.mp3", "drumloop95_3.mp3", "drumloop95_4.mp3" ],
     "volume": 0,
+    "size": 4,
     "energyRanges": [
       [0, 0.35],
       [0.35, 0.7],
@@ -83,9 +83,9 @@
   {
     "name": "drumloop100",
     "category": "drums",
-    "urls": [ "drumloop100.mp3" ],
     "comment": "Drum loops for 100 BPM",
     "volume": 0,
+    "size": 1,
     "energyRanges": [
       [0, 1]
     ]
@@ -94,14 +94,14 @@
     "name": "vinyl",
     "category": "fx",
     "comment": "Vinyl scratches; selected randomly",
-    "urls": [ "vinyl1.mp3", "vinyl2.mp3", "vinyl3.mp3", "vinyl4.mp3", "vinyl5.mp3", "vinyl6.mp3", "vinyl7.mp3", "vinyl8.mp3", "vinyl9.mp3", "vinyl10.mp3", "vinyl11.mp3", "vinyl12.mp3", "vinyl13.mp3", "vinyl14.mp3", "vinyl15.mp3", "vinyl16.mp3", "vinyl17.mp3", "vinyl18.mp3", "vinyl19.mp3", "vinyl20.mp3", "vinyl21.mp3", "vinyl22.mp3", "vinyl23.mp3", "vinyl24.mp3", "vinyl25.mp3", "vinyl26.mp3", "vinyl27.mp3", "vinyl28.mp3" ],
-    "volume": 0
+    "volume": 0,
+    "size": 28
   },
   {
     "name": "rain",
     "category": "fx",
     "comment": "Light rain",
-    "urls": [ "rain1.mp3", "rain2.mp3", "rain3.mp3", "rain4.mp3", "rain5.mp3", "rain6.mp3", "rain7.mp3", "rain8.mp3", "rain9.mp3", "rain10.mp3", "rain11.mp3", "rain12.mp3", "rain13.mp3" ],
-    "volume": -10
+    "volume": -10,
+    "size": 13
   }
 ]
