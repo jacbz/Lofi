@@ -33,7 +33,22 @@ const formatTime = (seconds: number) => {
 // Seekbar
 const seekbar = document.getElementById('seekbar') as HTMLInputElement;
 seekbar.addEventListener('input', () => {
+  timeLabel.textContent = formatTime(seekbar.valueAsNumber);
+  formatInputRange(seekbar, '#fc5c8c');
+});
+
+let wasPaused = false;
+seekbar.addEventListener('mousedown', () => {
+  wasPaused = !player.isPlaying;
+  if (!wasPaused) {
+    player.pause();
+  }
+});
+seekbar.addEventListener('mouseup', () => {
   player.seek(seekbar.valueAsNumber);
+  if (!wasPaused) {
+    player.play();
+  }
 });
 
 // Track details and time
@@ -55,7 +70,6 @@ player.updateTrackDisplay = (seconds?: number) => {
     titleLabel.textContent = player.currentTrack.title;
     const totalLength = player.currentTrack.length;
     seekbar.max = `${totalLength}`;
-
     seekbar.valueAsNumber = +seconds;
     // when current time is within 0.1s of total length, display total length
     timeLabel.textContent = formatTime(seconds);

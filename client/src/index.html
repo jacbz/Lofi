@@ -9,7 +9,6 @@
 <body>
   <div id="header">LOFI</div>
   <div id="center">
-
     <div id="player-panel" class="panel">
       <div id="now-playing">        
         <div id="cover">
@@ -75,7 +74,7 @@
         <div id="playlist-header">
           <div id="playlist-header-text">NOW PLAYING</div>
           <button id="export-button" class="plain" title="Share this playlist"></button>
-          <div id="export-panel" class="panel">
+          <div id="export-panel" class="panel" style="visibility: hidden;">
             <div id="export-panel-header-text">SHARE THIS PLAYLIST</div>
             <div id="export-panel-content">
               <input id="export-url-input" readonly>
@@ -87,8 +86,6 @@
       </div>
      
     </div>
-
-    
     <div id="input-panel" class="panel">
       <textarea rows="6" id="input" spellcheck="false"></textarea>
       <button id="add-button" class="flat">Add to playlist</button>
