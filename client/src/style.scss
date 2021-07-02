@@ -45,14 +45,11 @@ body {
 
 #center {
   position: absolute;
-  left: 0;
-  right: 0;
-  margin: auto;
   top: 50%;
-  width: 650px;
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translate(-50%, -42%);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 12px;
 }
 
@@ -61,11 +58,17 @@ body {
   flex-direction: column;
   gap: 12px;
   padding: 12px;
+  width: 210px;
+
+  #input {
+    flex: 1;
+  }
 }
 
 #player-panel {
   display: flex;
   flex-direction: row;
+  width: 650px;
   
   #now-playing {
     flex: 1;
@@ -279,8 +282,8 @@ body {
 
       #export-panel {
         position: absolute;
-        top: 0;
-        left: calc(100% + 12px);
+        top: -112px;
+        left: calc(100% - 250px);
         z-index: 100;
         width: 250px;
         transition: visibility 0.2s, opacity 0.2s;
@@ -305,7 +308,7 @@ body {
     }
 
     #playlist-tracks {      
-      max-height: 40vh;
+      max-height: 35vh;
       overflow-y: auto;
     }
 
@@ -450,10 +453,6 @@ button.circle {
   &:hover {
     background-color: $ui-hover-background;
   }
-}
-
-textarea {
-  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Courier New', Courier, monospace;
 }
 
 textarea, input:not([type]) {
