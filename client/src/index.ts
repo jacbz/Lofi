@@ -40,6 +40,7 @@ seekbar.addEventListener('input', () => {
 const titleLabel = document.getElementById('title');
 const timeLabel = document.getElementById('current-time');
 const totalTimeLabel = document.getElementById('total-time');
+const audio = document.getElementById('audio') as HTMLAudioElement; // dummy audio for Media Session API
 const formatInputRange = (input: HTMLInputElement, color: string) => {
   const value = ((input.valueAsNumber - +input.min) / (+input.max - +input.min)) * 100;
   if (!value) {
@@ -173,13 +174,15 @@ const repeatButton = document.getElementById('repeat-button');
 const shuffleButton = document.getElementById('shuffle-button');
 const volumeButton = document.getElementById('volume-button');
 const volumeBar = document.getElementById('volume-bar') as HTMLInputElement;
-const updatePlayingState = (isPlaying: boolean) => {
-  if (isPlaying) {
+const updatePlayingState = () => {
+  if (player.isPlaying) {
     playButton.classList.toggle('paused', true);
     vinyl.classList.toggle('paused', false);
+    audio.play();
   } else {
     playButton.classList.toggle('paused', false);
     vinyl.classList.toggle('paused', true);
+    audio.pause();
   }
 };
 player.onPlayingStateChange = updatePlayingState;
@@ -293,4 +296,23 @@ document.getElementById('connectdistortion').addEventListener('click', () => {
 });
 for (const el of document.getElementById('filter').querySelectorAll('input')) {
   el.addEventListener('input', adjustFilters);
+}
+
+// Media Session API
+const actionsAndHandlers = [
+  ['play', () => { player.play(); }],
+  ['pause', () => { player.pause(); }],
+  ['previoustrack', () => { player.playPrevious(); }],
+  ['nexttrack', () => { player.playNext(); }],
+  ['seekbackward', (details: MediaSessionActionDetails) => { player.seek(-details.seekOffset || -10); }],
+  ['seekforward', (details: MediaSessionActionDetails) => { player.seekRelative(details.seekOffset || 10); }],
+  ['seekto', (details: MediaSessionActionDetails) => { player.seek(details.seekTime); }],
+  ['stop', () => { player.unload(); }]
+];
+for (const [action, handler] of actionsAndHandlers) {
+  try {
+    navigator.mediaSession.setActionHandler(action as any, handler as any);
+  } catch (error) {
+    console.log(`The media session action ${action}, is not supported`);
+  }
 }

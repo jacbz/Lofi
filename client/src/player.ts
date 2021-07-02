@@ -29,7 +29,7 @@ class Player {
 
   set isPlaying(isPlaying: boolean) {
     this._isPlaying = isPlaying;
-    this.onPlayingStateChange(isPlaying);
+    this.onPlayingStateChange();
     if (this.gain) {
       this.gain.gain.value = +isPlaying;
     }
@@ -70,7 +70,7 @@ class Player {
   onTrackChange: () => void;
 
   /** Function to call when isPlaying changes */
-  onPlayingStateChange: (isPlaying: boolean) => void;
+  onPlayingStateChange: () => void;
 
   samplePlayers: Map<string, Tone.Player[]>;
 
@@ -168,6 +168,7 @@ class Player {
       return;
     }
     this.isPlaying = true;
+    this.setAudioWebApiMetadata();
 
     // wait 500ms before trying to play the track
     // this is needed due to Tone.js scheduling conflicts if the user rapidly changes the track
@@ -241,6 +242,7 @@ class Player {
     Tone.Transport.scheduleRepeat((time) => {
       const seconds = Tone.Transport.getSecondsAtTime(time);
       this.updateTrackDisplay(seconds);
+      this.updateAudioWebApiPosition();
 
       if (this.currentTrack.length - seconds < 0) {
         this.playNext();
@@ -251,11 +253,19 @@ class Player {
   }
 
   seek(seconds: number) {
-    if (this.currentTrack) {
-      this.instrumentSamplers?.forEach((s) => s.releaseAll());
-      Tone.Transport.seconds = seconds;
-      this.updateTrackDisplay(seconds);
+    if (!this.currentTrack) return;
+    this.instrumentSamplers?.forEach((s) => s.releaseAll());
+    Tone.Transport.seconds = seconds;
+    this.updateTrackDisplay(seconds);
+  }
+
+  seekRelative(seconds: number) {
+    if (!this.currentTrack) return;
+    const position = Math.max(0, Tone.Transport.seconds + seconds);
+    if (position > this.currentTrack.length) {
+      this.stop();
     }
+    this.seek(position);
   }
 
   continue() {
@@ -277,6 +287,14 @@ class Player {
     this.instrumentSamplers?.forEach((s) => s.dispose());
     this.samplePlayers?.forEach((s) => s.forEach((t) => t.dispose()));
     this.isPlaying = false;
+  }
+
+  /** Stops playback and unloads the current track in the UI */
+  unload() {
+    this.stop();
+    this.currentPlayingIndex = undefined;
+    this.updateTrackDisplay();
+    navigator.mediaSession.metadata = null;
   }
 
   playPrevious() {
@@ -318,7 +336,7 @@ class Player {
     if (nextTrackIndex !== null) {
       this.playTrack(nextTrackIndex);
     } else {
-      this.stop();
+      this.unload();
     }
   }
 
@@ -335,9 +353,7 @@ class Player {
   deleteTrack(index: number) {
     this.playlist.splice(index, 1);
     if (index === this.currentPlayingIndex) {
-      this.stop();
-      this.currentPlayingIndex = undefined;
-      this.updateTrackDisplay();
+      this.unload();
     } else if (index < this.currentPlayingIndex) {
       this.currentPlayingIndex -= 1;
     }
@@ -348,6 +364,26 @@ class Player {
     const json = JSON.stringify(this.playlist.map((t) => t.outputParams));
     const compressed = compress(json);
     return `${window.location.origin}${window.location.pathname}?${compressed}`.replace('home.in.tum.de/~zhangja/lofi', 'lofi.jacobzhang.de');
+  }
+
+  setAudioWebApiMetadata() {
+    if (!('mediaSession' in navigator) || !this.currentTrack) return;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: this.currentTrack.title,
+      artist: 'Lofi generator',
+      artwork: [
+        { src: './background.jpg', type: 'image/jpg' }
+      ]
+    });
+    this.updateAudioWebApiPosition();
+  }
+
+  updateAudioWebApiPosition() {
+    if (!('mediaSession' in navigator) || !this.currentTrack) return;
+    navigator.mediaSession.setPositionState({
+      duration: this.currentTrack.length,
+      position: Math.max(0, Tone.Transport.seconds)
+    });
   }
 }
 
