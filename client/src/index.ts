@@ -161,7 +161,6 @@ Sortable.create(playlistContainer, {
       player.currentPlayingIndex = event.newIndex;
     }
     updatePlaylistDisplay();
-    console.log(event, player.playlist);
   }
 });
 updatePlaylistDisplay();

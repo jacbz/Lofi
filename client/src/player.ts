@@ -252,6 +252,7 @@ class Player {
 
   seek(seconds: number) {
     if (this.currentTrack) {
+      this.instrumentSamplers?.forEach((s) => s.releaseAll());
       Tone.Transport.seconds = seconds;
       this.updateTrackDisplay(seconds);
     }
