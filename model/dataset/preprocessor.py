@@ -45,6 +45,15 @@ def process_song(artist, song, path):
 
     with open(file) as json_file:
         json_data = json.load(json_file)
+
+        # skip if no melodies
+        if len(json_data["tracks"]["melody"]) is 0:
+            return
+
+        # skip of no chords
+        if len(json_data["tracks"]["chord"]) is 0:
+            return
+
         if add_lyrics:
             if lyrics_provider == "google":
                 lyrics = retrieve_lyrics_google(artist_name, song_name)

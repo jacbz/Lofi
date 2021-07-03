@@ -1,15 +1,28 @@
+import jsonpickle
+import numpy as np
 import torch
 from torch.nn.utils.rnn import pack_padded_sequence
 import argparse
-
 from embeddings import make_embedding
 from model import Model
+from constants import *
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 file = "model.pth"
 
+class Output:
+    def __init__(self, title, key, mode, bpm, energy, valence, chords, melodies):
+        self.title = title
+        self.key = key
+        self.mode = mode
+        self.bpm = bpm
+        self.energy = energy
+        self.valence = valence
+        self.chords = chords
+        self.melodies = melodies
 
-def predict_chords(input):
+
+def predict(input):
     print("Loading model...", end=" ")
     model = Model()
     model.load_state_dict(torch.load(file))
@@ -20,17 +33,38 @@ def predict_chords(input):
     embedding, length = make_embedding(input)
 
     input = pack_padded_sequence(embedding[None], torch.tensor([length]), batch_first=True, enforce_sorted=False)
-    pred, _ = model(input)
+    (pred_chords, pred_notes), _, bpm, valence, energy = model(input, MAX_CHORD_PROGRESSION_LENGTH)
 
-    chords = pred.argmax(dim=2)[0].tolist()
-    chords.append(8)
-    chords = chords[:chords.index(8) - 1]  # cut off 8
+    chords = pred_chords.argmax(dim=2)[0].tolist()
+    notes = pred_notes.argmax(dim=2)[0].cpu().numpy()
 
-    print(f"Chord progression: {' '.join(map(str, chords))}")
+    chords.append(CHORD_PROGRESSION_END_TOKEN)
+    cut_off_point = chords.index(CHORD_PROGRESSION_END_TOKEN) - 1
+    chords = chords[:cut_off_point]  # cut off end token
+    notes = notes[:cut_off_point * MELODY_DISCRETIZATION_LENGTH]
+
+    key = 0 + 1
+    mode = 0 + 1
+    bpm = bpm.item() * 30 + 70
+    energy = energy.item()
+    valence = valence.item()
+    chords = chords
+    melodies = notes.reshape(-1, MELODY_DISCRETIZATION_LENGTH)
+    melodies = [x.tolist() for x in [*melodies]]
+
+    output = Output("", key, mode, bpm, energy, valence, chords, melodies)
+
+    json = jsonpickle.encode(output, unpicklable=False)\
+        .replace(", \"", ",\n  \"")\
+        .replace("{", "{\n  ")\
+        .replace("}","\n}")\
+        .replace("[[", "[\n    [")\
+        .replace("]]","]\n  ]").replace("], [", "],\n    [")
+    print(json)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Generate some chords.')
+    parser = argparse.ArgumentParser(description='Generate some chords and melodies.')
     parser.add_argument('input', type=str)
     args = parser.parse_args()
-    predict_chords(args.input)
+    predict(args.input)

@@ -12,7 +12,7 @@ model = BertModel.from_pretrained("bert-base-uncased").to(device)
 
 # make embeddings and save as np
 def make_embeddings():
-    dataset_folder = "../datasets/processed"
+    dataset_folder = "./dataset/processed-lyrics-spotify"
     dataset_files = os.listdir(dataset_folder)
     embeddings_file = "embeddings"
     embedding_lengths_file = "embedding_lengths.json"
