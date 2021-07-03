@@ -1,3 +1,4 @@
+import math
 import random
 
 import jsonpickle
@@ -55,16 +56,16 @@ class SongDataset(Dataset):
         energy = json_file["audio_features"]["energy"]
         valence = json_file["audio_features"]["valence"]
 
-
         bpm = int(json_file["audio_features"]["tempo"])
         # normalize tempo into range 70-100
         bpm = min(100.0, max(70.0, ((bpm-70) * (3/13)) + 70))
         # normalize tempo into [0, 1], cutting off at 70 and 100
         bpm = (bpm/30) - (7/3)
 
-        notes = json_file["tracks"]["melody"]
+        json_chords = json_file["tracks"]["chord"]
+        json_notes = json_file["tracks"]["melody"]
 
-        octaves = [int(note["octave"]) for note in notes]
+        octaves = [int(note["octave"]) for note in json_notes]
         min_octave = min(octaves)
         max_octave = max(octaves)
         octave_range = max_octave - min_octave
@@ -73,57 +74,67 @@ class SongDataset(Dataset):
         def overlap(a1, a2, b1, b2):
             return max(a2, b2) - min(a1, b1) < (a2 - a1) + (b2 - b1)
 
-        # returns a discretized note list of length MELODY_DISCRETIZATION_LENGTH for a chord
-        def discretize_melodies(chord):
-            chord_start = chord["event_on"]
-            chord_end = chord["event_off"]
-            notes_during_chord = filter(lambda note:  overlap(note["event_on"], note["event_off"], chord_start, chord_end), notes)
-            note_list = [MELODY_REST_TOKEN] * MELODY_DISCRETIZATION_LENGTH
+        # discretizes a measure into
+        # CHORD_DISCRETIZATION_LENGTH chords
+        # MELODY_DISCRETIZATION_LENGTH notes
+        def discretize(measure_start, measure_end):
+            chords_during_measure = filter(lambda chord: overlap(chord["event_on"], chord["event_off"], measure_start, measure_end), json_chords)
+            notes_during_measure = filter(lambda note:  overlap(note["event_on"], note["event_off"], measure_start, measure_end), json_notes)
 
-            for note in notes_during_chord:
-                scale_degree = MELODY_REST_TOKEN if note["isRest"] else int(note["scale_degree"].replace("s", "").replace("f", ""))
+            chord_list = [CHORD_REST_TOKEN] * CHORD_DISCRETIZATION_LENGTH
+            note_list = [MELODY_REST_TOKEN] * MELODY_DISCRETIZATION_LENGTH
+            isEmpty = True
+
+            for chord in chords_during_measure:
+                if chord["isRest"]:
+                    continue
+                scale_degree = int(chord["sd"])
+                relative_start = (max(measure_start, chord["event_on"]) - measure_start) / (measure_end - measure_start)
+                relative_end = (min(measure_end, chord["event_off"]) - measure_start) / (measure_end - measure_start)
+                i = round(relative_start * CHORD_DISCRETIZATION_LENGTH)
+                j = round(relative_end * CHORD_DISCRETIZATION_LENGTH)
+                for n in range(i, j):
+                    isEmpty = False
+                    chord_list[n] = scale_degree
+
+            for note in notes_during_measure:
+                if note["isRest"]:
+                    continue
+                scale_degree = int(note["scale_degree"].replace("s", "").replace("f", ""))
 
                 if scale_degree is not MELODY_REST_TOKEN:
-                    # print(f"Min {min_octave}, max {max_octave}, range {octave_range}: ", end=" ")
                     octave = int(note["octave"])
-                    # print(f"Octave {octave}->", end=" ")
-                    octave = abs(abs(octave_range) - abs(octave)) if octave_range > 0 else 1
+                    octave = min(2, abs(abs(octave_range) - abs(octave)) if octave_range > 0 else 1)
+                    scale_degree = octave * 7 + scale_degree + 1
 
-                    if octave > 2:
-                        octave = 2
-                    # print(f"{octave}, ", end=" ")
-
-                    # offset
-                    # print(f"sd {scale_degree}->", end=" ")
-                    scale_degree = octave * 7 + scale_degree + MELODY_FIRST_SCALE_DEGREE - 1
-                    # print(f"{scale_degree} ")
-
-                relative_start = (max(chord_start, note["event_on"]) - chord_start) / (chord_end - chord_start)
-                relative_end = (min(chord_end, note["event_off"]) - chord_start) / (chord_end - chord_start)
+                relative_start = (max(measure_start, note["event_on"]) - measure_start) / (measure_end - measure_start)
+                relative_end = (min(measure_end, note["event_off"]) - measure_start) / (measure_end - measure_start)
                 i = round(relative_start * MELODY_DISCRETIZATION_LENGTH)
                 j = round(relative_end * MELODY_DISCRETIZATION_LENGTH)
                 for n in range(i, j):
-                    note_list[n] = scale_degree if n == i or scale_degree == MELODY_REST_TOKEN else MELODY_REPEAT_TOKEN
-            return note_list
+                    isEmpty = False
+                    note_list[n] = scale_degree if n == i or scale_degree == MELODY_REST_TOKEN else 1
 
-        def map_chords(chord):
-            if chord["sd"] == "rest":
-                # map "rest" to 0
-                return CHORD_PROGRESSION_REST_TOKEN
-            return int(chord["sd"])
+            return chord_list, note_list, isEmpty
 
-        json_chords = json_file["tracks"]["chord"][:MAX_CHORD_PROGRESSION_LENGTH-1]
+
+        beats_per_measure = int(json_file["metadata"]["beats_in_measure"])
+        duration = max([chord["event_off"] for chord in json_chords] + [note["event_off"] for note in json_notes])
+        num_measures = min(MAX_LENGTH_IN_MEASURES, int(math.ceil(duration / beats_per_measure)))
+
+        chords_list = []
         melody_note_list = []
-        for note_list in list(map(discretize_melodies, json_chords)):
-            melody_note_list.extend(note_list)
+        for measure in range(num_measures):
+            measure_start = measure * beats_per_measure
+            measure_end = (measure + 1) * beats_per_measure
+            measure_chord_list, measure_note_list, isEmpty = discretize(measure_start, measure_end)
+            if isEmpty:
+                num_measures -= 1
+            else:
+                chords_list.extend(measure_chord_list)
+                melody_note_list.extend(measure_note_list)
 
-        for note in melody_note_list:
-            self.melody_note_count_map[note] += 1
-        melody_note_list += [0] * MELODY_DISCRETIZATION_LENGTH * (MAX_CHORD_PROGRESSION_LENGTH - len(melody_note_list)//MELODY_DISCRETIZATION_LENGTH)
-
-        chords = list(map(map_chords, json_chords))
-
-        output = Output(json_file["metadata"]["title"], key + 1, mode + 1, bpm, energy, valence, chords, [x.tolist() for x in [*np.array(melody_note_list[:len(chords) * MELODY_DISCRETIZATION_LENGTH]).reshape(-1, 16)]])
+        output = Output(json_file["metadata"]["title"], key + 1, mode + 1, bpm, energy, valence, chords_list, [x.tolist() for x in [*np.array(melody_note_list[:len(chords_list) * MELODY_DISCRETIZATION_LENGTH]).reshape(-1, 16)]])
         output_json = jsonpickle.encode(output, unpicklable=False)\
         .replace(", \"", ",\n  \"")\
         .replace("{", "{\n  ")\
@@ -131,22 +142,21 @@ class SongDataset(Dataset):
         .replace("[[", "[\n    [")\
         .replace("]]","]\n  ]").replace("], [", "],\n    [")
 
-        chords.append(CHORD_PROGRESSION_END_TOKEN)  # END token
-        chords_length = len(chords)
-        chords.append(CHORD_PROGRESSION_REST_TOKEN)
-
-        # create chord count map
-        for chord in chords:
+        chords_list.append(CHORD_END_TOKEN)  # END token
+        for chord in chords_list:
             self.chord_count_map[chord] += 1
+        for note in melody_note_list:
+            self.melody_note_count_map[note] += 1
 
-        # pad chord to max progression length
-        chords += [CHORD_PROGRESSION_END_TOKEN] * (MAX_CHORD_PROGRESSION_LENGTH + 1 - len(chords))
+        # pad chord and melodies to max measure length
+        chords_list += [CHORD_END_TOKEN] * ((MAX_LENGTH_IN_MEASURES + 1) * CHORD_DISCRETIZATION_LENGTH - len(chords_list))
+        melody_note_list += [MELODY_REST_TOKEN] * ((MAX_LENGTH_IN_MEASURES + 1) * MELODY_DISCRETIZATION_LENGTH - len(melody_note_list))
 
         return {
                     "key": key,
                     "mode": mode,
-                    "chords": chords,
-                    "chords_length": chords_length,
+                    "chords": chords_list,
+                    "num_measures": num_measures,
                     "melody_notes": melody_note_list,
                     "bpm": bpm,
                     "energy": energy,
@@ -167,7 +177,7 @@ class SongDataset(Dataset):
                     "key": sample["key"],
                     "mode": sample["mode"],
                     "chords": torch.tensor(sample["chords"]),
-                    "chords_length": sample["chords_length"],
+                    "num_measures": sample["num_measures"],
                     "melody_notes": torch.tensor(sample["melody_notes"]),
                     "bpm": sample["bpm"],
                     "energy": sample["energy"],
@@ -224,27 +234,30 @@ if __name__ == '__main__':
         for batch, data in enumerate(dataloader):
             embeddings = data["embedding"].to(device)
             embedding_lengths = data["embedding_length"]
-            chords_length = data["chords_length"].to(device)
-            max_chord_length = chords_length.max()
-            chords = data["chords"].to(device)[:,:max_chord_length]
-            melody_notes = data["melody_notes"].to(device)[:,:max_chord_length*MELODY_DISCRETIZATION_LENGTH]
+            num_measures = data["num_measures"].to(device)
+            max_num_measures = num_measures.max()
+            max_num_chords = max_num_measures * CHORD_DISCRETIZATION_LENGTH
+            max_num_notes = max_num_measures * MELODY_DISCRETIZATION_LENGTH
+
+            chords_gt = data["chords"].to(device)[:, :max_num_chords]
+            notes_gt = data["melody_notes"].to(device)[:, :max_num_notes]
             bpm_gt = data["bpm"].to(device)
             valence_gt = data["valence"].to(device)
             energy_gt = data["energy"].to(device)
 
             input = pack_padded_sequence(embeddings, embedding_lengths, batch_first=True, enforce_sorted=False)
 
-            (pred_chords, pred_notes), kl, bpm, valence, energy = model(input, chords_length.max(), chords, melody_notes)
-            loss_chords = chord_loss(pred_chords.permute(0, 2, 1), chords)
-            loss_melody_notes = melody_loss_notes(pred_notes.permute(0, 2, 1), melody_notes)
+            (pred_chords, pred_notes), kl, bpm, valence, energy = model(input, max_num_measures.max(), chords_gt, notes_gt)
+            loss_chords = chord_loss(pred_chords.permute(0, 2, 1), chords_gt)
+            loss_melody_notes = melody_loss_notes(pred_notes.permute(0, 2, 1), notes_gt)
 
             # compute mask
-            arrange = torch.arange(max_chord_length, device=device).repeat((embeddings.shape[0], 1)).permute(0, 1)
-            lengths_stacked = chords_length.repeat((max_chord_length, 1)).permute(1, 0)
+            arrange = torch.arange(max_num_chords, device=device).repeat((embeddings.shape[0], 1)).permute(0, 1)
+            lengths_stacked = (num_measures * CHORD_DISCRETIZATION_LENGTH).repeat((max_num_chords, 1)).permute(1, 0)
             mask_chord = (arrange <= lengths_stacked)
 
-            arrange = torch.arange(max_chord_length*MELODY_DISCRETIZATION_LENGTH, device=device).repeat((embeddings.shape[0], 1)).permute(0, 1)
-            lengths_stacked = (chords_length*MELODY_DISCRETIZATION_LENGTH).repeat((max_chord_length*MELODY_DISCRETIZATION_LENGTH, 1)).permute(1, 0)
+            arrange = torch.arange(max_num_notes, device=device).repeat((embeddings.shape[0], 1)).permute(0, 1)
+            lengths_stacked = (num_measures*MELODY_DISCRETIZATION_LENGTH).repeat((max_num_notes, 1)).permute(1, 0)
             mask_melody = (arrange <= lengths_stacked)
 
             loss_chords = torch.masked_select(loss_chords, mask_chord).mean()
@@ -260,8 +273,8 @@ if __name__ == '__main__':
 
             optimizer.step()
             loss = loss.item()
-            tp_chords.extend(torch.masked_select(pred_chords.argmax(dim=2) == chords, mask_chord).tolist())
-            tp_melodies.extend(torch.masked_select(pred_notes.argmax(dim=2) == melody_notes, mask_melody).tolist())
+            tp_chords.extend(torch.masked_select(pred_chords.argmax(dim=2) == chords_gt, mask_chord).tolist())
+            tp_melodies.extend(torch.masked_select(pred_notes.argmax(dim=2) == notes_gt, mask_melody).tolist())
 
             epoch_losses_chords.append(loss_chords)
             epoch_losses_melodies.append(loss_melody)

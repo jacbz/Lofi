@@ -12,5 +12,5 @@ model/dataset/processed*
 spotify_client_*
 *.npy
 *.pth
-embedding_lengths.json
+embedding*.json
 log.txt

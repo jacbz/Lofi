@@ -3,19 +3,22 @@ NUM_EPOCHS = 10000
 
 BERT_EMBEDDING_LENGTH = 768
 
-MAX_CHORD_PROGRESSION_LENGTH = 50
+MAX_LENGTH_IN_MEASURES = 50
+
 # input: hidden_size;output: chords (0-8) - 0: rest, 1-7: chord numerals, 8: end
 CHORD_PREDICTION_LENGTH = 9
-CHORD_PROGRESSION_REST_TOKEN = 0
-CHORD_PROGRESSION_END_TOKEN = 8
+CHORD_REST_TOKEN = 0
+CHORD_END_TOKEN = 8
 
+# discretize each measure into this many chords, must be a divisor of MELODY_DISCRETIZATION_LENGTH
+CHORD_DISCRETIZATION_LENGTH = 1
+# discretize each measure into this many notes
 MELODY_DISCRETIZATION_LENGTH = 16
-# 23 melody classes: 0 (rest), 1 (repeat), 2-8 (octave 1), 9-15 (octave 2), 16-22 (octave 3)
-MELODY_PREDICTION_LENGTH = 23
+NOTES_PER_CHORD = MELODY_DISCRETIZATION_LENGTH // CHORD_DISCRETIZATION_LENGTH
 
+# 22 melody classes: 0 (rest), 1 (repeat), 2-8 (octave 1), 9-15 (octave 2), 16-22 (octave 3)
+MELODY_PREDICTION_LENGTH = 23
 MELODY_REST_TOKEN = 0
-MELODY_REPEAT_TOKEN = 1
-MELODY_FIRST_SCALE_DEGREE = 2
 
 KEY_TO_NUM = {
     "C": 0,
