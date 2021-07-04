@@ -21,10 +21,10 @@ class Model(nn.Module):
 
         # VAE
         mu = self.mean_linear(temp)
-        logvar = self.variance_linear(temp)
-        z = self.sample(mu, logvar)
+        log_var = self.variance_linear(temp)
+        z = self.sample(mu, log_var)
         # compute the Kullback–Leibler divergence between a Gaussian and an uniform Gaussian
-        kl = 0.5 * torch.mean(mu ** 2 + logvar.exp() - logvar - 1, dim=[0, 1])
+        kl = 0.5 * torch.mean(mu ** 2 + log_var.exp() - log_var - 1, dim=[0, 1])
 
         # decode
         if self.training:
@@ -49,10 +49,10 @@ class Encoder(nn.Module):
     def __init__(self, hidden_size, num_layers):
         super(Encoder, self).__init__()
         self.hidden_size = hidden_size
-        self.rnn = nn.LSTM(input_size=BERT_EMBEDDING_LENGTH, hidden_size=hidden_size, num_layers=num_layers, bidirectional=True, batch_first=True)
+        self.encoder_lstm = nn.LSTM(input_size=BERT_EMBEDDING_LENGTH, hidden_size=hidden_size, num_layers=num_layers, bidirectional=True, batch_first=True)
 
     def forward(self, x):
-        _, (h, _) = self.rnn(x)
+        _, (h, _) = self.encoder_lstm(x)
         return h
 
 
@@ -108,42 +108,36 @@ class Decoder(nn.Module):
         hx_melody = torch.randn(z.shape[0], self.hidden_size * 1, device=device) # (batch, hidden_size)
         cx_melody = torch.randn(z.shape[0], self.hidden_size * 1, device=device)
 
-        hx_chords, cx_chords = self.chords_lstm(z, (hx_chords, cx_chords))
-        chord_prediction = self.chord_layers(hx_chords)
-        if gt_chords is not None:
-            chord_embeddings = self.chord_embeddings(gt_chords[:,0])
-        else:
-            chord_embeddings = self.chord_embeddings(chord_prediction.argmax(dim=1))
-        chord_outputs = [chord_prediction]
-        hx_melody, cx_melody = self.melody_lstm(chord_embeddings, (hx_melody, cx_melody))
-        melody_prediction = self.melody_prediction(hx_melody)
-        note_outputs = [melody_prediction]
-        for i in range(NOTES_PER_CHORD - 1):
-            if gt_melody is not None:
-                melody_embeddings = self.melody_embeddings(gt_melody[:,i])
-            else:
-                melody_embeddings = self.melody_embeddings(melody_prediction.argmax(dim=1))
-            hx_melody, cx_melody = self.melody_lstm(melody_embeddings+chord_embeddings, (hx_melody, cx_melody))
-            melody_prediction = self.melody_prediction(hx_melody)
-            note_outputs.append(melody_prediction)
-
         # stop when reaching max length
-        for i in range(1, max_measure_length * CHORD_DISCRETIZATION_LENGTH):
-            hx_chords, cx_chords = self.chords_lstm(chord_embeddings, (hx_chords, cx_chords))
+        chord_outputs = []
+        note_outputs = []
+
+        # the chord LSTM input at first only consists of z
+        # after the first iteration, we use the chord embeddings
+        chords_lstm_input = z
+        melody_embeddings = 0  # these will be set in the very first iteration
+        for i in range(max_measure_length * CHORD_DISCRETIZATION_LENGTH):
+            hx_chords, cx_chords = self.chords_lstm(chords_lstm_input, (hx_chords, cx_chords))
             chord_prediction = self.chord_layers(hx_chords)
             if gt_chords is not None:
                 chord_embeddings = self.chord_embeddings(gt_chords[:,i])
             else:
                 chord_embeddings = self.chord_embeddings(chord_prediction.argmax(dim=1))
+            chords_lstm_input = chord_embeddings
             chord_outputs.append(chord_prediction)
+
+            # the melody LSTM input at first only includes the chord embeddings
+            # after the first iteration, the input also includes the melody embeddings of the notes up to that point
+            melody_lstm_input = melody_embeddings + chord_embeddings
             for j in range(NOTES_PER_CHORD):
-                if gt_melody is not None:
-                    melody_embeddings = self.melody_embeddings(gt_melody[:, i*NOTES_PER_CHORD+j-1])
-                else:
-                    melody_embeddings = self.melody_embeddings(melody_prediction.argmax(dim=1))
-                hx_melody, cx_melody = self.melody_lstm(melody_embeddings + chord_embeddings, (hx_melody, cx_melody))
+                hx_melody, cx_melody = self.melody_lstm(melody_lstm_input, (hx_melody, cx_melody))
                 melody_prediction = self.melody_prediction(hx_melody)
                 note_outputs.append(melody_prediction)
+                if gt_melody is not None:
+                    melody_embeddings = self.melody_embeddings(gt_melody[:, i*NOTES_PER_CHORD + j])
+                else:
+                    melody_embeddings = self.melody_embeddings(melody_prediction.argmax(dim=1))
+                melody_lstm_input = melody_embeddings + chord_embeddings
 
         chord_outputs = torch.stack(chord_outputs, dim=1)
         note_outputs = torch.stack(note_outputs, dim=1)
