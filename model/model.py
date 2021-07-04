@@ -13,7 +13,7 @@ class Model(nn.Module):
         self.mean_linear = nn.Linear(in_features=hidden_size, out_features=hidden_size)
         self.variance_linear = nn.Linear(in_features=hidden_size, out_features=hidden_size)
 
-    def forward(self, input, max_chords_length, gt_chords=None, gt_melody=None):
+    def forward(self, input, num_chords, gt_chords=None, gt_melody=None):
         # encode
         h = self.encoder(input)
         # add two directions together
@@ -28,9 +28,9 @@ class Model(nn.Module):
 
         # decode
         if self.training:
-            chord_outputs, note_outputs, bpm_output, valence_output, energy_output = self.decoder(z, max_chords_length, gt_chords, gt_melody)
+            chord_outputs, note_outputs, bpm_output, valence_output, energy_output = self.decoder(z, num_chords, gt_chords, gt_melody)
         else:
-            chord_outputs, note_outputs, bpm_output, valence_output, energy_output = self.decoder(z, max_chords_length)
+            chord_outputs, note_outputs, bpm_output, valence_output, energy_output = self.decoder(z, num_chords)
 
         return chord_outputs, note_outputs, bpm_output, valence_output, energy_output, kl
 
@@ -94,7 +94,7 @@ class Decoder(nn.Module):
             nn.Linear(in_features=hidden_size, out_features=MELODY_PREDICTION_LENGTH)
         )
 
-    def forward(self, z, max_measure_length, gt_chords=None, gt_melody=None):
+    def forward(self, z, num_chords, gt_chords=None, gt_melody=None):
         bpm_output = self.bpm_linear(z)
         valence_output = self.valence_linear(z)
         energy_output = self.energy_linear(z)
@@ -103,12 +103,12 @@ class Decoder(nn.Module):
         energy_embedding = self.energy_embedding(energy_output)
         z = self.downsample(torch.cat((z, bpm_embedding, valence_embedding, energy_embedding), dim=1))
 
-        hx_chords = torch.randn(z.shape[0], self.hidden_size * 1, device=device) # (batch, hidden_size)
+        # initialize hidden states and cell states randomly
+        hx_chords = torch.randn(z.shape[0], self.hidden_size * 1, device=device)
         cx_chords = torch.randn(z.shape[0], self.hidden_size * 1, device=device)
-        hx_melody = torch.randn(z.shape[0], self.hidden_size * 1, device=device) # (batch, hidden_size)
+        hx_melody = torch.randn(z.shape[0], self.hidden_size * 1, device=device)
         cx_melody = torch.randn(z.shape[0], self.hidden_size * 1, device=device)
 
-        # stop when reaching max length
         chord_outputs = []
         note_outputs = []
 
@@ -116,7 +116,8 @@ class Decoder(nn.Module):
         # after the first iteration, we use the chord embeddings
         chords_lstm_input = z
         melody_embeddings = 0  # these will be set in the very first iteration
-        for i in range(max_measure_length * CHORD_DISCRETIZATION_LENGTH):
+
+        for i in range(num_chords):
             hx_chords, cx_chords = self.chords_lstm(chords_lstm_input, (hx_chords, cx_chords))
             chord_prediction = self.chord_layers(hx_chords)
             if gt_chords is not None:

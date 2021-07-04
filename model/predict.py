@@ -1,5 +1,4 @@
 import jsonpickle
-import numpy as np
 import torch
 from torch.nn.utils.rnn import pack_padded_sequence
 import argparse
