@@ -50,7 +50,10 @@ class Model(nn.Module):
         energy_embedding = self.energy_embedding(energy)
         z = self.downsample(torch.cat((z, bpm_embedding, valence_embedding, energy_embedding), dim=1))
         # make chord prediction
-        chords_pred = self.decoder(z, max_chords_length, gt_chords, gt_melody)
+        if self.training:
+            chords_pred = self.decoder(z, max_chords_length, gt_chords, gt_melody)
+        else:
+            chords_pred = self.decoder(z, max_chords_length)
 
         # compute the Kullback–Leibler divergence between a Gaussian and an uniform Gaussian
         KL = 0.5 * torch.mean(mu ** 2 + logvar.exp() - logvar - 1, dim=[0, 1])
@@ -98,7 +101,7 @@ class Decoder(nn.Module):
         self.melody_note_prediction = nn.Linear(in_features=hidden_size, out_features=MELODY_PREDICTION_LENGTH)
 
 
-    def forward(self, x, max_chords_length, gt_chords=None, gt_melody=None):
+    def forward(self, x, max_measure_length, gt_chords=None, gt_melody=None):
         hx_chords = torch.randn(x.shape[0], self.hidden_size * 1, device=device) # (batch, hidden_size)
         cx_chords = torch.randn(x.shape[0], self.hidden_size * 1, device=device)
         hx_melody = torch.randn(x.shape[0], self.hidden_size * 1, device=device) # (batch, hidden_size)
@@ -110,17 +113,12 @@ class Decoder(nn.Module):
             chord_embeddings = self.chord_embeddings(gt_chords[:,0])
         else:
             chord_embeddings = self.chord_embeddings(chord_prediction.argmax(dim=1))
-
         chord_outputs = [chord_prediction]
-
         hx_melody, cx_melody = self.melody_lstm(chord_embeddings, (hx_melody, cx_melody))
         md = self.melody_prediction(hx_melody)
-
         melody_note_prediction = self.melody_note_prediction(md)
-
         note_outputs = [melody_note_prediction]
-
-        for i in range(MELODY_DISCRETIZATION_LENGTH-1):
+        for i in range(NOTES_PER_CHORD - 1):
             if gt_melody is not None:
                 melody_embeddings = self.melody_embeddings(gt_melody[:,i])
             else:
@@ -131,18 +129,17 @@ class Decoder(nn.Module):
             note_outputs.append(melody_note_prediction)
 
         # stop when reaching max length
-        for i in range(max_chords_length - 1):
+        for i in range(1, max_measure_length * CHORD_DISCRETIZATION_LENGTH):
             hx_chords, cx_chords = self.chords_lstm(chord_embeddings, (hx_chords, cx_chords))
             chord_prediction = self.chord_layers(hx_chords)
             if gt_chords is not None:
-                chord_embeddings = self.chord_embeddings(gt_chords[:,i+1])
+                chord_embeddings = self.chord_embeddings(gt_chords[:,i])
             else:
                 chord_embeddings = self.chord_embeddings(chord_prediction.argmax(dim=1))
             chord_outputs.append(chord_prediction)
-
-            for j in range(MELODY_DISCRETIZATION_LENGTH):
+            for j in range(NOTES_PER_CHORD):
                 if gt_melody is not None:
-                    melody_embeddings = self.melody_embeddings(gt_melody[:, (i+1)*MELODY_DISCRETIZATION_LENGTH+j-1])
+                    melody_embeddings = self.melody_embeddings(gt_melody[:, i*NOTES_PER_CHORD+j-1])
                 else:
                     melody_embeddings = self.melody_embeddings(melody_note_prediction.argmax(dim=1))
                 hx_melody, cx_melody = self.melody_lstm(melody_embeddings + chord_embeddings, (hx_melody, cx_melody))
