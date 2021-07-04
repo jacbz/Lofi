@@ -202,26 +202,26 @@ def compute_loss(data):
 
     input = pack_padded_sequence(embeddings, embedding_lengths, batch_first=True, enforce_sorted=False)
 
-    (pred_chords, pred_notes), kl, bpm, valence, energy = model(input, max_num_measures.max(), chords_gt, notes_gt)
+    pred_chords, pred_notes, pred_bpm, pred_valence, pred_energy, kl = model(input, max_num_measures.max(), chords_gt, notes_gt)
     loss_chords = chord_loss(pred_chords.permute(0, 2, 1), chords_gt)
     loss_melody_notes = melody_loss_notes(pred_notes.permute(0, 2, 1), notes_gt)
 
     # compute mask
-    arrange = torch.arange(max_num_chords, device=device).repeat((embeddings.shape[0], 1)).permute(0, 1)
+    arange = torch.arange(max_num_chords, device=device).repeat((embeddings.shape[0], 1)).permute(0, 1)
     lengths_stacked = (num_measures * CHORD_DISCRETIZATION_LENGTH).repeat((max_num_chords, 1)).permute(1, 0)
-    mask_chord = (arrange <= lengths_stacked)
+    mask_chord = (arange <= lengths_stacked)
 
-    arrange = torch.arange(max_num_notes, device=device).repeat((embeddings.shape[0], 1)).permute(0, 1)
+    arange = torch.arange(max_num_notes, device=device).repeat((embeddings.shape[0], 1)).permute(0, 1)
     lengths_stacked = (num_measures * MELODY_DISCRETIZATION_LENGTH).repeat((max_num_notes, 1)).permute(1, 0)
-    mask_melody = (arrange <= lengths_stacked)
+    mask_melody = (arange <= lengths_stacked)
 
     loss_chords = torch.masked_select(loss_chords, mask_chord).mean()
     loss_melody = torch.masked_select(loss_melody_notes, mask_melody).mean()
     loss_melody *= 10
     kl_loss = kl * 1e-2
-    loss_bpm = mae(bpm[:, 0], bpm_gt) / 5
-    loss_valence = mae(valence[:, 0], valence_gt) / 5
-    loss_energy = mae(energy[:, 0], energy_gt) / 5
+    loss_bpm = mae(pred_bpm[:, 0], bpm_gt) / 5
+    loss_valence = mae(pred_valence[:, 0], valence_gt) / 5
+    loss_energy = mae(pred_energy[:, 0], energy_gt) / 5
     loss = loss_chords + kl_loss + loss_melody + loss_bpm + loss_energy + loss_valence
     tp_chords = torch.masked_select(pred_chords.argmax(dim=2) == chords_gt, mask_chord).tolist()
     tp_melodies = torch.masked_select(pred_notes.argmax(dim=2) == notes_gt, mask_melody).tolist()
