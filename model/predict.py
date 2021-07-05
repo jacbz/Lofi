@@ -40,7 +40,7 @@ def predict(input):
     chords.append(CHORD_END_TOKEN)
     cut_off_point = chords.index(CHORD_END_TOKEN) - 1
     chords = chords[:cut_off_point]  # cut off end token
-    notes = notes[:cut_off_point * MELODY_DISCRETIZATION_LENGTH]
+    notes = notes[:cut_off_point * NOTES_PER_CHORD]
 
     title = None
     key = 0 + 1
@@ -49,7 +49,7 @@ def predict(input):
     energy = pred_energy.item()
     valence = pred_valence.item()
     chords = chords
-    melodies = notes.reshape(-1, MELODY_DISCRETIZATION_LENGTH)
+    melodies = notes.reshape(-1, NOTES_PER_CHORD)
     melodies = [x.tolist() for x in [*melodies]]
 
     output = Output(title, key, mode, bpm, energy, valence, chords, melodies)

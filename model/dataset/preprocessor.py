@@ -47,11 +47,11 @@ def process_song(artist, song, path):
         json_data = json.load(json_file)
 
         # skip if no melodies
-        if len(json_data["tracks"]["melody"]) is 0:
+        if len(json_data["tracks"]["melody"]) is 0 or all([note["isRest"] for note in json_data["tracks"]["melody"]]):
             return
 
         # skip of no chords
-        if len(json_data["tracks"]["chord"]) is 0:
+        if len(json_data["tracks"]["chord"]) is 0 or all([chord["isRest"] for chord in json_data["tracks"]["chord"]]):
             return
 
         if add_lyrics:
