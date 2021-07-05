@@ -28,11 +28,11 @@ class Model(nn.Module):
 
         # decode
         if self.training:
-            chord_outputs, note_outputs, bpm_output, valence_output, energy_output = self.decoder(z, num_chords, gt_chords, gt_melody)
+            chord_outputs, note_outputs, bpm_output, key_output, mode_output, valence_output, energy_output = self.decoder(z, num_chords, gt_chords, gt_melody)
         else:
-            chord_outputs, note_outputs, bpm_output, valence_output, energy_output = self.decoder(z, num_chords)
+            chord_outputs, note_outputs, bpm_output, key_output, mode_output, valence_output, energy_output = self.decoder(z, num_chords)
 
-        return chord_outputs, note_outputs, bpm_output, valence_output, energy_output, kl
+        return chord_outputs, note_outputs, bpm_output, key_output, mode_output, valence_output, energy_output, kl
 
     # reparameterization trick:
     # because backpropagation cannot flow through a random node, we introduce a new parameter that allows us to
@@ -60,7 +60,16 @@ class Decoder(nn.Module):
     def __init__(self, hidden_size):
         super(Decoder, self).__init__()
         self.hidden_size = hidden_size
-        self.downsample = nn.Linear(in_features=4*hidden_size, out_features=hidden_size)
+        self.key_linear = nn.Sequential(
+            nn.Linear(in_features=hidden_size, out_features=hidden_size),
+            nn.ReLU(),
+            nn.Linear(in_features=hidden_size, out_features=NUMBER_OF_KEYS),
+        )
+        self.mode_linear = nn.Sequential(
+            nn.Linear(in_features=hidden_size, out_features=hidden_size),
+            nn.ReLU(),
+            nn.Linear(in_features=hidden_size, out_features=NUMBER_OF_MODES),
+        )
         self.bpm_linear = nn.Sequential(
             nn.Linear(in_features=hidden_size, out_features=hidden_size),
             nn.ReLU(),
@@ -77,8 +86,10 @@ class Decoder(nn.Module):
             nn.Linear(in_features=hidden_size, out_features=1),
         )
         self.bpm_embedding = nn.Linear(in_features=1, out_features=hidden_size)
+        self.mode_embedding = nn.Linear(in_features=NUMBER_OF_MODES, out_features=hidden_size)
         self.valence_embedding = nn.Linear(in_features=1, out_features=hidden_size)
         self.energy_embedding = nn.Linear(in_features=1, out_features=hidden_size)
+        self.downsample = nn.Linear(in_features=5*hidden_size, out_features=hidden_size)
         self.chords_lstm = nn.LSTMCell(input_size=hidden_size * 1, hidden_size=hidden_size * 1)
         self.chord_embeddings = nn.Embedding(CHORD_PREDICTION_LENGTH, hidden_size)
         self.melody_embeddings = nn.Embedding(MELODY_PREDICTION_LENGTH, hidden_size)
@@ -96,12 +107,15 @@ class Decoder(nn.Module):
 
     def forward(self, z, num_chords, gt_chords=None, gt_melody=None):
         bpm_output = self.bpm_linear(z)
+        key_output = self.key_linear(z)
+        mode_output = self.mode_linear(z)
         valence_output = self.valence_linear(z)
         energy_output = self.energy_linear(z)
         bpm_embedding = self.bpm_embedding(bpm_output)
+        mode_embedding = self.mode_embedding(mode_output)
         valence_embedding = self.valence_embedding(valence_output)
         energy_embedding = self.energy_embedding(energy_output)
-        z = self.downsample(torch.cat((z, bpm_embedding, valence_embedding, energy_embedding), dim=1))
+        z = self.downsample(torch.cat((z, bpm_embedding, mode_embedding, valence_embedding, energy_embedding), dim=1))
 
         # initialize hidden states and cell states randomly
         hx_chords = torch.randn(z.shape[0], self.hidden_size * 1, device=device)
@@ -142,4 +156,4 @@ class Decoder(nn.Module):
 
         chord_outputs = torch.stack(chord_outputs, dim=1)
         note_outputs = torch.stack(note_outputs, dim=1)
-        return chord_outputs, note_outputs, bpm_output, valence_output, energy_output
+        return chord_outputs, note_outputs, bpm_output, key_output, mode_output, valence_output, energy_output

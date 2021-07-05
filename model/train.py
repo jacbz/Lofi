@@ -1,15 +1,13 @@
-import collections
-import math
 import random
 
-import jsonpickle
 import numpy as np
 import torch
-import json
 import os
+import json
+import jsonpickle
 import matplotlib.pyplot as plot
 from torch import nn
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 from torch.nn.utils.rnn import pack_padded_sequence
 
 from constants import *
@@ -31,6 +29,8 @@ def compute_loss(data):
 
     chords_gt = data["chords"].to(device)[:, :max_num_chords]
     notes_gt = data["melody_notes"].to(device)[:, :max_num_notes]
+    key_gt = data["key"].to(device)
+    mode_gt = data["mode"].to(device)
     bpm_gt = data["bpm"].to(device)
     valence_gt = data["valence"].to(device)
     energy_gt = data["energy"].to(device)
@@ -38,10 +38,10 @@ def compute_loss(data):
     input = pack_padded_sequence(embeddings, embedding_lengths, batch_first=True, enforce_sorted=False)
 
     # run model
-    pred_chords, pred_notes, pred_bpm, pred_valence, pred_energy, kl = model(input, max_num_chords, chords_gt, notes_gt)
+    pred_chords, pred_notes, pred_bpm, pred_key, pred_mode, pred_valence, pred_energy, kl = model(input, max_num_chords, chords_gt, notes_gt)
 
     loss_chords = chord_loss(pred_chords.permute(0, 2, 1), chords_gt)
-    loss_melody_notes = melody_loss_notes(pred_notes.permute(0, 2, 1), notes_gt)
+    loss_melody_notes = melody_loss(pred_notes.permute(0, 2, 1), notes_gt)
 
     def compute_mask(max_length, curr_length):
         arange = torch.arange(max_length, device=device).repeat((embeddings.shape[0], 1)).permute(0, 1)
@@ -57,13 +57,15 @@ def compute_loss(data):
     loss_melody *= 10
     loss_kl = kl * 1e-2
     loss_bpm = mae(pred_bpm[:, 0], bpm_gt) / 5
+    loss_key = key_loss(pred_key, key_gt).mean() / 5
+    loss_mode = mode_loss(pred_mode, mode_gt).mean()
     loss_valence = mae(pred_valence[:, 0], valence_gt) / 5
     loss_energy = mae(pred_energy[:, 0], energy_gt) / 5
     loss_total = loss_chords + loss_kl + loss_melody + loss_bpm + loss_energy + loss_valence
     tp_chords = torch.masked_select(pred_chords.argmax(dim=2) == chords_gt, mask_chord).tolist()
     tp_melodies = torch.masked_select(pred_notes.argmax(dim=2) == notes_gt, mask_melody).tolist()
 
-    return loss_total, loss_chords, loss_kl, loss_melody, loss_bpm, loss_valence, loss_energy, tp_chords, tp_melodies
+    return loss_total, loss_chords, loss_kl, loss_melody, loss_bpm, loss_key, loss_mode, loss_valence, loss_energy, tp_chords, tp_melodies
 
 
 if __name__ == '__main__':
@@ -91,10 +93,15 @@ if __name__ == '__main__':
 
     chord_weights = count_map_to_weights(dataset.chord_count_map)
     note_weights = count_map_to_weights(dataset.melody_note_count_map)
+    key_weights = count_map_to_weights(dataset.key_count_map)
+    mode_weights = count_map_to_weights(dataset.mode_count_map)
 
     chord_loss = nn.CrossEntropyLoss(reduction='none', weight=chord_weights)
-    melody_loss_notes = nn.CrossEntropyLoss(reduction='none', weight=note_weights)
+    melody_loss = nn.CrossEntropyLoss(reduction='none', weight=note_weights)
+    key_loss = nn.CrossEntropyLoss(reduction='none', weight=key_weights)
+    mode_loss = nn.CrossEntropyLoss(reduction='none', weight=mode_weights)
     mae = nn.L1Loss(reduction='mean')
+
     model = Model().to(device)
     # model.load_state_dict(torch.load("model-2021-07-04-15-57-370epochs.pth"))
 
@@ -133,7 +140,7 @@ if __name__ == '__main__':
         # TRAINING
         model.train()
         for batch, data in enumerate(train_dataloader):
-            loss, loss_chords, kl_loss, loss_melody, loss_bpm, loss_valence, loss_energy, batch_tp_chords, batch_tp_melodies = compute_loss(data)
+            loss, loss_chords, kl_loss, loss_melody, loss_bpm, loss_key, loss_mode, loss_valence, loss_energy, batch_tp_chords, batch_tp_melodies = compute_loss(data)
 
             epoch_training_losses_chords.append(loss_chords)
             epoch_training_losses_melodies.append(loss_melody)
@@ -146,13 +153,13 @@ if __name__ == '__main__':
 
             optimizer.step()
             loss = loss.item()
-            print(f"\tBatch {batch}: Loss {loss} (C: {loss_chords} + KL: {kl_loss} + M: {loss_melody} + B: {loss_bpm} V: {loss_valence} + E: {loss_energy}), batch chord acc. cum. {sum(epoch_training_tp_chords) / len(epoch_training_tp_chords)}, batch melody acc. cum. {sum(epoch_training_tp_melodies) / len(epoch_training_tp_melodies)}")
+            print(f"\tBatch {batch}: Loss {loss} (C: {loss_chords} + KL: {kl_loss} + Me: {loss_melody} + B: {loss_bpm} + K: {loss_key} + Mo: {loss_mode} + V: {loss_valence} + E: {loss_energy}), batch chord acc. cum. {sum(epoch_training_tp_chords) / len(epoch_training_tp_chords)}, batch melody acc. cum. {sum(epoch_training_tp_melodies) / len(epoch_training_tp_melodies)}")
 
         # VALIDATION
         model.eval()
         for batch, data in enumerate(validation_dataloader):
             with torch.no_grad():
-                loss, loss_chords, kl_loss, loss_melody, loss_bpm, loss_valence, loss_energy, batch_tp_chords, batch_tp_melodies = compute_loss(data)
+                loss, loss_chords, kl_loss, loss_melody, loss_bpm, loss_key, loss_mode, loss_valence, loss_energy, batch_tp_chords, batch_tp_melodies = compute_loss(data)
 
                 epoch_validation_losses_chords.append(loss_chords)
                 epoch_validation_losses_melodies.append(loss_melody)
@@ -160,7 +167,7 @@ if __name__ == '__main__':
                 epoch_validation_tp_chords.extend(batch_tp_chords)
                 epoch_validation_tp_melodies.extend(batch_tp_melodies)
 
-                print(f"\tVALIDATION Batch {batch}: Loss {loss} (C: {loss_chords} + KL: {kl_loss} + M: {loss_melody} + B: {loss_bpm} V: {loss_valence} + E: {loss_energy}), batch chord acc. cum. {sum(epoch_validation_tp_chords) / len(epoch_validation_tp_chords)}, batch melody acc. cum. {sum(epoch_validation_tp_melodies) / len(epoch_validation_tp_melodies)}")
+                print(f"\tVALIDATION Batch {batch}: Loss {loss} (C: {loss_chords} + KL: {kl_loss} + M: {loss_melody} + B: {loss_bpm} + K: {loss_key} + Mo: {loss_mode} + V: {loss_valence} + E: {loss_energy}), batch chord acc. cum. {sum(epoch_validation_tp_chords) / len(epoch_validation_tp_chords)}, batch melody acc. cum. {sum(epoch_validation_tp_melodies) / len(epoch_validation_tp_melodies)}")
 
         epoch_training_loss_chord = sum(epoch_training_losses_chords) / len(epoch_training_losses_chords)
         epoch_training_loss_melody = sum(epoch_training_losses_melodies) / len(epoch_training_losses_melodies)

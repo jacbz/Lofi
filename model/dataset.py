@@ -15,6 +15,8 @@ class SongDataset(Dataset):
         self.max_chord_progression_length = 0
         self.chord_count_map = {i: 0 for i in range(CHORD_PREDICTION_LENGTH)}
         self.melody_note_count_map = {i: 0 for i in range(MELODY_PREDICTION_LENGTH)}
+        self.key_count_map = {i: 0 for i in range(NUMBER_OF_KEYS)}
+        self.mode_count_map = {i: 0 for i in range(NUMBER_OF_MODES)}
 
         with open(embedding_lengths_file) as embeddings_length_json:
             embedding_lengths_json = json.load(embeddings_length_json)
@@ -32,11 +34,13 @@ class SongDataset(Dataset):
 
         # between 0-11
         key = KEY_TO_NUM[json_file["metadata"]["key"]]
+        self.key_count_map[key] += 1
 
         mode_string = json_file["metadata"]["mode"]
         # if no mode_string, we can assume that it is major
         # between 0-6
         mode = int(mode_string) - 1 if mode_string is not None else 0
+        self.mode_count_map[mode] += 1
 
         energy = json_file["audio_features"]["energy"]
         valence = json_file["audio_features"]["valence"]

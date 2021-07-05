@@ -32,7 +32,7 @@ def predict(input):
     embedding, length = make_embedding(input)
 
     input = pack_padded_sequence(embedding[None], torch.tensor([length]), batch_first=True, enforce_sorted=False)
-    pred_chords, pred_notes, pred_bpm, pred_valence, pred_energy, kl = model(input, MAX_LENGTH_IN_MEASURES)
+    pred_chords, pred_notes, pred_bpm, pred_key, pred_mode, pred_valence, pred_energy, kl = model(input, MAX_CHORD_LENGTH)
 
     chords = pred_chords.argmax(dim=2)[0].tolist()
     notes = pred_notes.argmax(dim=2)[0].cpu().numpy()
@@ -43,8 +43,8 @@ def predict(input):
     notes = notes[:cut_off_point * NOTES_PER_CHORD]
 
     title = None
-    key = 0 + 1
-    mode = 0 + 1
+    key = pred_key.argmax().item() + 1
+    mode = pred_mode.argmax().item() + 1
     bpm = round(pred_bpm.item() * 30 + 70)
     energy = pred_energy.item()
     valence = pred_valence.item()
