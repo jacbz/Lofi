@@ -5,13 +5,22 @@ from torch.nn.utils.rnn import pad_sequence
 import json
 import os
 
+tokenizer = None
+model = None
 device = "cuda" if torch.cuda.is_available() else "cpu"
-tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-model = BertModel.from_pretrained("bert-base-uncased").to(device)
+
+
+def load_bert():
+    global tokenizer
+    global model
+    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+    model = BertModel.from_pretrained("bert-base-uncased").to(device)
 
 
 # make embeddings and save as np
 def make_embeddings():
+    load_bert()
+
     dataset_folder = "./dataset/processed-lyrics-spotify"
     dataset_files = os.listdir(dataset_folder)
     embeddings_file = "embeddings"
@@ -33,7 +42,13 @@ def make_embeddings():
         json.dump(embedding_lengths, outfile)
 
 
-def make_embedding(lyrics):
+def make_embedding(lyrics, custom_device=None):
+    global device
+    if custom_device is not None:
+        device = custom_device
+    if model is None:
+        load_bert()
+
     encoded_input = tokenizer(lyrics, truncation=True, return_tensors='pt').to(device)
     output = model(**encoded_input)
     embedding = output.last_hidden_state[0]

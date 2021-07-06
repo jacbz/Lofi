@@ -1,19 +1,19 @@
+import numpy as np
 import torch
 from torch import nn
 from constants import *
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-
 
 class Model(nn.Module):
-    def __init__(self, hidden_size=200, num_layers=1):
+    def __init__(self, hidden_size=200, num_layers=1, device="cuda" if torch.cuda.is_available() else "cpu"):
         super(Model, self).__init__()
-        self.encoder = Encoder(hidden_size, num_layers)
-        self.decoder = Decoder(hidden_size)
+        self.device = device
+        self.encoder = Encoder(hidden_size, num_layers, device)
+        self.decoder = Decoder(hidden_size, device)
         self.mean_linear = nn.Linear(in_features=hidden_size, out_features=hidden_size)
         self.variance_linear = nn.Linear(in_features=hidden_size, out_features=hidden_size)
 
-    def forward(self, input, num_chords, gt_chords=None, gt_melody=None):
+    def forward(self, input, num_chords, sampling_rate_chords=0, sampling_rate_melodies=0, gt_chords=None, gt_melody=None):
         # encode
         h = self.encoder(input)
         # add two directions together
@@ -28,9 +28,11 @@ class Model(nn.Module):
 
         # decode
         if self.training:
-            chord_outputs, note_outputs, bpm_output, key_output, mode_output, valence_output, energy_output = self.decoder(z, num_chords, gt_chords, gt_melody)
+            chord_outputs, note_outputs, bpm_output, key_output, mode_output, valence_output, energy_output = \
+                self.decoder(z, num_chords, sampling_rate_chords, sampling_rate_melodies, gt_chords, gt_melody)
         else:
-            chord_outputs, note_outputs, bpm_output, key_output, mode_output, valence_output, energy_output = self.decoder(z, num_chords)
+            chord_outputs, note_outputs, bpm_output, key_output, mode_output, valence_output, energy_output = \
+                self.decoder(z, num_chords)
 
         return chord_outputs, note_outputs, bpm_output, key_output, mode_output, valence_output, energy_output, kl
 
@@ -46,8 +48,9 @@ class Model(nn.Module):
 
 
 class Encoder(nn.Module):
-    def __init__(self, hidden_size, num_layers):
+    def __init__(self, hidden_size, num_layers, device):
         super(Encoder, self).__init__()
+        self.device = device
         self.hidden_size = hidden_size
         self.encoder_lstm = nn.LSTM(input_size=BERT_EMBEDDING_LENGTH, hidden_size=hidden_size, num_layers=num_layers, bidirectional=True, batch_first=True)
 
@@ -57,8 +60,9 @@ class Encoder(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self, hidden_size):
+    def __init__(self, hidden_size, device):
         super(Decoder, self).__init__()
+        self.device = device
         self.hidden_size = hidden_size
         self.key_linear = nn.Sequential(
             nn.Linear(in_features=hidden_size, out_features=hidden_size),
@@ -105,7 +109,7 @@ class Decoder(nn.Module):
             nn.Linear(in_features=hidden_size, out_features=MELODY_PREDICTION_LENGTH)
         )
 
-    def forward(self, z, num_chords, gt_chords=None, gt_melody=None):
+    def forward(self, z, num_chords, sampling_rate_chords=0, sampling_rate_melodies=0, gt_chords=None, gt_melody=None):
         bpm_output = self.bpm_linear(z)
         key_output = self.key_linear(z)
         mode_output = self.mode_linear(z)
@@ -118,10 +122,10 @@ class Decoder(nn.Module):
         z = self.downsample(torch.cat((z, bpm_embedding, mode_embedding, valence_embedding, energy_embedding), dim=1))
 
         # initialize hidden states and cell states randomly
-        hx_chords = torch.randn(z.shape[0], self.hidden_size * 1, device=device)
-        cx_chords = torch.randn(z.shape[0], self.hidden_size * 1, device=device)
-        hx_melody = torch.randn(z.shape[0], self.hidden_size * 1, device=device)
-        cx_melody = torch.randn(z.shape[0], self.hidden_size * 1, device=device)
+        hx_chords = torch.randn(z.shape[0], self.hidden_size * 1, device=self.device)
+        cx_chords = torch.randn(z.shape[0], self.hidden_size * 1, device=self.device)
+        hx_melody = torch.randn(z.shape[0], self.hidden_size * 1, device=self.device)
+        cx_melody = torch.randn(z.shape[0], self.hidden_size * 1, device=self.device)
 
         chord_outputs = []
         note_outputs = []
@@ -135,12 +139,22 @@ class Decoder(nn.Module):
             hx_chords, cx_chords = self.chords_lstm(chords_lstm_input, (hx_chords, cx_chords))
             chord_prediction = self.chord_layers(hx_chords)
             if gt_chords is not None:
-                chord_embeddings = self.chord_embeddings(gt_chords[:,i])
+                chord_gt_embeddings = self.chord_embeddings(gt_chords[:, i])
+
+            # perform teacher forcing during training
+            perform_teacher_forcing_chords = bool(np.random.choice(2, 1, p=[1 - sampling_rate_chords, sampling_rate_chords])[0])
+            if gt_chords is not None and perform_teacher_forcing_chords:
+                chord_embeddings = chord_gt_embeddings
             else:
                 chord_embeddings = self.chord_embeddings(chord_prediction.argmax(dim=1))
+
             chords_lstm_input = chord_embeddings
             chord_outputs.append(chord_prediction)
 
+            # when teacher forcing, always put in the chord embedding
+            # this makes the chord and melody LSTMs independent during training
+            if gt_chords is not None and not perform_teacher_forcing_chords:
+                chord_embeddings = chord_gt_embeddings
             # the melody LSTM input at first only includes the chord embeddings
             # after the first iteration, the input also includes the melody embeddings of the notes up to that point
             melody_lstm_input = melody_embeddings + chord_embeddings
@@ -148,12 +162,15 @@ class Decoder(nn.Module):
                 hx_melody, cx_melody = self.melody_lstm(melody_lstm_input, (hx_melody, cx_melody))
                 melody_prediction = self.melody_prediction(hx_melody)
                 note_outputs.append(melody_prediction)
-                if gt_melody is not None:
+                # perform teacher forcing during training
+                perform_teacher_forcing = bool(np.random.choice(2, 1, p=[1 - sampling_rate_melodies, sampling_rate_melodies])[0])
+                if gt_melody is not None and perform_teacher_forcing:
                     melody_embeddings = self.melody_embeddings(gt_melody[:, i*NOTES_PER_CHORD + j])
                 else:
                     melody_embeddings = self.melody_embeddings(melody_prediction.argmax(dim=1))
                 melody_lstm_input = melody_embeddings + chord_embeddings
 
         chord_outputs = torch.stack(chord_outputs, dim=1)
-        note_outputs = torch.stack(note_outputs, dim=1)
+        if len(note_outputs) > 0:
+            note_outputs = torch.stack(note_outputs, dim=1)
         return chord_outputs, note_outputs, bpm_output, key_output, mode_output, valence_output, energy_output

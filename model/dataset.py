@@ -13,10 +13,10 @@ class SongDataset(Dataset):
         self.samples = []
         self.embedding_lengths = []
         self.max_chord_progression_length = 0
-        self.chord_count_map = {i: 0 for i in range(CHORD_PREDICTION_LENGTH)}
-        self.melody_note_count_map = {i: 0 for i in range(MELODY_PREDICTION_LENGTH)}
-        self.key_count_map = {i: 0 for i in range(NUMBER_OF_KEYS)}
-        self.mode_count_map = {i: 0 for i in range(NUMBER_OF_MODES)}
+        # self.chord_count_map = {i: 0 for i in range(CHORD_PREDICTION_LENGTH)}
+        # self.melody_note_count_map = {i: 0 for i in range(MELODY_PREDICTION_LENGTH)}
+        # self.key_count_map = {i: 0 for i in range(NUMBER_OF_KEYS)}
+        # self.mode_count_map = {i: 0 for i in range(NUMBER_OF_MODES)}
 
         with open(embedding_lengths_file) as embeddings_length_json:
             embedding_lengths_json = json.load(embeddings_length_json)
@@ -34,13 +34,13 @@ class SongDataset(Dataset):
 
         # between 0-11
         key = KEY_TO_NUM[json_file["metadata"]["key"]]
-        self.key_count_map[key] += 1
+        # self.key_count_map[key] += 1
 
         mode_string = json_file["metadata"]["mode"]
         # if no mode_string, we can assume that it is major
         # between 0-6
         mode = int(mode_string) - 1 if mode_string is not None else 0
-        self.mode_count_map[mode] += 1
+        # self.mode_count_map[mode] += 1
 
         energy = json_file["audio_features"]["energy"]
         valence = json_file["audio_features"]["valence"]
@@ -87,10 +87,10 @@ class SongDataset(Dataset):
 
         # pad chord and melodies to max measure length
         chords_list.append(CHORD_END_TOKEN)
-        for chord in chords_list:
-            self.chord_count_map[chord] += 1
-        for note in note_list:
-            self.melody_note_count_map[note] += 1
+        # for chord in chords_list:
+        #     self.chord_count_map[chord] += 1
+        # for note in note_list:
+        #     self.melody_note_count_map[note] += 1
         chords_list += [CHORD_END_TOKEN] * ((MAX_CHORD_LENGTH + 1) - len(chords_list))
         note_list += [MELODY_REST_TOKEN] * ((MAX_CHORD_LENGTH + 1) * NOTES_PER_CHORD - len(note_list))
 

@@ -6,8 +6,8 @@ from embeddings import make_embedding
 from model import Model
 from constants import *
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-file = "model.pth"
+device = "cpu" if torch.cuda.is_available() else "cpu"
+file = "model-2021-07-06-16-33-150epochs-cosine50.pth"
 
 class Output:
     def __init__(self, title, key, mode, bpm, energy, valence, chords, melodies):
@@ -23,13 +23,13 @@ class Output:
 
 def predict(input):
     print("Loading model...", end=" ")
-    model = Model()
+    model = Model(device=device)
     model.load_state_dict(torch.load(file))
     print(f"Loaded {file}.")
     model.to(device)
     model.eval()
 
-    embedding, length = make_embedding(input)
+    embedding, length = make_embedding(input, device)
 
     input = pack_padded_sequence(embedding[None], torch.tensor([length]), batch_first=True, enforce_sorted=False)
     pred_chords, pred_notes, pred_bpm, pred_key, pred_mode, pred_valence, pred_energy, kl = model(input, MAX_CHORD_LENGTH)
