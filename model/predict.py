@@ -7,7 +7,7 @@ from model import Model
 from constants import *
 
 device = "cpu" if torch.cuda.is_available() else "cpu"
-file = "model-2021-07-06-16-33-150epochs-cosine50.pth"
+file = "model-2021-07-06-19-46-227epochs.pth"
 
 class Output:
     def __init__(self, title, key, mode, bpm, energy, valence, chords, melodies):

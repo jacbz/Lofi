@@ -1,8 +1,14 @@
+# as much as can fit into the GPU
 BATCH_SIZE = 128
-NUM_EPOCHS = 250
+# learning rate for Adam
+LEARNING_RATE = 0.001
+
+# number of epochs to scale sample scheduling to
+SCHEDULED_SAMPLING_EPOCHS = 500
+START_SCHEDULED_SAMPLING_RATE = 1.0
+END_SCHEDULED_SAMPLING_RATE = 0.1
 
 BERT_EMBEDDING_LENGTH = 768
-
 MAX_CHORD_LENGTH = 50
 
 # input: hidden_size;output: chords (0-8) - 0: rest, 1-7: chord numerals, 8: end

@@ -13,8 +13,8 @@ class SongDataset(Dataset):
         self.samples = []
         self.embedding_lengths = []
         self.max_chord_progression_length = 0
-        # self.chord_count_map = {i: 0 for i in range(CHORD_PREDICTION_LENGTH)}
-        # self.melody_note_count_map = {i: 0 for i in range(MELODY_PREDICTION_LENGTH)}
+        self.chord_count_map = {i: 0 for i in range(CHORD_PREDICTION_LENGTH)}
+        self.melody_note_count_map = {i: 0 for i in range(MELODY_PREDICTION_LENGTH)}
         # self.key_count_map = {i: 0 for i in range(NUMBER_OF_KEYS)}
         # self.mode_count_map = {i: 0 for i in range(NUMBER_OF_MODES)}
 
@@ -87,10 +87,10 @@ class SongDataset(Dataset):
 
         # pad chord and melodies to max measure length
         chords_list.append(CHORD_END_TOKEN)
-        # for chord in chords_list:
-        #     self.chord_count_map[chord] += 1
-        # for note in note_list:
-        #     self.melody_note_count_map[note] += 1
+        for chord in chords_list:
+            self.chord_count_map[chord] += 1
+        for note in note_list:
+            self.melody_note_count_map[note] += 1
         chords_list += [CHORD_END_TOKEN] * ((MAX_CHORD_LENGTH + 1) - len(chords_list))
         note_list += [MELODY_REST_TOKEN] * ((MAX_CHORD_LENGTH + 1) * NOTES_PER_CHORD - len(note_list))
 

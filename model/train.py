@@ -1,7 +1,4 @@
 import math
-import random
-
-import numpy as np
 import torch
 import os
 import json
@@ -71,9 +68,9 @@ def compute_loss(data):
 
 
 if __name__ == '__main__':
-    torch.manual_seed(42)
-    random.seed(42)
-    np.random.seed(42)
+    # torch.manual_seed(42)
+    # random.seed(42)
+    # np.random.seed(42)
 
     dataset_folder = "dataset/processed-lyrics-spotify"
     dataset_files = os.listdir(dataset_folder)
@@ -87,24 +84,24 @@ if __name__ == '__main__':
     train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     validation_dataloader = DataLoader(validation_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
-    # def count_map_to_weights(count_map):
-    #     weights = torch.tensor(list(count_map.values()), dtype=torch.float32, device=device)
-    #     weights = weights / weights.sum()
-    #     weights = 1.0 / weights
-    #     return weights / weights.sum()
-    #
-    # chord_weights = count_map_to_weights(dataset.chord_count_map)
-    # note_weights = count_map_to_weights(dataset.melody_note_count_map)
+    def count_map_to_weights(count_map):
+        weights = torch.tensor(list(count_map.values()), dtype=torch.float32, device=device)
+        weights = weights / weights.sum()
+        weights = 1.0 / weights
+        return weights / weights.sum()
 
-    # chord_loss = nn.CrossEntropyLoss(reduction='none', weight=chord_weights)
-    # melody_loss = nn.CrossEntropyLoss(reduction='none', weight=note_weights)
+    chord_weights = count_map_to_weights(dataset.chord_count_map)
+    note_weights = count_map_to_weights(dataset.melody_note_count_map)
+
+    chord_loss = nn.CrossEntropyLoss(reduction='none', weight=chord_weights)
+    melody_loss = nn.CrossEntropyLoss(reduction='none', weight=note_weights)
     ce_loss = nn.CrossEntropyLoss(reduction='none')
     mae = nn.L1Loss(reduction='mean')
 
     model = Model().to(device)
     # model.load_state_dict(torch.load("model-2021-07-04-15-57-370epochs.pth"))
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
     epochs = []
 
@@ -120,7 +117,8 @@ if __name__ == '__main__':
     validation_accuracies_chords = []
     validation_accuracies_melodies = []
 
-    for epoch in range(NUM_EPOCHS):
+    epoch = 0
+    while True:
         epochs.append(epoch)
 
         print(f"== Epoch {epoch} ==")
@@ -136,7 +134,9 @@ if __name__ == '__main__':
         epoch_validation_tp_chords = []
         epoch_validation_tp_melodies = []
 
-        sampling_rate_chords = 0.5 * (1 + math.cos((epoch / NUM_EPOCHS) * math.pi))
+        sampling_rate_chords =  0.5 * (START_SCHEDULED_SAMPLING_RATE - END_SCHEDULED_SAMPLING_RATE) * \
+                               (1 + math.cos((epoch / SCHEDULED_SAMPLING_EPOCHS) * math.pi)) + END_SCHEDULED_SAMPLING_RATE \
+            if epoch <= SCHEDULED_SAMPLING_EPOCHS else START_SCHEDULED_SAMPLING_RATE
         sampling_rate_melodies = sampling_rate_chords
 
         print(f"Scheduled sampling rate: C {sampling_rate_chords}, M {sampling_rate_melodies}")
@@ -198,7 +198,9 @@ if __name__ == '__main__':
         print(f"VALIDATION: epoch chord loss: {epoch_validation_loss_chord:.3f}, melody loss: {epoch_validation_loss_melody:.3f}, KL: {epoch_validation_loss_kl:.3f}, "
               f"chord accuracy: {epoch_validation_chord_accuracy:.3f}, melody accuracy: {epoch_validation_melody_accuracy:.3f}")
 
-        torch.save(model.state_dict(), "model.pth")
+        # copy old model
+        save_name = f"model-epoch{epoch}.pth" if epoch > SCHEDULED_SAMPLING_EPOCHS / 5 and epoch % 10 == 0 else "model.pth"
+        torch.save(model.state_dict(), save_name)
 
         training_losses_chords.append(epoch_training_loss_chord)
         training_losses_melodies.append(epoch_training_loss_melody)
@@ -249,3 +251,5 @@ if __name__ == '__main__':
         axs[1, 1].grid(True)
         plot.tight_layout()
         plot.show()
+
+        epoch += 1
