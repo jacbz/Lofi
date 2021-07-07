@@ -138,23 +138,17 @@ class Decoder(nn.Module):
         for i in range(num_chords):
             hx_chords, cx_chords = self.chords_lstm(chords_lstm_input, (hx_chords, cx_chords))
             chord_prediction = self.chord_layers(hx_chords)
-            if gt_chords is not None:
-                chord_gt_embeddings = self.chord_embeddings(gt_chords[:, i])
 
             # perform teacher forcing during training
             perform_teacher_forcing_chords = bool(np.random.choice(2, 1, p=[1 - sampling_rate_chords, sampling_rate_chords])[0])
             if gt_chords is not None and perform_teacher_forcing_chords:
-                chord_embeddings = chord_gt_embeddings
+                chord_embeddings = self.chord_embeddings(gt_chords[:, i])
             else:
                 chord_embeddings = self.chord_embeddings(chord_prediction.argmax(dim=1))
 
             chords_lstm_input = chord_embeddings
             chord_outputs.append(chord_prediction)
 
-            # when teacher forcing, always put in the chord embedding
-            # this makes the chord and melody LSTMs independent during training
-            if gt_chords is not None and not perform_teacher_forcing_chords:
-                chord_embeddings = chord_gt_embeddings
             # the melody LSTM input at first only includes the chord embeddings
             # after the first iteration, the input also includes the melody embeddings of the notes up to that point
             melody_lstm_input = melody_embeddings + chord_embeddings

@@ -134,9 +134,9 @@ if __name__ == '__main__':
         epoch_validation_tp_chords = []
         epoch_validation_tp_melodies = []
 
-        sampling_rate_chords =  0.5 * (START_SCHEDULED_SAMPLING_RATE - END_SCHEDULED_SAMPLING_RATE) * \
+        sampling_rate_chords = 0.5 * (START_SCHEDULED_SAMPLING_RATE - END_SCHEDULED_SAMPLING_RATE) * \
                                (1 + math.cos((epoch / SCHEDULED_SAMPLING_EPOCHS) * math.pi)) + END_SCHEDULED_SAMPLING_RATE \
-            if epoch <= SCHEDULED_SAMPLING_EPOCHS else START_SCHEDULED_SAMPLING_RATE
+            if epoch <= SCHEDULED_SAMPLING_EPOCHS else END_SCHEDULED_SAMPLING_RATE
         sampling_rate_melodies = sampling_rate_chords
 
         print(f"Scheduled sampling rate: C {sampling_rate_chords}, M {sampling_rate_melodies}")
