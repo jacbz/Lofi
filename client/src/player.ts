@@ -73,7 +73,7 @@ class Player {
 
   instrumentSamplers: Map<Instrument, Tone.Sampler>;
 
-  gain: Tone.Gain = new Tone.Gain();
+  gain: Tone.Gain;
 
   /** Filters */
 
@@ -82,13 +82,6 @@ class Player {
   // lowPassFilter: Tone.Filter;
 
   // highPassFilter: Tone.Filter;
-
-  equalizer: Tone.EQ3 = new Tone.EQ3({
-    low: -0.5,
-    mid: 0,
-    high: -0.5
-  });
-
   // distortion: Tone.Distortion;
 
   // reverb: Tone.Reverb;
@@ -170,6 +163,7 @@ class Player {
     if (!this.currentTrack) {
       return;
     }
+    this.gain = new Tone.Gain();
     this.isPlaying = true;
     this.setAudioWebApiMetadata();
 
@@ -206,7 +200,7 @@ class Player {
         // fadeIn: '4n',
         // fadeOut: sampleGroup.isLoop ? 0 : '4n'
       })
-        .chain(...filters, this.equalizer, this.gain, Tone.Destination)
+        .chain(...filters, this.gain, Tone.Destination)
         .sync();
 
       if (!this.samplePlayers.has(sampleGroupName)) {
@@ -218,7 +212,7 @@ class Player {
     // load instruments
     for (const instrument of this.currentTrack.instruments) {
       const sampler = getInstrumentSampler(instrument)
-        .chain(...getInstrumentFilters(instrument), this.equalizer, this.gain, Tone.Destination)
+        .chain(...getInstrumentFilters(instrument), this.gain, Tone.Destination)
         .sync();
       this.instrumentSamplers.set(instrument, sampler);
     }
@@ -298,11 +292,12 @@ class Player {
 
   /** Stops the current track, and disposes Tone.js objects */
   stop() {
+    this.isPlaying = false;
+    this.gain?.disconnect();
     Tone.Transport.cancel();
     Tone.Transport.stop();
     this.instrumentSamplers?.forEach((s) => s.dispose());
     this.samplePlayers?.forEach((s) => s.forEach((t) => t.dispose()));
-    this.isPlaying = false;
   }
 
   /** Stops playback and unloads the current track in the UI */

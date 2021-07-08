@@ -2,7 +2,8 @@ import * as Tonal from '@tonaljs/tonal';
 import { Time } from 'tone/build/esm/core/type/Units';
 import { InstrumentNote, SampleLoop, Track } from './track';
 import { OutputParams } from './params';
-import { addTime,
+import {
+  addTime,
   Chord,
   keyNumberToString,
   mapNote,
@@ -11,7 +12,8 @@ import { addTime,
   octShiftAll,
   randomColor,
   randomFromInterval,
-  subtractTime } from './helper';
+  subtractTime
+} from './helper';
 import { SAMPLEGROUPS, selectDrumbeat } from './samples';
 import { Instrument } from './instruments';
 import * as Presets from './producer_presets';
@@ -164,13 +166,11 @@ class Producer {
   }
 
   produceMain(): number {
-    const numberOfIterations = 2;
+    const numberOfIterations = Math.ceil(36 / this.chords.length);
     const length = this.chords.length * numberOfIterations;
 
     // the measure where the main part starts
     const measureStart = this.introLength;
-    // the measure where the main part ends
-    const measureEnd = this.introLength + length;
 
     const preset = Presets.selectPreset(this.valence, this.energy);
 
@@ -178,6 +178,7 @@ class Producer {
       const iterationMeasure = measureStart + i * this.chords.length;
       this.startDrumbeat(`${i === 0 ? iterationMeasure + 2 : iterationMeasure}:0`);
       this.endDrumbeat(`${measureStart + (i + 1) * this.chords.length - 2}:0`);
+
       this.chords.forEach((scaleDegree, chordNo) => {
         const chord = this.chordsTonal[chordNo];
         const measure = iterationMeasure + chordNo;
@@ -185,14 +186,25 @@ class Producer {
         if (!chord.empty) {
           // bass line: on the first beat of every measure
           if (preset.bassLine) {
-            const rootNote = octShift(`${chord.tonic}`, preset.bassLine.octaveShift);
-            this.addNote(
-              preset.bassLine.instrument,
-              rootNote,
-              '1m',
-              `${measure}:0`,
-              preset.bassLine.volume
+            const rootNote = `${this.notesInScale[scaleDegree - 1]}${
+              1 + preset.bassLine.octaveShift
+            }`;
+            // get a random bass pattern
+            const bassPatternNo = randomFromInterval(
+              0,
+              Presets.BassPatterns.length - 1,
+              this.energy + this.valence + iterationMeasure + chordNo
             );
+            const bassPattern = Presets.BassPatterns[bassPatternNo];
+            bassPattern.forEach(([startBeat, duration]) => {
+              this.addNote(
+                preset.bassLine.instrument,
+                rootNote,
+                `0:${duration}`,
+                `${measure}:${startBeat}`,
+                preset.bassLine.volume
+              );
+            });
           }
 
           // harmony

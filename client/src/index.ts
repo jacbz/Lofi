@@ -125,7 +125,7 @@ const onTrackChange = () => {
   });
 
   if (player.currentTrack) {
-    vinylBottomText.textContent = `${player.currentTrack.key} ${player.currentTrack.mode}`;
+    vinylBottomText.textContent = player.currentTrack.title;
     vinylColor.setAttribute('fill', player.currentTrack.color);
   } else {
     vinylBottomText.textContent = '';
