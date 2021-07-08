@@ -8,6 +8,8 @@ import { deflate, inflate } from 'pako';
 
 /** Wraps inaccessible Tonal.Chord class */
 export class Chord {
+  empty: boolean;
+
   name: string;
 
   aliases: string[];
@@ -29,6 +31,38 @@ export class Chord {
 export const octShift = (note: string, octaves: number) => {
   const n = Tonal.Note.get(note);
   return `${n.pc}${n.oct + octaves}`;
+};
+
+/** Shifts given notes by a number of octaves */
+export const octShiftAll = (notes: string[], octaves: number) =>
+  notes.map((n) => octShift(n, octaves));
+
+/** e.g. 8 -> [0, 1] */
+export const mapNote = (note: number) => {
+  const scaleDegreeIndex = (note - 1) % 7;
+  const octave = Math.floor((note - 1) / 7);
+  return [scaleDegreeIndex, octave];
+};
+
+/**  e.g. in G major:  */
+export const mountNotesOnScale = (offsetScaleDegree: number, notes: number[], scale: string[]) =>
+  notes.map((n) => {
+    const [scaleDegreeIndex, octave] = mapNote(n + offsetScaleDegree - 1);
+    return octShift(scale[scaleDegreeIndex], octave);
+  });
+
+/** 2 => 'C#' */
+export const keyNumberToString = (key: number): string =>
+  Tonal.Scale.get('C chromatic').notes[key - 1];
+
+/** Returns the closest pitch shift distance from key1 to key2, e.g. 'C' and 'G' => -5 */
+export const pitchShiftDistance = (key1: string, key2: string) => {
+  const shiftUpInterval =
+    Tonal.Interval.get(Tonal.Interval.distance(`${key1}1`, `${key2}2`)).semitones % 12;
+    // shift down sounds weird with Tone.js
+  // const shiftDownInterval =
+  //   Tonal.Interval.get(Tonal.Interval.distance(`${key1}2`, `${key2}1`)).semitones % 12;
+  return shiftUpInterval;
 };
 
 /** Adds two Tone.js Time objects together */
@@ -55,10 +89,15 @@ export const random = (seed: number) => {
 };
 
 /** Generates a random pastel color based on seed */
-export const randomColor = (seed: number) => `hsl(${360 * random(seed)},${25 + 70 * random(seed + 1)}%,${85 + 10 * random(seed + 2)}%)`;
+export const randomColor = (seed: number) =>
+  `hsl(${360 * random(seed)},${25 + 70 * random(seed + 1)}%,${85 + 10 * random(seed + 2)}%)`;
 
 /** Compresses a given string into a Base64-encoded string using deflate */
 export const compress = (input: string) => btoa(String.fromCharCode.apply(null, deflate(input)));
 
 /** Decompresses a given Base64-encoded string using inflate */
-export const decompress = (input: string) => inflate(Uint8Array.from(atob(input), (c) => c.charCodeAt(0)), { to: 'string' });
+export const decompress = (input: string) =>
+  inflate(
+    Uint8Array.from(atob(input), (c) => c.charCodeAt(0)),
+    { to: 'string' }
+  );

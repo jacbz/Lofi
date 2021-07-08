@@ -1,7 +1,8 @@
 import { randomFromInterval } from './helper';
 
-export const getRandomInputParams = () => {
-  const params = {
+export const getRandomOutputParams = () => {
+  const params: OutputParams = {
+    title: null,
     // key: 8,
     key: randomFromInterval(1, 12),
     mode: 6,
@@ -9,7 +10,8 @@ export const getRandomInputParams = () => {
     bpm: randomFromInterval(70, 90),
     energy: Math.random(),
     valence: Math.random(),
-    chordProgression: [1, 4, 6, 5]
+    chords: [1, 4, 6, 5, 1, 4, 6, 5],
+    melodies: [] as number[][]
   };
   return JSON.stringify(params, null, 2);
 };
@@ -19,6 +21,9 @@ export class InputParams {
 }
 
 export class OutputParams {
+  /** Optional: title */
+  title: string;
+
   /** Key as a number between 1-12 */
   key: number;
 
@@ -43,5 +48,7 @@ export class OutputParams {
   /** How positive the music should be, 0 (sad) to 1 (cheerful) */
   valence: number;
 
-  chordProgression: number[];
+  chords: number[];
+
+  melodies: number[][];
 }

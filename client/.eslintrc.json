@@ -14,6 +14,7 @@
     "no-restricted-syntax": 0,
     "comma-dangle": ["error", "never"],
     "import/extensions": "off",
+    "implicit-arrow-linebreak": "off",
     "max-classes-per-file": "off",
     "no-console": "off",
     "no-undef": "off",

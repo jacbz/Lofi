@@ -11,14 +11,21 @@ class Track {
   /** Root note of key, e.g. 'Db' */
   key: string;
 
+  keyNum: number;
+
   /** Musical mode of key, e.g. 'major' or 'lydian' */
   mode: string;
+
+  modeNum: number;
 
   /** Title of the track */
   title: string;
 
   /** Tempo in BPM (beats per minute) */
   bpm: number = 100;
+
+  /** Whether to swing eighth notes */
+  swing: boolean = false;
 
   /** Number of measures; each measure contains four beats */
   numMeasures: number = 60;
@@ -91,7 +98,16 @@ class InstrumentNote {
   /** Onset time in Tone.js */
   time: Time;
 
-  public constructor(instrument: Instrument, pitch: string | string[], duration: Time, time: Time) {
+  /** Velocity of the note, between 0 and 1 (defaults to 1) */
+  velocity?: number;
+
+  public constructor(
+    instrument: Instrument,
+    pitch: string | string[],
+    duration: Time,
+    time: Time,
+    velocity?: number
+  ) {
     this.instrument = instrument;
     this.pitch =
       typeof pitch === 'string'
@@ -99,6 +115,7 @@ class InstrumentNote {
         : pitch.map((p) => Tonal.Note.simplify(p));
     this.duration = duration;
     this.time = time;
+    this.velocity = velocity;
   }
 }
 

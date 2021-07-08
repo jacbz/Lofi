@@ -1,7 +1,7 @@
 import Sortable from 'sortablejs';
 import Player, { RepeatMode } from './player';
 import Producer from './producer';
-import { getRandomInputParams, OutputParams } from './params';
+import { getRandomOutputParams, OutputParams } from './params';
 import { decompress } from './helper';
 
 const player = new Player();
@@ -9,18 +9,21 @@ const player = new Player();
 // load playlist in URL if possible
 const queryString = window.location.search;
 if (queryString.length > 0) {
+  let outputParams: OutputParams[];
   const compressed = queryString.substring(1);
   try {
     const decompressed = decompress(compressed);
-    const outputParams: OutputParams[] = JSON.parse(decompressed);
+    outputParams = JSON.parse(decompressed);
+    // window.history.pushState({}, null, '/');
+  } catch (e) {
+    console.log('Error parsing', compressed);
+  }
+  if (outputParams) {
     const playlist = outputParams.map((params) => {
       const producer = new Producer();
       return producer.produce(params);
     });
     player.playlist = playlist;
-    window.history.pushState({}, null, '/');
-  } catch (e) {
-    console.log('Error parsing', compressed);
   }
 }
 
@@ -92,7 +95,7 @@ player.updateTrackDisplay = (seconds?: number) => {
 
 // Input field
 const inputTextarea = document.getElementById('input') as HTMLTextAreaElement;
-inputTextarea.textContent = getRandomInputParams();
+inputTextarea.textContent = getRandomOutputParams();
 
 // Add button
 const addButton = document.getElementById('add-button');
@@ -100,8 +103,7 @@ addButton.addEventListener('click', async () => {
   let params: OutputParams;
   try {
     params = JSON.parse(inputTextarea.value);
-    console.log(params);
-    inputTextarea.textContent = getRandomInputParams();
+    inputTextarea.textContent = getRandomOutputParams();
   } catch (e) {
     window.alert('Could not parse JSON');
     return;
@@ -158,6 +160,7 @@ const updatePlaylistDisplay = () => {
     trackElement.addEventListener('click', async (e: MouseEvent) => {
       if ((e.target as HTMLElement).tagName === 'BUTTON') return;
       player.playTrack(i);
+      console.log(track.outputParams);
     });
 
     const deleteButton = trackElement.querySelector('.delete-button');

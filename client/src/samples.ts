@@ -1,5 +1,5 @@
 import * as Tone from 'tone';
-import { randomFromInterval } from './helper';
+import { keyNumberToString, pitchShiftDistance, random, randomFromInterval } from './helper';
 import sampleConfig from './samples.json';
 
 export const SAMPLES_BASE_URL = './samples';
@@ -8,26 +8,38 @@ export const SAMPLE_DEFAULT_VOLUME = -8;
 class SampleGroup {
   name: string;
 
-  category: string;
+  isLoop: boolean;
 
   volume: number;
 
-  energyRanges: number[][];
-
   size: number;
+
+  energyRanges?: number[][];
+
+  mode: number;
+
+  keys?: number[];
+
+  durations?: number[];
 
   public constructor(
     name: string,
-    category: string,
+    isLoop: boolean,
     size: number,
-    energyRanges: number[][],
-    volume: number
+    volume: number,
+    energyRanges?: number[][],
+    mode?: number,
+    keys?: number[],
+    durations?: number[]
   ) {
     this.name = name;
-    this.category = category;
+    this.isLoop = isLoop;
     this.volume = SAMPLE_DEFAULT_VOLUME + volume;
     this.energyRanges = energyRanges;
     this.size = size;
+    this.mode = mode;
+    this.keys = keys;
+    this.durations = durations;
   }
 
   /** Gets a random sample index, based on a seed number */
@@ -35,12 +47,38 @@ class SampleGroup {
     return randomFromInterval(0, this.size - 1, seed);
   }
 
-  getSampleUrl(index: number) {
-    return `${SAMPLES_BASE_URL}/loops/${this.category}/${this.name}/${this.name}_${index + 1}.mp3`;
+  getRandomSampleByKey(seed: number, key: number) {
+    const weights = this.keys.map((k) =>
+      1 / (Math.abs(pitchShiftDistance(keyNumberToString(k), keyNumberToString(key))) + 1) ** 4);
+    return this.getRandomSampleWithWeights(seed, weights);
   }
 
-  getFilters() {
-    if (this.category === 'drums') {
+  /** Gets a random sample index, weighted.
+   * Weights must be of length size */
+  getRandomSampleWithWeights(seed: number, weights: number[]) {
+    const weightsSum = weights.reduce((pv, cv) => pv + cv, 0);
+    const lastIndex = this.size - 1;
+
+    const num = random(seed);
+
+    let s = 0;
+    for (let i = 0; i < lastIndex; i += 1) {
+      s += weights[i] / weightsSum;
+      if (num < s) {
+        return i;
+      }
+    }
+    return lastIndex;
+  }
+
+  getSampleUrl(index: number) {
+    return `${SAMPLES_BASE_URL}/${this.isLoop ? 'loops' : 'oneshots'}/${this.name}/${this.name}_${
+      index + 1
+    }.mp3`;
+  }
+
+  getFilters(): any[] {
+    if (this.name.includes('drumloop')) {
       return [
         new Tone.Filter({
           type: 'lowpass',
@@ -53,19 +91,37 @@ class SampleGroup {
   }
 }
 
-export const SAMPLEGROUPS: Map<string, SampleGroup> = sampleConfig.reduce((map, sampleGroup) => {
-  map.set(
-    sampleGroup.name,
-    new SampleGroup(
+export const SAMPLEGROUPS: Map<string, SampleGroup> = new Map([
+  ...sampleConfig.loops.reduce((map, sampleGroup) => {
+    map.set(
       sampleGroup.name,
-      sampleGroup.category,
-      sampleGroup.size,
-      sampleGroup.energyRanges,
-      sampleGroup.volume
-    )
-  );
-  return map;
-}, new Map());
+      new SampleGroup(
+        sampleGroup.name,
+        true,
+        sampleGroup.size,
+        sampleGroup.volume,
+        sampleGroup.energyRanges
+      )
+    );
+    return map;
+  }, new Map()),
+  ...sampleConfig.oneshots.reduce((map, sampleGroup) => {
+    map.set(
+      sampleGroup.name,
+      new SampleGroup(
+        sampleGroup.name,
+        false,
+        sampleGroup.keys.length,
+        sampleGroup.volume,
+        null,
+        sampleGroup.mode,
+        sampleGroup.keys,
+        sampleGroup.durations
+      )
+    );
+    return map;
+  }, new Map())
+]);
 
 export const selectDrumbeat = (bpm: number, energy: number): [string, number] => {
   const sampleGroup = `drumloop${bpm}`;

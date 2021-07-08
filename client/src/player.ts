@@ -1,8 +1,9 @@
 import * as Tone from 'tone';
+import { PitchShift } from 'tone';
 import { getInstrumentFilters, getInstrumentSampler, Instrument } from './instruments';
 import * as Samples from './samples';
 import { Track } from './track';
-import { compress } from './helper';
+import { compress, keyNumberToString, pitchShiftDistance } from './helper';
 
 /**
  * The Player plays a Track through Tone.js.
@@ -82,7 +83,11 @@ class Player {
 
   // highPassFilter: Tone.Filter;
 
-  // equalizer: Tone.EQ3;
+  equalizer: Tone.EQ3 = new Tone.EQ3({
+    low: -0.5,
+    mid: 0,
+    high: -0.5
+  });
 
   // distortion: Tone.Distortion;
 
@@ -183,18 +188,25 @@ class Player {
     this.instrumentSamplers = new Map();
 
     // this.initDefaultFilters();
-
     // load samples
     for (const [sampleGroupName, sampleIndex] of this.currentTrack.samples) {
       const sampleGroup = Samples.SAMPLEGROUPS.get(sampleGroupName);
+      const filters = sampleGroup.getFilters();
+      // if the sample group specifies a specific key, shift to that key
+      if (sampleGroup.keys && sampleGroup.keys[sampleIndex] !== this.currentTrack.keyNum) {
+        const shift = pitchShiftDistance(
+          keyNumberToString(sampleGroup.keys[sampleIndex] - 1), this.currentTrack.key
+        );
+        filters.push(new PitchShift(shift));
+      }
       const player = new Tone.Player({
         url: sampleGroup.getSampleUrl(sampleIndex),
         volume: sampleGroup.volume,
-        loop: true,
-        fadeIn: '4n',
-        fadeOut: '4n'
+        loop: sampleGroup.isLoop
+        // fadeIn: '4n',
+        // fadeOut: sampleGroup.isLoop ? 0 : '4n'
       })
-        .chain(...sampleGroup.getFilters(), this.gain, Tone.Destination)
+        .chain(...filters, this.equalizer, this.gain, Tone.Destination)
         .sync();
 
       if (!this.samplePlayers.has(sampleGroupName)) {
@@ -206,10 +218,13 @@ class Player {
     // load instruments
     for (const instrument of this.currentTrack.instruments) {
       const sampler = getInstrumentSampler(instrument)
-        .chain(...getInstrumentFilters(instrument), this.gain, Tone.Destination)
+        .chain(...getInstrumentFilters(instrument), this.equalizer, this.gain, Tone.Destination)
         .sync();
       this.instrumentSamplers.set(instrument, sampler);
     }
+
+    // set swing
+    Tone.Transport.swing = +this.currentTrack.swing;
 
     // wait until all samples are loaded
     await Tone.loaded();
@@ -228,7 +243,8 @@ class Player {
       instrumentSampler.triggerAttackRelease(
         noteTiming.pitch,
         noteTiming.duration,
-        noteTiming.time
+        noteTiming.time,
+        noteTiming.velocity !== undefined ? noteTiming.velocity : 1
       );
     }
 
@@ -242,7 +258,6 @@ class Player {
       }
     }, 0.1);
 
-    console.log(Tone.Transport.seconds);
     this.play();
   }
 
@@ -295,6 +310,7 @@ class Player {
     this.stop();
     this.currentPlayingIndex = undefined;
     this.updateTrackDisplay();
+    this.updatePlaylistDisplay();
     navigator.mediaSession.metadata = null;
   }
 
@@ -369,8 +385,10 @@ class Player {
   getExportUrl() {
     const json = JSON.stringify(this.playlist.map((t) => t.outputParams));
     const compressed = compress(json);
-    return `${window.location.origin}${window.location.pathname}?${compressed}`
-      .replace('home.in.tum.de/~zhangja/lofi', 'lofi.jacobzhang.de');
+    return `${window.location.origin}${window.location.pathname}?${compressed}`.replace(
+      'home.in.tum.de/~zhangja/lofi',
+      'lofi.jacobzhang.de'
+    );
   }
 
   /** Set up Media Session API metadata */
@@ -379,9 +397,7 @@ class Player {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: this.currentTrack.title,
       artist: 'Lofi generator',
-      artwork: [
-        { src: './background.jpg', type: 'image/jpg' }
-      ]
+      artwork: [{ src: './background.jpg', type: 'image/jpg' }]
     });
     this.updateAudioWebApiPosition(0);
   }
