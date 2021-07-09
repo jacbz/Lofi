@@ -31,7 +31,7 @@ class Player {
     this._isPlaying = isPlaying;
     this.onPlayingStateChange();
     if (this.gain) {
-      this.gain.gain.value = isPlaying ? this.getGain() : 0;
+      this.gain.gain.value = isPlaying && !this._muted ? this.getGain() : 0;
     }
   }
 
