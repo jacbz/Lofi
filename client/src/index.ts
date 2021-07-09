@@ -101,8 +101,13 @@ generateButton.addEventListener('click', async () => {
   generateButton.disabled = true;
   loadingAnimation.style.visibility = 'visible';
 
-  const params = await generate();
-
+  let params;
+  try {
+    params = await generate();
+  } catch (err) {
+    generateButton.textContent = 'Error!';
+    return;
+  }
   generateButton.disabled = false;
   loadingAnimation.style.visibility = 'hidden';
 

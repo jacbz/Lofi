@@ -471,13 +471,9 @@ button.flat {
   transition: background-color 0.25s, color 0.25s;
   padding: 5px;
 
-  &:hover {
+  &:hover:enabled {
     background-color: white;
     color: black;
-
-    #loading-animation div {      
-      background: black !important;
-    }
   }
 }
 
