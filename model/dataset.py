@@ -2,7 +2,6 @@ import json
 import collections
 import math
 import torch
-import numpy as np
 from torch.utils.data import Dataset
 from constants import *
 
@@ -11,23 +10,23 @@ class SongDataset(Dataset):
     def __init__(self, dataset_folder, files, embeddings_file, embedding_lengths_file):
         super(SongDataset, self).__init__()
         self.samples = []
-        self.embedding_lengths = []
+        # self.embedding_lengths = []
         self.max_chord_progression_length = 0
         self.chord_count_map = {i: 0 for i in range(CHORD_PREDICTION_LENGTH)}
         self.melody_note_count_map = {i: 0 for i in range(MELODY_PREDICTION_LENGTH)}
         # self.key_count_map = {i: 0 for i in range(NUMBER_OF_KEYS)}
         # self.mode_count_map = {i: 0 for i in range(NUMBER_OF_MODES)}
 
-        with open(embedding_lengths_file) as embeddings_length_json:
-            embedding_lengths_json = json.load(embeddings_length_json)
-            for file in files:
-                with open(f"{dataset_folder}/{file}") as sample_file_json:
-                    json_loaded = json.load(sample_file_json)
-                    self.embedding_lengths.append(embedding_lengths_json[file])
-                    sample = self.process_sample(json_loaded)
-                    self.samples.append(sample)
+        # with open(embedding_lengths_file) as embeddings_length_json:
+        #     embedding_lengths_json = json.load(embeddings_length_json)
+        for file in files:
+            with open(f"{dataset_folder}/{file}") as sample_file_json:
+                json_loaded = json.load(sample_file_json)
+                # self.embedding_lengths.append(embedding_lengths_json[file])
+                sample = self.process_sample(json_loaded)
+                self.samples.append(sample)
 
-        self.embeddings = np.load(f"{embeddings_file}.npy", mmap_mode="r")
+        # self.embeddings = np.load(f"{embeddings_file}.npy", mmap_mode="r")
 
     def process_sample(self, json_file):
         self.max_chord_progression_length = max(self.max_chord_progression_length, len(json_file["tracks"]["chord"]))
@@ -77,14 +76,6 @@ class SongDataset(Dataset):
         chords_list, note_list, num_chords = self.discretize_sample(json_chords, json_notes, octave_boundary_lower,
                                                                     num_chords, num_measures * beats_per_measure)
 
-        # output = Output(json_file["metadata"]["title"], key + 1, mode + 1, bpm, energy, valence, chords_list, [x.tolist() for x in [*np.array(melody_note_list[:len(chords_list) * NOTES_PER_CHORD]).reshape(-1, NOTES_PER_CHORD)]])
-        # output_json = jsonpickle.encode(output, unpicklable=False)\
-        # .replace(", \"", ",\n  \"")\
-        # .replace("{", "{\n  ")\
-        # .replace("}","\n}")\
-        # .replace("[[", "[\n    [")\
-        # .replace("]]","]\n  ]").replace("], [", "],\n    [")
-
         # pad chord and melodies to max measure length
         chords_list.append(CHORD_END_TOKEN)
         for chord in chords_list:
@@ -107,13 +98,13 @@ class SongDataset(Dataset):
 
     # discretizes a sample into notes and chords
     def discretize_sample(self, json_chords, json_notes, octave_boundary_lower, num_chords, max_event_off):
-        chords = filter(lambda chord: not chord["isRest"], json_chords)
-        notes = filter(lambda note: not note["isRest"], json_notes)
+        chords = list(filter(lambda chord: not chord["isRest"], json_chords))
+        notes = list(filter(lambda note: not note["isRest"], json_notes))
 
         chord_list = [CHORD_REST_TOKEN] * num_chords
         note_list = [MELODY_REST_TOKEN] * num_chords * NOTES_PER_CHORD
 
-        for chord in chords:
+        for chord in reversed(chords):
             scale_degree = int(chord["sd"])
             relative_start = chord["event_on"] / max_event_off
             relative_end = chord["event_off"] / max_event_off
@@ -122,7 +113,7 @@ class SongDataset(Dataset):
             for n in range(i, j):
                 chord_list[n] = scale_degree
 
-        for note in notes:
+        for note in reversed(notes):
             scale_degree = int(note["scale_degree"].replace("s", "").replace("f", ""))
             octave = int(note["octave"])
             octave = octave - octave_boundary_lower
@@ -155,12 +146,12 @@ class SongDataset(Dataset):
 
     def __getitem__(self, index):
         sample = self.samples[index]
-        embedding = np.copy(self.embeddings[index])
-        embedding_length = self.embedding_lengths[index]
+        # embedding = np.copy(self.embeddings[index])
+        # embedding_length = self.embedding_lengths[index]
 
         return {
-            "embedding": embedding,
-            "embedding_length": embedding_length,
+            # "embedding": embedding,
+            # "embedding_length": embedding_length,
             "key": sample["key"],
             "mode": sample["mode"],
             "chords": torch.tensor(sample["chords"]),

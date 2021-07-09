@@ -9,11 +9,11 @@ from spotipy import SpotifyClientCredentials
 from pathlib import Path
 
 add_lyrics = False
-add_spotify = True
 lyrics_provider = "google"  # google or musixmatch
+add_spotify = True
 
 hooktheory_folder = "hooktheory"
-output_folder = "processed"
+output_folder = "processed-spotify-all"
 log_file = "log.txt"
 alphabet_paths = [f.path for f in os.scandir(hooktheory_folder) if f.is_dir()]
 headers = {
@@ -33,49 +33,58 @@ def log(text):
 
 
 def process_song(artist, song, path):
-    file = f"{path}/chorus_roman.json"
-    # no chorus_roman.json? Take the largest roman file
-    if not Path(file).is_file():
-        files = [f"{path}/{f}" for f in os.listdir(path) if "roman" in f]
-        sorted_files = sorted(files, key=os.path.getsize, reverse=True)
-        file = sorted_files[0]
+    # files = [f"{path}/{f}" for f in os.listdir(path) if "roman" in f]
+    # file = f"{path}/chorus_roman.json"
+    # # no chorus_roman.json? Take the largest roman file
+    # if not Path(file).is_file():
+    #     sorted_files = sorted(files, key=os.path.getsize, reverse=True)
+    #     file = sorted_files[0]
 
     artist_name = artist.replace("-", " ").title()
     song_name = song.replace("-", " ").title()
 
-    with open(file) as json_file:
-        json_data = json.load(json_file)
+    if add_lyrics:
+        if lyrics_provider == "google":
+            lyrics = retrieve_lyrics_google(artist_name, song_name)
+        else:
+            lyrics = retrieve_lyrics_musixmatch(artist_name, song_name)
+        time.sleep(1)
 
-        # skip if no melodies
-        if len(json_data["tracks"]["melody"]) is 0 or all([note["isRest"] for note in json_data["tracks"]["melody"]]):
+        if lyrics is None:
             return
 
-        # skip of no chords
-        if len(json_data["tracks"]["chord"]) is 0 or all([chord["isRest"] for chord in json_data["tracks"]["chord"]]):
+    if add_spotify:
+        audio_features = get_audio_features(f"{artist_name} - {song_name}")
+        if audio_features is None:
             return
 
-        if add_lyrics:
-            if lyrics_provider == "google":
-                lyrics = retrieve_lyrics_google(artist_name, song_name)
-            else:
-                lyrics = retrieve_lyrics_musixmatch(artist_name, song_name)
-            time.sleep(1)
+    for f in os.listdir(path):
+        if "roman" not in f:
+            continue
+        file = f"{path}/{f}"
+        with open(file) as json_file:
+            json_data = json.load(json_file)
 
-            if lyrics is None:
-                return
-            json_data["lyrics"] = lyrics
+            # skip if no melodies
+            if len(json_data["tracks"]["melody"]) is 0 or all([note["isRest"] for note in json_data["tracks"]["melody"]]):
+                continue
 
-        if add_spotify:
-            result = add_audio_features(f"{artist_name} - {song_name}", json_data)
-            if not result:
-                return
+            # skip of no chords
+            if len(json_data["tracks"]["chord"]) is 0 or all([chord["isRest"] for chord in json_data["tracks"]["chord"]]):
+                continue
 
-        output_name = f"{artist_name} - {song_name}.json"
-        with open(f"{output_folder}/{output_name}", 'w') as outfile:
-            json.dump(json_data, outfile)
+            if add_lyrics:
+                json_data["lyrics"] = lyrics
+
+            if add_spotify:
+                json_data["audio_features"] = audio_features
+
+            output_name = f"{artist_name} - {song_name} - {f.replace('_roman.json', '')}.json"
+            with open(f"{output_folder}/{output_name}", 'w') as outfile:
+                json.dump(json_data, outfile)
 
 
-def add_audio_features(search_string, json):
+def get_audio_features(search_string):
     results = sp.search(q=search_string, limit=1)
     tracks = results['tracks']['items']
     if len(tracks) == 0:
@@ -87,14 +96,13 @@ def add_audio_features(search_string, json):
         audio_features = sp.audio_features(id)[0]
         if audio_features is None:
             log(f"Could not get audio features for {search_string}")
-            return False
+            return None
         del audio_features["track_href"]
         del audio_features["analysis_url"]
         del audio_features["uri"]
         del audio_features["type"]
 
-        json["audio_features"] = audio_features
-        return True
+        return audio_features
 
 
 def retrieve_lyrics_google(artist, song):

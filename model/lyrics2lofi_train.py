@@ -1,16 +1,14 @@
 import math
 import torch
 import os
-import json
-import jsonpickle
 import matplotlib.pyplot as plot
 from torch import nn
 from torch.utils.data import DataLoader
 from torch.nn.utils.rnn import pack_padded_sequence
 
-from constants import *
-from dataset import SongDataset
-from model import Model
+from model.constants import *
+from model.dataset import SongDataset
+from model.lyrics2lofi_model import Model
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
@@ -44,11 +42,11 @@ def compute_loss(data):
         lengths_stacked = curr_length.repeat((max_length, 1)).permute(1, 0)
         return arange <= lengths_stacked
 
-    loss_chords = ce_loss(pred_chords.permute(0, 2, 1), chords_gt)
+    loss_chords = chord_loss(pred_chords.permute(0, 2, 1), chords_gt)
     mask_chord = compute_mask(max_num_chords, num_chords)
     loss_chords = torch.masked_select(loss_chords, mask_chord).mean()
 
-    loss_melody_notes = ce_loss(pred_notes.permute(0, 2, 1), notes_gt)
+    loss_melody_notes = melody_loss(pred_notes.permute(0, 2, 1), notes_gt)
     mask_melody = compute_mask(max_num_notes, num_notes)
     loss_melody = torch.masked_select(loss_melody_notes, mask_melody).mean()
     # loss_melody *= 10
@@ -250,6 +248,7 @@ if __name__ == '__main__':
         axs[1, 1].legend()
         axs[1, 1].grid(True)
         plot.tight_layout()
+        plot.savefig("model-train.png")
         plot.show()
 
         epoch += 1

@@ -1,34 +1,17 @@
 import jsonpickle
 import torch
 from torch.nn.utils.rnn import pack_padded_sequence
-import argparse
-from embeddings import make_embedding
-from model import Model
-from constants import *
 
-device = "cpu" if torch.cuda.is_available() else "cpu"
-file = "model.pth"
+from output import *
+import sys
+sys.path.insert(0, '..')
+from model.constants import *
+from model.embeddings import make_embedding
 
-class Output:
-    def __init__(self, title, key, mode, bpm, energy, valence, chords, melodies):
-        self.title = title
-        self.key = key
-        self.mode = mode
-        self.bpm = bpm
-        self.energy = energy
-        self.valence = valence
-        self.chords = chords
-        self.melodies = melodies
+device = "cpu"
 
 
-def predict(input):
-    print("Loading model...", end=" ")
-    model = Model(device=device)
-    model.load_state_dict(torch.load(file))
-    print(f"Loaded {file}.")
-    model.to(device)
-    model.eval()
-
+def predict(model, input):
     embedding, length = make_embedding(input, device)
 
     input = pack_padded_sequence(embedding[None], torch.tensor([length]), batch_first=True, enforce_sorted=False)
@@ -38,7 +21,7 @@ def predict(input):
     notes = pred_notes.argmax(dim=2)[0].cpu().numpy()
 
     chords.append(CHORD_END_TOKEN)
-    cut_off_point = chords.index(CHORD_END_TOKEN) - 1
+    cut_off_point = chords.index(CHORD_END_TOKEN)
     chords = chords[:cut_off_point]  # cut off end token
     notes = notes[:cut_off_point * NOTES_PER_CHORD]
 
@@ -61,10 +44,5 @@ def predict(input):
         .replace("[[", "[\n    [")\
         .replace("]]","]\n  ]").replace("], [", "],\n    [")
     print(json)
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Generate some chords and melodies.')
-    parser.add_argument('input', type=str)
-    args = parser.parse_args()
-    predict(args.input)
+    return json
+	

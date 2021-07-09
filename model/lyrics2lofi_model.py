@@ -1,11 +1,12 @@
 import numpy as np
 import torch
 from torch import nn
-from constants import *
+
+from model.constants import *
 
 
 class Model(nn.Module):
-    def __init__(self, hidden_size=200, num_layers=1, device="cuda" if torch.cuda.is_available() else "cpu"):
+    def __init__(self, hidden_size=400, num_layers=1, device="cuda" if torch.cuda.is_available() else "cpu"):
         super(Model, self).__init__()
         self.device = device
         self.encoder = Encoder(hidden_size, num_layers, device)
