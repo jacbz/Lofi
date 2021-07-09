@@ -8,7 +8,7 @@ from torch.nn.utils.rnn import pack_padded_sequence
 
 from model.constants import *
 from model.dataset import SongDataset
-from model.lofi_model import Model
+from model.lofi_model import LofiModel
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
@@ -48,7 +48,9 @@ def compute_loss(data):
     loss_melody_notes = melody_loss(pred_notes.permute(0, 2, 1), notes_gt)
     mask_melody = compute_mask(max_num_notes, num_notes)
     loss_melody = torch.masked_select(loss_melody_notes, mask_melody).mean()
-    # loss_melody *= 10
+
+    if (epoch < MELODY_EPOCH_DELAY):
+        loss_melody = 0
 
     loss_kl = kl
     # loss_bpm = mae(pred_bpm[:, 0], bpm_gt) / 5
@@ -95,7 +97,7 @@ if __name__ == '__main__':
     ce_loss = nn.CrossEntropyLoss(reduction='none')
     mae = nn.L1Loss(reduction='mean')
 
-    model = Model().to(device)
+    model = LofiModel().to(device)
     # model.load_state_dict(torch.load("model-2021-07-04-15-57-370epochs.pth"))
 
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
@@ -131,11 +133,8 @@ if __name__ == '__main__':
         epoch_validation_tp_chords = []
         epoch_validation_tp_melodies = []
 
-        sampling_rate_chords = 0.5 * (START_SCHEDULED_SAMPLING_RATE - END_SCHEDULED_SAMPLING_RATE) * \
-                               (1 + math.cos(
-                                   (epoch / SCHEDULED_SAMPLING_EPOCHS) * math.pi)) + END_SCHEDULED_SAMPLING_RATE \
-            if epoch <= SCHEDULED_SAMPLING_EPOCHS else END_SCHEDULED_SAMPLING_RATE
-        sampling_rate_melodies = sampling_rate_chords
+        sampling_rate_chords = sampling_rate_at_epoch(epoch)
+        sampling_rate_melodies = sampling_rate_at_epoch(epoch - MELODY_EPOCH_DELAY)
 
         print(f"Scheduled sampling rate: C {sampling_rate_chords}, M {sampling_rate_melodies}")
 

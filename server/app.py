@@ -4,15 +4,13 @@ from lyrics2lofi_predict import predict
 import torch
 device = "cpu"
 
-import sys
-sys.path.insert(0, '..')
-from model.lofi_model import Model as LofiModel
-from model.lyrics2lofi_model import Model as Lyrics2LofiModel
+from model.lofi_model import LofiModel
+from model.lyrics2lofi_model import Lyrics2LofiModel
 
 
 app = Flask(__name__)
 
-lofi_checkpoint = "../checkpoints/lofimodel_epoch710_weights_0.5to0.1over300.pth"
+lofi_checkpoint = "../checkpoints/lofimodel_epoch850_weights_0.5to0.1over300_melodydelay250.pth"
 print("Loading lofi model...", end=" ")
 lofi_model = LofiModel(device=device)
 lofi_model.load_state_dict(torch.load(lofi_checkpoint, map_location=device))

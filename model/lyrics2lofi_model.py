@@ -5,9 +5,9 @@ from torch import nn
 from model.constants import *
 
 
-class Model(nn.Module):
+class Lyrics2LofiModel(nn.Module):
     def __init__(self, hidden_size=400, num_layers=1, device="cuda" if torch.cuda.is_available() else "cpu"):
-        super(Model, self).__init__()
+        super(Lyrics2LofiModel, self).__init__()
         self.device = device
         self.encoder = Encoder(hidden_size, num_layers, device)
         self.decoder = Decoder(hidden_size, device)

@@ -1,8 +1,6 @@
 import jsonpickle
 
 from output import *
-import sys
-sys.path.insert(0, '..')
 from model.constants import *
 
 

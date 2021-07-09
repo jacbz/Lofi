@@ -1,12 +1,24 @@
+import math
+
 # as much as can fit into the GPU
 BATCH_SIZE = 128
 # learning rate for Adam
 LEARNING_RATE = 0.001
 
 # number of epochs to scale sample scheduling to
-SCHEDULED_SAMPLING_EPOCHS = 500
+SCHEDULED_SAMPLING_EPOCHS = 1000
 START_SCHEDULED_SAMPLING_RATE = 0.5
 END_SCHEDULED_SAMPLING_RATE = 0.1
+# number of epochs to wait before adding the melody loss
+MELODY_EPOCH_DELAY = 400
+
+# inverse sigmoid decay
+def sampling_rate_at_epoch(epoch):
+    if epoch < 0:
+        return START_SCHEDULED_SAMPLING_RATE
+    # expected speed of convergence
+    k = SCHEDULED_SAMPLING_EPOCHS / 10
+    return (k / (k + math.exp(epoch / k))) * (START_SCHEDULED_SAMPLING_RATE - END_SCHEDULED_SAMPLING_RATE) + END_SCHEDULED_SAMPLING_RATE
 
 BERT_EMBEDDING_LENGTH = 768
 MAX_CHORD_LENGTH = 50

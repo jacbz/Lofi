@@ -3,8 +3,6 @@ import torch
 from torch.nn.utils.rnn import pack_padded_sequence
 
 from output import *
-import sys
-sys.path.insert(0, '..')
 from model.constants import *
 from model.embeddings import make_embedding
 

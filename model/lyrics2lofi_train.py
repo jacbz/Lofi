@@ -8,7 +8,7 @@ from torch.nn.utils.rnn import pack_padded_sequence
 
 from model.constants import *
 from model.dataset import SongDataset
-from model.lyrics2lofi_model import Model
+from model.lyrics2lofi_model import Lyrics2LofiModel
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     ce_loss = nn.CrossEntropyLoss(reduction='none')
     mae = nn.L1Loss(reduction='mean')
 
-    model = Model().to(device)
+    model = Lyrics2LofiModel().to(device)
     # model.load_state_dict(torch.load("model-2021-07-04-15-57-370epochs.pth"))
 
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
@@ -132,9 +132,7 @@ if __name__ == '__main__':
         epoch_validation_tp_chords = []
         epoch_validation_tp_melodies = []
 
-        sampling_rate_chords = 0.5 * (START_SCHEDULED_SAMPLING_RATE - END_SCHEDULED_SAMPLING_RATE) * \
-                               (1 + math.cos((epoch / SCHEDULED_SAMPLING_EPOCHS) * math.pi)) + END_SCHEDULED_SAMPLING_RATE \
-            if epoch <= SCHEDULED_SAMPLING_EPOCHS else END_SCHEDULED_SAMPLING_RATE
+        sampling_rate_chords = sampling_rate_at_epoch(epoch)
         sampling_rate_melodies = sampling_rate_chords
 
         print(f"Scheduled sampling rate: C {sampling_rate_chords}, M {sampling_rate_melodies}")
@@ -197,7 +195,7 @@ if __name__ == '__main__':
               f"chord accuracy: {epoch_validation_chord_accuracy:.3f}, melody accuracy: {epoch_validation_melody_accuracy:.3f}")
 
         # copy old model
-        save_name = f"model-epoch{epoch}.pth" if epoch > SCHEDULED_SAMPLING_EPOCHS / 5 and epoch % 10 == 0 else "model.pth"
+        save_name = f"model/model-epoch{epoch}.pth" if epoch > SCHEDULED_SAMPLING_EPOCHS / 5 and epoch % 10 == 0 else "model.pth"
         torch.save(model.state_dict(), save_name)
 
         training_losses_chords.append(epoch_training_loss_chord)
