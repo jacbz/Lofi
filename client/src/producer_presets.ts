@@ -39,10 +39,10 @@ export class ProducerPreset {
 }
 
 export const selectPreset = (valence: number, energy: number): ProducerPreset => {
-  if (energy <= 0.2) {
+  if (energy < 0.3) {
     return Preset3;
   }
-  if (energy <= 0.5) {
+  if (energy < 0.6) {
     return Preset2;
   }
   return Preset1;
@@ -55,7 +55,8 @@ export const Preset1: ProducerPreset = new ProducerPreset({
   }),
   harmony: new InstrumentConfiguration({
     instrument: Instrument.ElectricPiano,
-    octaveShift: 1
+    octaveShift: 1,
+    volume: 0.8
   }),
   firstBeatArpeggio: new InstrumentConfiguration({
     instrument: Instrument.Piano,
@@ -68,12 +69,12 @@ export const Preset1: ProducerPreset = new ProducerPreset({
   // }),
   melody: new InstrumentConfiguration({
     instrument: Instrument.AcousticGuitar,
-    octaveShift: -1,
-    volume: 0.8
+    octaveShift: 0,
+    volume: 0.6
   })
 });
 
-/** A softer preset, with piano melodies */
+/** A softer preset, with epiano melodies */
 export const Preset2: ProducerPreset = new ProducerPreset({
   bassLine: new InstrumentConfiguration({
     instrument: Instrument.BassGuitar,
@@ -81,19 +82,20 @@ export const Preset2: ProducerPreset = new ProducerPreset({
   }),
   harmony: new InstrumentConfiguration({
     instrument: Instrument.ElectricPiano,
-    octaveShift: 1
+    octaveShift: 1,
+    volume: 0.8
   }),
   firstBeatArpeggio: new InstrumentConfiguration({
-    instrument: Instrument.AcousticGuitar,
+    instrument: Instrument.Harp,
     octaveShift: -1,
-    volume: 0.3
+    volume: 0.6
   }),
   // secondBeatArpeggio: new InstrumentConfiguration({
   //   instrument: Instrument.Piano,
   //   volume: 0.3
   // }),
   melody: new InstrumentConfiguration({
-    instrument: Instrument.Piano,
+    instrument: Instrument.ElectricPiano,
     octaveShift: 1,
     volume: 0.8
   }),

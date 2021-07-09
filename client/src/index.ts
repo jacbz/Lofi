@@ -114,6 +114,8 @@ generateButton.addEventListener('click', async () => {
   const producer = new Producer();
   const track = producer.produce(params);
   player.addToPlaylist(track);
+  // scroll to end of playlist
+  playlistContainer.scrollTop = playlistContainer.scrollHeight;
 });
 
 // Input field
