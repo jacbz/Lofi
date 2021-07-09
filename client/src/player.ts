@@ -218,7 +218,7 @@ class Player {
     }
 
     // set swing
-    Tone.Transport.swing = +this.currentTrack.swing;
+    Tone.Transport.swing = this.currentTrack.swing ? 2 / 3 : 0;
 
     // wait until all samples are loaded
     await Tone.loaded();

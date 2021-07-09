@@ -29,6 +29,7 @@ export class Chord {
 
 /** Shifts a given note by a number of octaves */
 export const octShift = (note: string, octaves: number) => {
+  if (!octaves) return note;
   const n = Tonal.Note.get(note);
   return `${n.pc}${n.oct + octaves}`;
 };

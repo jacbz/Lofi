@@ -1,4 +1,5 @@
 import * as Tonal from '@tonaljs/tonal';
+import * as Tone from 'tone';
 import { Time } from 'tone/build/esm/core/type/Units';
 import { InstrumentNote, SampleLoop, Track } from './track';
 import { OutputParams } from './params';
@@ -67,9 +68,8 @@ class Producer {
 
   instrumentNotes: InstrumentNote[] = [];
 
-  drumbeatStartCurr: Time;
-
-  drumbeatTimings: [Time, Time][] = [];
+  /** Drum beat timings, as tuples of (isStart, Time) */
+  drumbeatTimings: [boolean, Time][] = [];
 
   produce(params: OutputParams): Track {
     // must be 70, 75, 80, 85, 90, 95 or 100
@@ -100,13 +100,6 @@ class Producer {
 
     const swing = randomFromInterval(1, 10, this.energy) <= 1;
 
-    if (this.chords[0] === 0) {
-      this.chords[0] = 1;
-    } else if (this.chords[0] !== 1) {
-      this.chords.unshift(1);
-      params.melodies.unshift([0, 0, 0, 0, 0, 0, 0, 0]);
-    }
-
     this.chordsTonal = this.chords.map((c, chordNo) => {
       const chordIndex = this.chords[chordNo] - 1;
       const chordString = this.chordsInScale[chordIndex];
@@ -127,8 +120,19 @@ class Producer {
 
     // drumbeat
     const [drumbeatGroup, drumbeatIndex] = selectDrumbeat(this.bpm, this.energy);
-    this.drumbeatTimings.forEach(([startTime, endTime]) => {
-      this.addSample(drumbeatGroup, drumbeatIndex, `${startTime}:0`, `${endTime}:0`);
+    this.drumbeatTimings.sort(
+      ([_, time], [__, time2]) => Tone.Time(time).toSeconds() - Tone.Time(time2).toSeconds()
+    );
+    let currentStartTime: Time = null;
+    this.drumbeatTimings.forEach(([isStart, time]) => {
+      if (isStart) {
+        if (!currentStartTime) {
+          currentStartTime = time;
+        }
+      } else if (currentStartTime) {
+        this.addSample(drumbeatGroup, drumbeatIndex, `${currentStartTime}:0`, `${time}:0`);
+        currentStartTime = null;
+      }
     });
 
     const title = params.title || `Lofi track in ${this.tonic} ${this.mode}`;
@@ -166,7 +170,7 @@ class Producer {
   }
 
   produceMain(): number {
-    const numberOfIterations = Math.ceil(36 / this.chords.length);
+    const numberOfIterations = Math.ceil(24 / this.chords.length);
     const length = this.chords.length * numberOfIterations;
 
     // the measure where the main part starts
@@ -174,16 +178,27 @@ class Producer {
 
     const preset = Presets.selectPreset(this.valence, this.energy);
 
+    // number of bars at the beginning and end without a drumbeat
+    const drumbeatPadding = this.chords.length > 8 ? 2 : 1;
+
     for (let i = 0; i < numberOfIterations; i += 1) {
       const iterationMeasure = measureStart + i * this.chords.length;
-      this.startDrumbeat(`${i === 0 ? iterationMeasure + 2 : iterationMeasure}:0`);
-      this.endDrumbeat(`${measureStart + (i + 1) * this.chords.length - 2}:0`);
+      this.startDrumbeat(`${i === 0 ? iterationMeasure + drumbeatPadding : iterationMeasure}:0`);
+      this.endDrumbeat(`${measureStart + (i + 1) * this.chords.length - drumbeatPadding}:0`);
 
+      let noDrumBeatCurrently = false;
       this.chords.forEach((scaleDegree, chordNo) => {
         const chord = this.chordsTonal[chordNo];
         const measure = iterationMeasure + chordNo;
 
-        if (!chord.empty) {
+        if (chord.empty) {
+          this.endDrumbeat(`${measure}:3`);
+          noDrumBeatCurrently = true;
+        } else {
+          if (noDrumBeatCurrently) {
+            this.startDrumbeat(`${measure}:0`);
+            noDrumBeatCurrently = false;
+          }
           // bass line: on the first beat of every measure
           if (preset.bassLine) {
             const rootNote = `${this.notesInScale[scaleDegree - 1]}${
@@ -352,12 +367,11 @@ class Producer {
   }
 
   startDrumbeat(time: Time) {
-    this.drumbeatStartCurr = time;
+    this.drumbeatTimings.push([true, time]);
   }
 
   endDrumbeat(time: Time) {
-    this.drumbeatTimings.push([this.drumbeatStartCurr, time]);
-    this.drumbeatStartCurr = undefined;
+    this.drumbeatTimings.push([false, time]);
   }
 
   addSample(sample: string, sampleIndex: number, startTime: Time, stopTime: Time) {

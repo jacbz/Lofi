@@ -258,6 +258,8 @@ body {
 
   #playlist {
     flex: 1.5;
+    display: flex;
+    flex-direction: column;
 
     #playlist-header {
       display: block;
@@ -308,8 +310,57 @@ body {
     }
 
     #playlist-tracks {      
-      max-height: 35vh;
+      max-height: 37vh;
       overflow-y: auto;
+    }
+
+    #playlist-footer {
+      margin-top: auto;
+      padding: 8px;
+      border-top: 1px solid $ui-background;
+
+      #generate-button {
+        width: 100%
+      }
+
+      #loading-animation {
+        display: inline-block;
+        position: relative;
+        width: 20px;
+        height: 12px;
+
+        div {
+          position: absolute;
+          left: 2px;
+          width: 4px;
+          background: #fff;
+          animation: loading 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+
+          &:nth-child(1) {
+            left: 2px;
+            animation-delay: -0.24s;
+          }
+          &:nth-child(2) {
+            left: 8px;
+            animation-delay: -0.12s;
+          }
+          &:nth-child(3) {
+            left: 14px;
+            animation-delay: 0;
+          }
+        }
+      }
+      
+      @keyframes loading {
+        0% {
+          top: 0px;
+          height: 16px;
+        }
+        50%, 100% {
+          top: 4px;
+          height: 8px;
+        }
+      }      
     }
 
     .track {
@@ -423,6 +474,10 @@ button.flat {
   &:hover {
     background-color: white;
     color: black;
+
+    #loading-animation div {      
+      background: black !important;
+    }
   }
 }
 

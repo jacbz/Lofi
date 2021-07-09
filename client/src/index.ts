@@ -3,6 +3,7 @@ import Player, { RepeatMode } from './player';
 import Producer from './producer';
 import { getRandomOutputParams, OutputParams } from './params';
 import { decompress } from './helper';
+import generate from './api';
 
 const player = new Player();
 
@@ -92,6 +93,23 @@ player.updateTrackDisplay = (seconds?: number) => {
   }
   formatInputRange(seekbar, '#fc5c8c');
 };
+
+// Generate button
+const generateButton = document.getElementById('generate-button') as HTMLButtonElement;
+const loadingAnimation = document.getElementById('loading-animation');
+generateButton.addEventListener('click', async () => {
+  generateButton.disabled = true;
+  loadingAnimation.style.visibility = 'visible';
+
+  const params = await generate();
+
+  generateButton.disabled = false;
+  loadingAnimation.style.visibility = 'hidden';
+
+  const producer = new Producer();
+  const track = producer.produce(params);
+  player.addToPlaylist(track);
+});
 
 // Input field
 const inputTextarea = document.getElementById('input') as HTMLTextAreaElement;

@@ -39,6 +39,9 @@ export class ProducerPreset {
 }
 
 export const selectPreset = (valence: number, energy: number): ProducerPreset => {
+  if (energy <= 0.2) {
+    return Preset3;
+  }
   if (energy <= 0.5) {
     return Preset2;
   }
@@ -57,7 +60,7 @@ export const Preset1: ProducerPreset = new ProducerPreset({
   firstBeatArpeggio: new InstrumentConfiguration({
     instrument: Instrument.Piano,
     octaveShift: -1,
-    volume: 0.3
+    volume: 0.25
   }),
   // secondBeatArpeggio: new InstrumentConfiguration({
   //   instrument: Instrument.Piano,
@@ -95,6 +98,23 @@ export const Preset2: ProducerPreset = new ProducerPreset({
     volume: 0.8
   }),
   melodyOctaves: true
+});
+
+/** A very soft preset */
+export const Preset3: ProducerPreset = new ProducerPreset({
+  bassLine: new InstrumentConfiguration({
+    instrument: Instrument.BassGuitar,
+    volume: 0.5
+  }),
+  harmony: new InstrumentConfiguration({
+    instrument: Instrument.ElectricPiano,
+    octaveShift: 1,
+    volume: 0.6
+  }),
+  melody: new InstrumentConfiguration({
+    instrument: Instrument.SoftPiano,
+    octaveShift: 1
+  })
 });
 
 /** Bass patterns, in tuples [startBeat, duration] */

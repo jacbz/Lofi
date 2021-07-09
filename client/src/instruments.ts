@@ -81,7 +81,7 @@ export const getInstrumentSampler = (instrument: Instrument) => {
           'F#7': 'Fs7.mp3'
         },
         baseUrl: `${BASE_URL}/piano-soft/`,
-        volume: 3
+        volume: 6
       });
     }
 

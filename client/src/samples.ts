@@ -3,7 +3,7 @@ import { keyNumberToString, pitchShiftDistance, random, randomFromInterval } fro
 import sampleConfig from './samples.json';
 
 export const SAMPLES_BASE_URL = './samples';
-export const SAMPLE_DEFAULT_VOLUME = -8;
+export const SAMPLE_DEFAULT_VOLUME = -6;
 
 class SampleGroup {
   name: string;
