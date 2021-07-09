@@ -298,7 +298,7 @@ class Producer {
             this.addNote(
               preset.melody.instrument,
               melody,
-              `0:0:${length * 4}`,
+              '1:0',
               `${measure}:0:${i * 2}`,
               preset.melody.volume
             );

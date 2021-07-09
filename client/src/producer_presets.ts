@@ -64,11 +64,11 @@ export const Preset1: ProducerPreset = new ProducerPreset({
     volume: 0.25
   }),
   // secondBeatArpeggio: new InstrumentConfiguration({
-  //   instrument: Instrument.Piano,
+  //   instrument: Instrument.AcousticGuitar,
   //   volume: 0.3
   // }),
   melody: new InstrumentConfiguration({
-    instrument: Instrument.AcousticGuitar,
+    instrument: Instrument.ElectricGuitar,
     octaveShift: 0,
     volume: 0.6
   })
