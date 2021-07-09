@@ -88,7 +88,7 @@ export const Preset2: ProducerPreset = new ProducerPreset({
   firstBeatArpeggio: new InstrumentConfiguration({
     instrument: Instrument.Harp,
     octaveShift: -1,
-    volume: 0.6
+    volume: 0.25
   }),
   // secondBeatArpeggio: new InstrumentConfiguration({
   //   instrument: Instrument.Piano,

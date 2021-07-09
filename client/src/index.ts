@@ -57,6 +57,29 @@ seekbar.addEventListener('mouseup', () => {
   }
 });
 
+// Visualizer
+const visualizer = document.getElementById('visualizer');
+const spectrumBars: HTMLDivElement[] = [];
+for (let i = 0; i < 16; i += 1) {
+  const spectrumBar = document.createElement('div');
+  spectrumBar.classList.add('spectrum-bar');
+  visualizer.appendChild(spectrumBar);
+  spectrumBars.push(spectrumBar);
+}
+const minDecibels = -120;
+const maxDecibels = -10;
+const updateVisualization = (spectrum: Float32Array) => {
+  spectrumBars.forEach((bar: HTMLDivElement, i) => {
+    if (spectrum) {
+      const val = Math.min(maxDecibels, Math.max(minDecibels, spectrum[i]));
+      const scaled = val - minDecibels * (100 / (maxDecibels - minDecibels));
+      bar.style.height = `${scaled}%`;
+    } else {
+      bar.style.height = '0%';
+    }
+  });
+};
+
 // Track details and time
 const titleLabel = document.getElementById('title');
 const timeLabel = document.getElementById('current-time');
@@ -69,7 +92,7 @@ const formatInputRange = (input: HTMLInputElement, color: string) => {
   }
   input.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${value}%, rgba(0, 0, 0, 0.25) ${value}%, rgba(0, 0, 0, 0.25) 100%)`;
 };
-player.updateTrackDisplay = (seconds?: number) => {
+player.updateTrackDisplay = (seconds?: number, spectrum?: Float32Array) => {
   // don't update display while seekbar is being dragged
   if (seekbarDragging) return;
 
@@ -92,6 +115,7 @@ player.updateTrackDisplay = (seconds?: number) => {
     totalTimeLabel.textContent = '0:00';
   }
   formatInputRange(seekbar, '#fc5c8c');
+  updateVisualization(spectrum);
 };
 
 // Generate button

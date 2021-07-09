@@ -1,9 +1,8 @@
 import * as Tone from 'tone';
-import { PitchShift } from 'tone';
 import { getInstrumentFilters, getInstrumentSampler, Instrument } from './instruments';
 import * as Samples from './samples';
 import { Track } from './track';
-import { compress, keyNumberToString, pitchShiftDistance } from './helper';
+import { compress } from './helper';
 
 /**
  * The Player plays a Track through Tone.js.
@@ -61,7 +60,7 @@ class Player {
   updatePlaylistDisplay: () => void;
 
   /** Function to update track information in the UI */
-  updateTrackDisplay: (seconds?: number) => void;
+  updateTrackDisplay: (seconds?: number, spectrum?: Float32Array) => void;
 
   /** Function to call when the track changes */
   onTrackChange: () => void;
@@ -123,12 +122,12 @@ class Player {
       const sampleGroup = Samples.SAMPLEGROUPS.get(sampleGroupName);
       const filters = sampleGroup.getFilters();
       // if the sample group specifies a specific key, shift to that key
-      if (sampleGroup.keys && sampleGroup.keys[sampleIndex] !== this.currentTrack.keyNum) {
-        const shift = pitchShiftDistance(
-          keyNumberToString(sampleGroup.keys[sampleIndex] - 1), this.currentTrack.key
-        );
-        filters.push(new PitchShift(shift));
-      }
+      // if (sampleGroup.keys && sampleGroup.keys[sampleIndex] !== this.currentTrack.keyNum) {
+      //   const shift = pitchShiftDistance(
+      //     keyNumberToString(sampleGroup.keys[sampleIndex] - 1), this.currentTrack.key
+      //   );
+      //   filters.push(new PitchShift(shift));
+      // }
       const player = new Tone.Player({
         url: sampleGroup.getSampleUrl(sampleIndex),
         volume: sampleGroup.volume,
@@ -178,9 +177,13 @@ class Player {
       );
     }
 
+    const analyzer = new Tone.Analyser('fft', 16);
+    this.gain.connect(analyzer);
+
     Tone.Transport.scheduleRepeat((time) => {
       const seconds = Tone.Transport.getSecondsAtTime(time);
-      this.updateTrackDisplay(seconds);
+      const spectrum = analyzer.getValue() as Float32Array;
+      this.updateTrackDisplay(seconds, spectrum);
       this.updateAudioWebApiPosition(seconds);
 
       if (this.currentTrack.length - seconds < 0) {

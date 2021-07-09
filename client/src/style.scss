@@ -59,7 +59,7 @@ body {
 #player-panel {
   display: flex;
   flex-direction: row;
-  width: 620px;
+  width: 650px;
   
   #now-playing {
     flex: 1;
@@ -217,6 +217,7 @@ body {
       align-items: center;
       gap: 16px;
       padding: 8px;
+      position: relative;
 
       #play-previous-button {
         background-image: url("icons/previous.svg");
@@ -253,7 +254,7 @@ body {
   }
 
   #playlist {
-    flex: 1.3;
+    flex: 1.4;
     display: flex;
     flex-direction: column;
 
@@ -324,6 +325,7 @@ body {
         position: relative;
         width: 20px;
         height: 12px;
+        margin-right: 4px;
 
         div {
           position: absolute;
@@ -423,9 +425,25 @@ body {
         }
       }  
     }
-
   }
+}
 
+#visualizer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  pointer-events: none;
+
+  .spectrum-bar {
+    margin-left: 2px;
+    margin-right: 2px;
+    background: rgba(0, 0, 0, 0.08);
+    width: 100%;
+    transition: height 0.15s;
+  }
 }
 
 footer {
