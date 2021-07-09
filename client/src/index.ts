@@ -141,7 +141,8 @@ addButton.addEventListener('click', async () => {
 // On track change
 const vinyl = document.getElementById('vinyl');
 const vinylColor = document.getElementById('vinyl-color');
-const vinylBottomText = document.getElementById('vinyl-bottom-text');
+const vinylBottomText1 = document.getElementById('vinyl-bottom-text1');
+const vinylBottomText2 = document.getElementById('vinyl-bottom-text2');
 const onTrackChange = () => {
   const trackElements = playlistContainer.querySelectorAll('.track');
   player.playlist.forEach((track, i) => {
@@ -150,10 +151,12 @@ const onTrackChange = () => {
   });
 
   if (player.currentTrack) {
-    vinylBottomText.textContent = player.currentTrack.title;
+    vinylBottomText1.textContent = `${player.currentTrack.key} ${player.currentTrack.mode}`;
+    vinylBottomText2.textContent = player.currentTrack.title.substring(0, 10);
     vinylColor.setAttribute('fill', player.currentTrack.color);
   } else {
-    vinylBottomText.textContent = '';
+    vinylBottomText1.textContent = '';
+    vinylBottomText2.textContent = '';
     vinylColor.setAttribute('fill', '#eee');
   }
 

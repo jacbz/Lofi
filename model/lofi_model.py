@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from torch import nn
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+from hashlib import md5
 
 from model.constants import *
 
@@ -51,7 +52,8 @@ class LofiModel(nn.Module):
 
     def generate(self):
         mu = torch.randn(1,self.hidden_size)
-        return self.decoder(mu, MAX_CHORD_LENGTH)
+        hash = '#' + str(int(md5(mu.numpy()).hexdigest(), 16))[:24]
+        return hash, self.decoder(mu, MAX_CHORD_LENGTH)
 
     def interpolate(self, chords1, chords2):
         pass

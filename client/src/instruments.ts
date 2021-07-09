@@ -144,7 +144,6 @@ export const getInstrumentSampler = (instrument: Instrument) => {
       });
     }
 
-
     case Instrument.AcousticGuitar: {
       return new Tone.Sampler({
         urls: {
@@ -238,7 +237,7 @@ export const getInstrumentFilters = (instrument: Instrument) => {
   switch (instrument) {
     case Instrument.Piano: {
       return [
-        DefaultReverb,
+        DefaultReverb
         // new Tone.Filter({
         //   type: 'lowpass',
         //   frequency: 3600,
@@ -260,7 +259,7 @@ export const getInstrumentFilters = (instrument: Instrument) => {
 
     case Instrument.ElectricPiano: {
       return [
-        DefaultReverb,
+        DefaultReverb
         // new FrequencyShifter(3)
       ];
     }

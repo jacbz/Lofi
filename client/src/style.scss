@@ -59,7 +59,7 @@ body {
 #player-panel {
   display: flex;
   flex-direction: row;
-  width: 650px;
+  width: 620px;
   
   #now-playing {
     flex: 1;
@@ -108,7 +108,12 @@ body {
             font-weight: bold;
           }
 
-          #vinyl-bottom-text {
+          #vinyl-bottom-text1 {
+            font-size: 45%;
+            letter-spacing: 0.3px;
+          }
+
+          #vinyl-bottom-text2 {
             font-size: 70%;
             letter-spacing: 0.8px;
           }
@@ -248,7 +253,7 @@ body {
   }
 
   #playlist {
-    flex: 1.5;
+    flex: 1.3;
     display: flex;
     flex-direction: column;
 

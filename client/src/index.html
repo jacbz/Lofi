@@ -16,13 +16,15 @@
             <svg id="vinyl-center" viewBox="0 0 52 52">
               <defs>
                 <path id="tophalf" d="M 8 32 a 14 14 0 0 1 36 0" />
-                <path id="lowerhalf" d="M 2 26 a 24 24 0 0 0 48 0" />
+                <path id="lowerhalf1" d="M 10 21 a 16 16 0 0 0 32 0" />
+                <path id="lowerhalf2" d="M 2 26 a 24 24 0 0 0 48 0" />
               </defs>
               <circle cx="26" cy="26" r="26" fill="#eee" id="vinyl-color" />
               <circle cx="26" cy="26" r="2" fill="black" />
               <text text-anchor="middle">
                 <textPath xlink:href="#tophalf" startOffset="50%" id="vinyl-top-text">LOFI</textPath>
-                <textPath xlink:href="#lowerhalf" startOffset="50%" id="vinyl-bottom-text"></textPath>
+                <textPath xlink:href="#lowerhalf1" startOffset="50%" id="vinyl-bottom-text1"></textPath>
+                <textPath xlink:href="#lowerhalf2" startOffset="50%" id="vinyl-bottom-text2"></textPath>
               </text>
             </svg>
           </div>    
@@ -94,39 +96,6 @@
       <button id="add-button" class="flat">Add to playlist</button>
     </div>
   </div>
-
-  <!-- <div id="filter" style="z-index: 300;">
-    Compressor threshold (dB): Compression above this point.
-    <div>-30<input type="range" min="-30" max="0" value="-15" class="slider" id="compressorthreshold">0</div>
-    Compressor ratio: The gain reduction ratio.
-    <div>1<input type="range" min="1" max="20" value="3" class="slider" id="compressorratio">20</div>
-    LPF frequency: cuts off frequencies higher than this
-    <div>0<input type="range" min="0" max="5000" value="5000" class="slider" id="lpffrequency">5000</div>
-    LPF Q: Quality of the filter
-    <div>0<input type="range" min="0" max="10" step="0.1" value="0" class="slider" id="lpfq">10</div>
-    HPF frequency: cuts off frequencies lower than this
-    <div>0<input type="range" min="0" max="5000" value="0" class="slider" id="hpffrequency">5000</div>
-    HPF Q: Quality of the filter
-    <div>0<input type="range" min="0" max="10" step="0.1" value="0" class="slider" id="hpfq">10</div>
-    Equalizer low (dB)
-    <div>-30<input type="range" min="-30" max="0" value="0" class="slider" id="eqlow">0</div>
-    Equalizer mid (dB)
-    <div>-30<input type="range" min="-30" max="0" value="0" class="slider" id="eqmid">0</div>
-    Equalizer high (dB)
-    <div>-30<input type="range" min="-30" max="0" value="0" class="slider" id="eqhigh">0<button id="connecteq" class="flat">Connect EQ</button></div>
-    Reverb decay: The amount of time it will reverberate for.
-    <div>0<input type="range" min="0.001" max="4" step="0.1" value="0" class="slider" id="reverbdecay">4</div>
-    Reverb pre-lecay
-    <div>0<input type="range" min="0" max="4" step="0.1" value="0" class="slider" id="reverbpredelay">4</div>
-    Reverb wet
-    <div>0<input type="range" min="0" max="1" step="0.01" value="0" class="slider" id="reverbwet">1</div>
-    Chebyshev
-    <div>1<input type="range" min="1" max="10" value="1" step="1" class="slider" id="chebyshev">10</div>
-    Distortion
-    <div>0<input type="range" min="0" max="1" step="0.01" value="0" class="slider" id="distortion">1<button id="connectdistortion" class="flat">Connect distortion</button></div>
-    Bitcrusher: down-samples the incoming signal to a different bit depth
-    <div>1<input type="range" min="1" max="16" step="1" value="16" class="slider" id="bitcrusher">16</div>
-  </div> -->
 
   <!-- Dummy audio for Media Session API -->
   <audio id="audio" src="silence.mp3" loop></audio>
