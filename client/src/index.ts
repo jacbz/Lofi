@@ -66,13 +66,13 @@ for (let i = 0; i < 16; i += 1) {
   visualizer.appendChild(spectrumBar);
   spectrumBars.push(spectrumBar);
 }
-const minDecibels = -120;
+const minDecibels = -100;
 const maxDecibels = -10;
 const updateVisualization = (spectrum: Float32Array) => {
   spectrumBars.forEach((bar: HTMLDivElement, i) => {
     if (spectrum) {
       const val = Math.min(maxDecibels, Math.max(minDecibels, spectrum[i]));
-      const scaled = val - minDecibels * (100 / (maxDecibels - minDecibels));
+      const scaled = (100 / (maxDecibels - minDecibels)) * (val - minDecibels);
       bar.style.height = `${scaled}%`;
     } else {
       bar.style.height = '0%';
