@@ -77,6 +77,12 @@ export const subtractTime = (time1: Time, time2: Time) => {
   return Tone.Time(time).toBarsBeatsSixteenths();
 };
 
+/** Converts a number of measures to seconds */
+export const measuresToSeconds = (measures: number, bpm: number) => {
+  const measureInSeconds = 240 / bpm;
+  return measureInSeconds * measures;
+};
+
 /** Returns a quasi-random number between min-max based on given seed number */
 export const randomFromInterval = (min: number, max: number, seed?: number) => {
   const randomNumber = seed ? random(seed) : Math.random();

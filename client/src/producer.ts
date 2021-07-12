@@ -8,6 +8,7 @@ import {
   Chord,
   keyNumberToString,
   mapNote,
+  measuresToSeconds,
   mountNotesOnScale,
   octShift,
   octShiftAll,
@@ -37,6 +38,8 @@ class Producer {
 
   /** How positive the music should be, 0 (sad) to 1 (cheerful) */
   valence: number;
+
+  preset: Presets.ProducerPreset;
 
   notesInScale: string[];
 
@@ -97,6 +100,8 @@ class Producer {
     this.energy = params.energy;
     this.valence = params.valence;
     this.chords = params.chords;
+
+    this.preset = Presets.selectPreset(this.valence, this.energy);
 
     const swing = randomFromInterval(1, 10, this.energy) <= 1;
 
@@ -176,8 +181,6 @@ class Producer {
     // the measure where the main part starts
     const measureStart = this.introLength;
 
-    const preset = Presets.selectPreset(this.valence, this.energy);
-
     // number of bars at the beginning and end without a drumbeat
     const drumbeatPadding = this.chords.length > 8 ? 2 : 1;
 
@@ -186,125 +189,7 @@ class Producer {
       this.startDrumbeat(`${i === 0 ? iterationMeasure + drumbeatPadding : iterationMeasure}:0`);
       this.endDrumbeat(`${measureStart + (i + 1) * this.chords.length - drumbeatPadding}:0`);
 
-      let noDrumBeatCurrently = false;
-      this.chords.forEach((scaleDegree, chordNo) => {
-        const chord = this.chordsTonal[chordNo];
-        const measure = iterationMeasure + chordNo;
-
-        if (chord.empty) {
-          this.endDrumbeat(`${measure}:3`);
-          noDrumBeatCurrently = true;
-        } else {
-          if (noDrumBeatCurrently) {
-            this.startDrumbeat(`${measure}:0`);
-            noDrumBeatCurrently = false;
-          }
-          // bass line: on the first beat of every measure
-          if (preset.bassLine) {
-            const rootNote = `${this.notesInScale[scaleDegree - 1]}${
-              1 + preset.bassLine.octaveShift
-            }`;
-            // get a random bass pattern
-            const bassPatternNo = randomFromInterval(
-              0,
-              Presets.BassPatterns.length - 1,
-              this.energy + this.valence + iterationMeasure + chordNo
-            );
-            const bassPattern = Presets.BassPatterns[bassPatternNo];
-            bassPattern.forEach(([startBeat, duration]) => {
-              this.addNote(
-                preset.bassLine.instrument,
-                rootNote,
-                `0:${duration}`,
-                `${measure}:${startBeat}`,
-                preset.bassLine.volume
-              );
-            });
-          }
-
-          // harmony
-          if (preset.harmony) {
-            const harmonyNotes = chord.notes.slice(0, 3);
-            harmonyNotes[0] = octShift(harmonyNotes[0], preset.harmony.octaveShift);
-            this.addNote(
-              preset.harmony.instrument,
-              harmonyNotes,
-              '1m',
-              `${measure}:0`,
-              preset.harmony.volume
-            );
-          }
-
-          // first beat arpeggio
-          if (preset.firstBeatArpeggio) {
-            const arpeggioNotes = octShiftAll(
-              mountNotesOnScale(scaleDegree, [1, 5, 8, 9, 10], this.notesInScalePitched),
-              preset.firstBeatArpeggio.octaveShift
-            );
-            this.addArpeggio(
-              preset.firstBeatArpeggio.instrument,
-              arpeggioNotes,
-              '0:4',
-              '8n',
-              `${measure}:0`,
-              preset.firstBeatArpeggio.volume
-            );
-          }
-
-          // second beat arpeggio
-          if (preset.secondBeatArpeggio) {
-            const arpeggioNotes = octShiftAll(chord.notes, preset.secondBeatArpeggio.octaveShift);
-            this.addArpeggio(
-              preset.secondBeatArpeggio.instrument,
-              arpeggioNotes,
-              '0:3',
-              '16n',
-              `${measure}:1`,
-              preset.secondBeatArpeggio.volume
-            );
-          }
-        }
-
-        // this should not happen
-        if (this.melodies.length === 0 || !preset.melody) {
-          return;
-        }
-        // reduce into array of [note, length, i]
-        const notes = this.melodies[chordNo].reduce(
-          ([arr, top], curr, i) => {
-            if (top.length === 0) {
-              return [arr, [curr, 1, i]];
-            }
-            if (top[0] === curr) {
-              return [arr, [curr, top[1] + 1, top[2]]];
-            }
-            return [
-              [...arr, top],
-              [curr, 1, i]
-            ];
-          },
-          [[], []]
-        );
-        const notesReduced = [...notes[0], notes[1]];
-        notesReduced.forEach(([note, length, i]) => {
-          const [scaleDegreeIndex, octave] = mapNote(note);
-
-          if (scaleDegreeIndex >= 0) {
-            const n = octShift(
-              this.notesInScalePitched[scaleDegreeIndex],
-              octave + preset.melody.octaveShift
-            );
-            const melody = preset.melodyOctaves ? [octShift(n, -1), n] : n;
-            this.addNote(
-              preset.melody.instrument,
-              melody,
-              '1:0',
-              `${measure}:0:${i * 2}`,
-              preset.melody.volume
-            );
-          }
-        });
-      });
+      this.produceIteration(iterationMeasure);
     }
 
     return length;
@@ -313,21 +198,13 @@ class Producer {
   produceOutro(): number {
     // the measure where the outro part starts
     const measureStart = this.introLength + this.mainLength;
+
+    // play first two chords (for fade out)
+    const measures = this.produceIteration(measureStart, 2);
+    this.outroLength = measuresToSeconds(measures, this.bpm) * 2;
+
     // add an empty measure of silence at the end
-    const length = 2;
-
-    // leading tone for resolution
-    const resolutionNoteTime = `${measureStart - 1}:${3}`;
-    const resolutionNote = Tonal.Note.transpose(`${this.tonic}2`, '-2M');
-    this.addNote(Instrument.Piano, resolutionNote, '4n', resolutionNoteTime);
-    this.addNote(Instrument.BassGuitar, octShift(resolutionNote, -1), '4n', resolutionNoteTime);
-
-    // end with I9 chord
-    const i9chord = Tonal.Chord.getChord('9', `${this.tonic}2`);
-    this.addArpeggio(Instrument.Piano, i9chord.notes, '1:2', '16n', `${measureStart}:0`);
-
-    // ending bass note
-    this.addNote(Instrument.BassGuitar, `${this.tonic}1`, '1m', `${measureStart}:0`);
+    const length = measures + 1;
 
     return length;
   }
@@ -344,6 +221,131 @@ class Producer {
       // end half a measure before the end
       this.addSample('vinyl', randomVinyl, '0:0', `${this.numMeasures - 0.5}:0`);
     }
+  }
+
+  produceIteration(iterationMeasure: number, cutoff?: number) {
+    let noDrumBeatCurrently = false;
+    const chords = cutoff ? this.chords.slice(0, cutoff) : this.chords;
+    chords.forEach((scaleDegree, chordNo) => {
+      const chord = this.chordsTonal[chordNo];
+      const measure = iterationMeasure + chordNo;
+
+      if (chord.empty) {
+        this.endDrumbeat(`${measure}:3`);
+        noDrumBeatCurrently = true;
+      } else {
+        if (noDrumBeatCurrently) {
+          this.startDrumbeat(`${measure}:0`);
+          noDrumBeatCurrently = false;
+        }
+        // bass line: on the first beat of every measure
+        if (this.preset.bassLine) {
+          const rootNote = `${this.notesInScale[scaleDegree - 1]}${
+            1 + this.preset.bassLine.octaveShift
+          }`;
+          // get a random bass pattern
+          const bassPatternNo = randomFromInterval(
+            0,
+            Presets.BassPatterns.length - 1,
+            this.energy + this.valence + iterationMeasure + chordNo
+          );
+          const bassPattern = Presets.BassPatterns[bassPatternNo];
+          bassPattern.forEach(([startBeat, duration]) => {
+            this.addNote(
+              this.preset.bassLine.instrument,
+              rootNote,
+              `0:${duration}`,
+              `${measure}:${startBeat}`,
+              this.preset.bassLine.volume
+            );
+          });
+        }
+
+        // harmony
+        if (this.preset.harmony) {
+          const harmonyNotes = chord.notes.slice(0, 3);
+          harmonyNotes[0] = octShift(harmonyNotes[0], this.preset.harmony.octaveShift);
+          this.addNote(
+            this.preset.harmony.instrument,
+            harmonyNotes,
+            '1m',
+            `${measure}:0`,
+            this.preset.harmony.volume
+          );
+        }
+
+        // first beat arpeggio
+        if (this.preset.firstBeatArpeggio) {
+          const arpeggioNotes = octShiftAll(
+            mountNotesOnScale(scaleDegree, this.preset.firstBeatArpeggioPattern, this.notesInScalePitched),
+            this.preset.firstBeatArpeggio.octaveShift
+          );
+          this.addArpeggio(
+            this.preset.firstBeatArpeggio.instrument,
+            arpeggioNotes,
+            '0:4',
+            '8n',
+            `${measure}:0`,
+            this.preset.firstBeatArpeggio.volume
+          );
+        }
+
+        // second beat arpeggio
+        if (this.preset.secondBeatArpeggio) {
+          const arpeggioNotes = octShiftAll(chord.notes, this.preset.secondBeatArpeggio.octaveShift);
+          this.addArpeggio(
+            this.preset.secondBeatArpeggio.instrument,
+            arpeggioNotes,
+            '0:3',
+            '16n',
+            `${measure}:1`,
+            this.preset.secondBeatArpeggio.volume
+          );
+        }
+      }
+
+      // this should not happen
+      if (this.melodies.length === 0 || !this.preset.melody) {
+        return;
+      }
+      // reduce into array of [note, length, i]
+      const notes = this.melodies[chordNo].reduce(
+        ([arr, top], curr, i) => {
+          if (top.length === 0) {
+            return [arr, [curr, 1, i]];
+          }
+          if (top[0] === curr) {
+            return [arr, [curr, top[1] + 1, top[2]]];
+          }
+          return [
+            [...arr, top],
+            [curr, 1, i]
+          ];
+        },
+        [[], []]
+      );
+      const notesReduced = [...notes[0], notes[1]];
+      notesReduced.forEach(([note, length, i]) => {
+        const [scaleDegreeIndex, octave] = mapNote(note);
+
+        if (scaleDegreeIndex >= 0) {
+          const n = octShift(
+            this.notesInScalePitched[scaleDegreeIndex],
+            octave + this.preset.melody.octaveShift
+          );
+          const melody = this.preset.melodyOctaves ? [octShift(n, -1), n] : n;
+          this.addNote(
+            this.preset.melody.instrument,
+            melody,
+            '1:0',
+            `${measure}:0:${i * 2}`,
+            this.preset.melody.volume
+          );
+        }
+      });
+    });
+
+    return chords.length;
   }
 
   /** simplify key signature, e.g. Db major instead of C# major */

@@ -116,7 +116,6 @@ class Player {
     this.samplePlayers = new Map();
     this.instrumentSamplers = new Map();
 
-    // this.initDefaultFilters();
     // load samples
     for (const [sampleGroupName, sampleIndex] of this.currentTrack.samples) {
       const sampleGroup = Samples.SAMPLEGROUPS.get(sampleGroupName);
@@ -145,11 +144,13 @@ class Player {
     }
 
     // load instruments
+    const instrumentVolumes = new Map();
     for (const instrument of this.currentTrack.instruments) {
       const sampler = getInstrumentSampler(instrument)
         .chain(...getInstrumentFilters(instrument), this.gain, Tone.Destination)
         .sync();
       this.instrumentSamplers.set(instrument, sampler);
+      instrumentVolumes.set(sampler, sampler.volume.value);
     }
 
     // set swing
@@ -180,6 +181,7 @@ class Player {
     const analyzer = new Tone.Analyser('fft', 16);
     this.gain.connect(analyzer);
 
+    const fadeOutBegin = this.currentTrack.length - this.currentTrack.fadeOutDuration;
     Tone.Transport.scheduleRepeat((time) => {
       const seconds = Tone.Transport.getSecondsAtTime(time);
       const spectrum = analyzer.getValue() as Float32Array;
@@ -188,6 +190,12 @@ class Player {
 
       if (this.currentTrack.length - seconds < 0) {
         this.playNext();
+      }
+
+      // fade out
+      const volumeOffset = seconds < fadeOutBegin ? 0 : (seconds - fadeOutBegin) * 4;
+      for (const [sampler, volume] of instrumentVolumes) {
+        sampler.volume.value = volume - volumeOffset;
       }
     }, 0.1);
 

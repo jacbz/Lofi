@@ -30,6 +30,9 @@ class Track {
   /** Number of measures; each measure contains four beats */
   numMeasures: number = 60;
 
+  /** Number of seconds to fade out at the end */
+  fadeOutDuration: number = 10;
+
   /** Total length of the track in seconds */
   get length() {
     return Math.ceil(((this.numMeasures * 4) / this.bpm) * 60);

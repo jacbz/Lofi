@@ -22,6 +22,7 @@ export class ProducerPreset {
   /** Instrument that plays an arpeggio at the first beat */
   firstBeatArpeggio: InstrumentConfiguration;
 
+  /** First beat arpeggio pattern, played in eighth notes */
   firstBeatArpeggioPattern = [1, 5, 8, 9, 10];
 
   /** Instrument that plays the diminished chord arpeggio at the second beat */
@@ -42,7 +43,7 @@ export const selectPreset = (valence: number, energy: number): ProducerPreset =>
   if (energy < 0.3) {
     return Preset3;
   }
-  if (energy < 0.6) {
+  if (energy < 0.5) {
     return Preset2;
   }
   return Preset1;
@@ -61,8 +62,9 @@ export const Preset1: ProducerPreset = new ProducerPreset({
   firstBeatArpeggio: new InstrumentConfiguration({
     instrument: Instrument.Piano,
     octaveShift: -1,
-    volume: 0.25
+    volume: 0.2
   }),
+  firstBeatArpeggioPattern: [1, 5, 8, 5, 10, 5, 8],
   // secondBeatArpeggio: new InstrumentConfiguration({
   //   instrument: Instrument.AcousticGuitar,
   //   volume: 0.3
@@ -97,7 +99,7 @@ export const Preset2: ProducerPreset = new ProducerPreset({
   melody: new InstrumentConfiguration({
     instrument: Instrument.ElectricPiano,
     octaveShift: 1,
-    volume: 0.8
+    volume: 0.9
   }),
   melodyOctaves: true
 });
