@@ -2,7 +2,7 @@ import jsonpickle
 import torch
 from torch.nn.utils.rnn import pack_padded_sequence
 
-from output import *
+from server.output import *
 from model.constants import *
 from model.embeddings import make_embedding
 

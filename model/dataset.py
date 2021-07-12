@@ -3,8 +3,8 @@ import collections
 import math
 import torch
 from torch.utils.data import Dataset
-from constants import *
 
+from model.constants import *
 
 class SongDataset(Dataset):
     def __init__(self, dataset_folder, files, embeddings_file, embedding_lengths_file):

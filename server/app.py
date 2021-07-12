@@ -1,16 +1,15 @@
 from flask import Flask, request, jsonify
-from lofi_generate import generate
-from lyrics2lofi_predict import predict
 import torch
-device = "cpu"
 
+from server.lofi_generate import generate
+from server.lyrics2lofi_predict import predict
 from model.lofi_model import LofiModel
 from model.lyrics2lofi_model import Lyrics2LofiModel
 
-
+device = "cpu"
 app = Flask(__name__)
 
-lofi_checkpoint = "../checkpoints/lofimodel_epoch850_weights_0.5to0.1over300_melodydelay250.pth"
+lofi_checkpoint = "../checkpoints/lofimodel_7_zdownsample_unweighted_0.5to0.1over500_melodydelay100_epoch240.pth"
 print("Loading lofi model...", end=" ")
 lofi_model = LofiModel(device=device)
 lofi_model.load_state_dict(torch.load(lofi_checkpoint, map_location=device))
@@ -18,7 +17,7 @@ print(f"Loaded {lofi_checkpoint}.")
 lofi_model.to(device)
 lofi_model.eval()
 
-lyrics2lofi_checkpoint = "../checkpoints/model-2021-07-09-02-19-260epochs.pth"
+lyrics2lofi_checkpoint = "../checkpoints/lyrics2lofi_5_zfix_unweighted_epoch780.pth"
 print("Loading lyrics2lofi model...", end=" ")
 lyrics2lofi_model = Lyrics2LofiModel(device=device)
 lyrics2lofi_model.load_state_dict(torch.load(lyrics2lofi_checkpoint, map_location=device))

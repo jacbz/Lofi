@@ -83,17 +83,17 @@ if __name__ == '__main__':
     train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     validation_dataloader = DataLoader(validation_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
-    def count_map_to_weights(count_map):
-        weights = torch.tensor(list(count_map.values()), dtype=torch.float32, device=device)
-        weights = weights / weights.sum()
-        weights = 1.0 / weights
-        return weights / weights.sum()
+    # def count_map_to_weights(count_map):
+    #     weights = torch.tensor(list(count_map.values()), dtype=torch.float32, device=device)
+    #     weights = weights / weights.sum()
+    #     weights = 1.0 / weights
+    #     return weights / weights.sum()
 
-    chord_weights = count_map_to_weights(dataset.chord_count_map)
-    note_weights = count_map_to_weights(dataset.melody_note_count_map)
+    # chord_weights = count_map_to_weights(dataset.chord_count_map)
+    # note_weights = count_map_to_weights(dataset.melody_note_count_map)
 
-    chord_loss = nn.CrossEntropyLoss(reduction='none', weight=chord_weights)
-    melody_loss = nn.CrossEntropyLoss(reduction='none', weight=note_weights)
+    chord_loss = nn.CrossEntropyLoss(reduction='none')
+    melody_loss = nn.CrossEntropyLoss(reduction='none')
     ce_loss = nn.CrossEntropyLoss(reduction='none')
     mae = nn.L1Loss(reduction='mean')
 

@@ -1,6 +1,6 @@
 import jsonpickle
 
-from output import *
+from server.output import *
 from model.constants import *
 
 

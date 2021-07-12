@@ -99,6 +99,7 @@ class Decoder(nn.Module):
             nn.ReLU(),
             nn.Linear(in_features=hidden_size, out_features=CHORD_PREDICTION_LENGTH)
         )
+        self.chord_downsample = nn.Linear(in_features=2*hidden_size, out_features=hidden_size)
 
         self.melody_embeddings = nn.Embedding(MELODY_PREDICTION_LENGTH, hidden_size)
         self.melody_lstm = nn.LSTMCell(input_size=hidden_size * 1, hidden_size=hidden_size * 1)
@@ -107,6 +108,7 @@ class Decoder(nn.Module):
             nn.ReLU(),
             nn.Linear(in_features=hidden_size, out_features=MELODY_PREDICTION_LENGTH)
         )
+        self.melody_downsample = nn.Linear(in_features=2*hidden_size, out_features=hidden_size)
 
     def forward(self, z, num_chords, sampling_rate_chords=0, sampling_rate_melodies=0, gt_chords=None, gt_melody=None):
         # initialize hidden states and cell states randomly
@@ -135,6 +137,9 @@ class Decoder(nn.Module):
             else:
                 chord_embeddings = self.chord_embeddings(chord_prediction.argmax(dim=1))
 
+            # let z influence the chord embedding
+            chord_embeddings = self.chord_downsample(torch.cat((chord_embeddings, z), dim=1))
+
             chords_lstm_input = chord_embeddings
             chord_outputs.append(chord_prediction)
 
@@ -152,9 +157,11 @@ class Decoder(nn.Module):
                     melody_embeddings = self.melody_embeddings(gt_melody[:, i * NOTES_PER_CHORD + j])
                 else:
                     melody_embeddings = self.melody_embeddings(melody_prediction.argmax(dim=1))
-                melody_lstm_input = melody_embeddings + chord_embeddings
+
+                melody_lstm_input = self.melody_downsample(torch.cat((melody_embeddings, chord_embeddings), dim=1))
 
         chord_outputs = torch.stack(chord_outputs, dim=1)
         if len(note_outputs) > 0:
             note_outputs = torch.stack(note_outputs, dim=1)
+
         return chord_outputs, note_outputs
