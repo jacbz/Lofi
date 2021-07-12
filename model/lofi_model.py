@@ -20,12 +20,9 @@ class LofiModel(nn.Module):
     def forward(self, gt_chords, gt_melodies, batch_num_chords, num_chords, sampling_rate_chords=0, sampling_rate_melodies=0):
         # encode
         h = self.encoder(gt_chords, gt_melodies, batch_num_chords)
-        # add two directions together
-        temp = h[-1] + h[-2]
-
         # VAE
-        mu = self.mean_linear(temp)
-        log_var = self.variance_linear(temp)
+        mu = self.mean_linear(h)
+        log_var = self.variance_linear(h)
         z = self.sample(mu, log_var)
         # compute the Kullback–Leibler divergence between a Gaussian and an uniform Gaussian
         kl = 0.5 * torch.mean(mu ** 2 + log_var.exp() - log_var - 1, dim=[0, 1])
@@ -52,11 +49,17 @@ class LofiModel(nn.Module):
 
     def generate(self):
         mu = torch.randn(1,self.hidden_size)
+        return self.decode(mu)
+
+    def decode(self, mu):
         hash = '#' + str(int(md5(mu.numpy()).hexdigest(), 16))[:24]
         return hash, self.decoder(mu, MAX_CHORD_LENGTH)
 
-    def interpolate(self, chords1, chords2):
-        pass
+    def interpolate(self):
+        mu1 = torch.randn(1,self.hidden_size)
+        mu2 = torch.randn(1,self.hidden_size)
+        mu3 = 0.99 * mu1 + 0.01 * mu2
+        return [self.decode(mu) for mu in [mu1, mu2, mu3]]
 
 
 class Encoder(nn.Module):
@@ -69,6 +72,9 @@ class Encoder(nn.Module):
 
         self.melody_embeddings = nn.Embedding(MELODY_PREDICTION_LENGTH, hidden_size)
         self.melody_lstm = nn.LSTM(input_size=hidden_size, hidden_size=hidden_size, num_layers=num_layers, bidirectional=True, batch_first=True)
+
+        self.downsample = nn.Linear(in_features=4*hidden_size, out_features=hidden_size)
+
 
     def forward(self, chords, melodies, batch_num_chords):
         chord_embeddings = self.chord_embeddings(chords)
@@ -83,7 +89,8 @@ class Encoder(nn.Module):
         melody_input = pack_padded_sequence(melody_embeddings, batch_num_chords * NOTES_PER_CHORD, batch_first=True, enforce_sorted=False)
 
         _, (h_melodies, _) = self.melody_lstm(melody_input)
-        return h_melodies
+
+        return self.downsample(torch.cat((h_chords[-1], h_chords[-2], h_melodies[-1], h_melodies[-2]), dim=1))
 
 
 class Decoder(nn.Module):
@@ -108,7 +115,7 @@ class Decoder(nn.Module):
             nn.ReLU(),
             nn.Linear(in_features=hidden_size, out_features=MELODY_PREDICTION_LENGTH)
         )
-        self.melody_downsample = nn.Linear(in_features=2*hidden_size, out_features=hidden_size)
+        self.melody_downsample = nn.Linear(in_features=3*hidden_size, out_features=hidden_size)
 
     def forward(self, z, num_chords, sampling_rate_chords=0, sampling_rate_melodies=0, gt_chords=None, gt_melody=None):
         # initialize hidden states and cell states randomly
@@ -158,7 +165,7 @@ class Decoder(nn.Module):
                 else:
                     melody_embeddings = self.melody_embeddings(melody_prediction.argmax(dim=1))
 
-                melody_lstm_input = self.melody_downsample(torch.cat((melody_embeddings, chord_embeddings), dim=1))
+                melody_lstm_input = self.melody_downsample(torch.cat((melody_embeddings, chord_embeddings, z), dim=1))
 
         chord_outputs = torch.stack(chord_outputs, dim=1)
         if len(note_outputs) > 0:

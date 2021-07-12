@@ -10,7 +10,7 @@ SCHEDULED_SAMPLING_EPOCHS = 500
 START_SCHEDULED_SAMPLING_RATE = 0.5
 END_SCHEDULED_SAMPLING_RATE = 0.1
 # number of epochs to wait before adding the melody loss
-MELODY_EPOCH_DELAY = 100
+MELODY_EPOCH_DELAY = 0
 
 # inverse sigmoid decay
 def sampling_rate_at_epoch(epoch):

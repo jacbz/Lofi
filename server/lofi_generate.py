@@ -12,7 +12,6 @@ def generate(model):
 
     chords.append(CHORD_END_TOKEN)
     cut_off_point = chords.index(CHORD_END_TOKEN)
-    print(cut_off_point)
     chords = chords[:cut_off_point]  # cut off end token
     notes = notes[:cut_off_point * NOTES_PER_CHORD]
 
