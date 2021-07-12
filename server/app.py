@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import torch
 
 from server.lofi_generate import generate
@@ -8,6 +10,11 @@ from model.lyrics2lofi_model import Lyrics2LofiModel
 
 device = "cpu"
 app = Flask(__name__)
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["60 per minute"]
+)
 
 lofi_checkpoint = "../checkpoints/lofimodel_7_zdownsample_unweighted_0.5to0.1over500_melodydelay100_epoch240.pth"
 print("Loading lofi model...", end=" ")
