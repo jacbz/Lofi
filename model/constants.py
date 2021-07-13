@@ -1,9 +1,8 @@
 import math
 
-# as much as can fit into the GPU
 BATCH_SIZE = 128
-# learning rate for Adam
 LEARNING_RATE = 0.001
+WEIGHT_DECAY = 0.1
 TRAIN_VALIDATION_SPLIT = 0.8
 
 # scheduled sampling speed of convergence

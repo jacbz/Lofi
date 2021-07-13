@@ -22,7 +22,7 @@ def train(dataset, model, name):
 
     model = model.to(device)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
 
     epochs = []
     train_losses_chords, train_losses_melodies, train_losses_kl, train_accs_chords, train_accs_melodies = [], [], [], [], []
@@ -74,11 +74,11 @@ def train(dataset, model, name):
             loss_melody = 0
 
         loss_kl = kl
-        loss_bpm = l1_loss(pred_bpm[:, 0], bpm_gt) / 5
-        loss_key = ce_loss(pred_key, key_gt).mean() / 30
-        loss_mode = ce_loss(pred_mode, mode_gt).mean() / 10
-        loss_valence = l1_loss(pred_valence[:, 0], valence_gt) / 5
-        loss_energy = l1_loss(pred_energy[:, 0], energy_gt) / 5
+        loss_bpm = l1_loss(pred_bpm[:, 0], bpm_gt)
+        loss_key = ce_loss(pred_key, key_gt).mean() / 5
+        loss_mode = ce_loss(pred_mode, mode_gt).mean()
+        loss_valence = l1_loss(pred_valence[:, 0], valence_gt)
+        loss_energy = l1_loss(pred_energy[:, 0], energy_gt)
         loss_total = loss_chords + loss_kl + loss_melody + loss_bpm + loss_key + loss_mode + loss_energy + loss_valence
 
         tp_chords = torch.masked_select(pred_chords.argmax(dim=2) == chords_gt, mask_chord).tolist()
