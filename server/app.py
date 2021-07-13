@@ -16,7 +16,7 @@ limiter = Limiter(
     default_limits=["30 per minute"]
 )
 
-lofi2lofi_checkpoint = "../model/model2.pth"
+lofi2lofi_checkpoint = "../model/lofi2lofi-epoch0.pth"
 print("Loading lofi model...", end=" ")
 lofi2lofi_model = Lofi2LofiModel(device=device)
 lofi2lofi_model.load_state_dict(torch.load(lofi2lofi_checkpoint, map_location=device))

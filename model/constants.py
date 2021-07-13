@@ -4,8 +4,9 @@ import math
 BATCH_SIZE = 128
 # learning rate for Adam
 LEARNING_RATE = 0.001
+TRAIN_VALIDATION_SPLIT = 0.8
 
-# number of epochs to scale sample scheduling to
+# scheduled sampling speed of convergence
 SCHEDULED_SAMPLING_CONVERGENCE = 50
 START_SCHEDULED_SAMPLING_RATE = 0.5
 END_SCHEDULED_SAMPLING_RATE = 0.1
@@ -16,9 +17,8 @@ MELODY_EPOCH_DELAY = 0
 def sampling_rate_at_epoch(epoch):
     if epoch < 0:
         return START_SCHEDULED_SAMPLING_RATE
-    # expected speed of convergence
-    k = SCHEDULED_SAMPLING_CONVERGENCE
-    return (k / (k + math.exp(epoch / k))) * (START_SCHEDULED_SAMPLING_RATE - END_SCHEDULED_SAMPLING_RATE) + END_SCHEDULED_SAMPLING_RATE
+    return (SCHEDULED_SAMPLING_CONVERGENCE / (SCHEDULED_SAMPLING_CONVERGENCE + math.exp(epoch / SCHEDULED_SAMPLING_CONVERGENCE))) \
+           * (START_SCHEDULED_SAMPLING_RATE - END_SCHEDULED_SAMPLING_RATE) + END_SCHEDULED_SAMPLING_RATE
 
 HIDDEN_SIZE = 400
 HIDDEN_SIZE2 = 100
