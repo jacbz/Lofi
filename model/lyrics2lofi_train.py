@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from torch.nn.utils.rnn import pack_padded_sequence
 
 from model.constants import *
-from model.dataset import SongDataset
+from model.lyrics2lofi_dataset import Lyrics2LofiDataset
 from model.lyrics2lofi_model import Lyrics2LofiModel
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     embeddings_file = "embeddings"  # without .npy extension
     embedding_lengths_file = "embedding_lengths.json"
 
-    dataset = SongDataset(dataset_folder, dataset_files, embeddings_file, embedding_lengths_file)
+    dataset = Lyrics2LofiDataset(dataset_folder, dataset_files, embeddings_file, embedding_lengths_file)
     train_size = int(0.8 * len(dataset))
     validation_size = len(dataset) - train_size
     train_dataset, validation_dataset = torch.utils.data.random_split(dataset, [train_size, validation_size])

@@ -6,7 +6,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 
 from model.constants import *
-from model.dataset import SongDataset
+from model.lofi2lofi_dataset import Lofi2LofiDataset
 from model.lofi_model import LofiModel
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -70,10 +70,8 @@ if __name__ == '__main__':
 
     dataset_folder = "dataset/processed-spotify-all"
     dataset_files = os.listdir(dataset_folder)
-    embeddings_file = "embeddings"  # without .npy extension
-    embedding_lengths_file = "embedding_lengths.json"
 
-    dataset = SongDataset(dataset_folder, dataset_files, embeddings_file, embedding_lengths_file)
+    dataset = Lofi2LofiDataset(dataset_folder, dataset_files)
     train_size = int(0.8 * len(dataset))
     validation_size = len(dataset) - train_size
     train_dataset, validation_dataset = torch.utils.data.random_split(dataset, [train_size, validation_size])
