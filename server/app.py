@@ -16,7 +16,8 @@ limiter = Limiter(
     default_limits=["60 per minute"]
 )
 
-lofi_checkpoint = "../checkpoints/lofimodel_7_zdownsample_unweighted_0.5to0.1over500_melodydelay100_epoch240.pth"
+lofi_checkpoint = "../model/model2.pth"
+# lofi_checkpoint = "../checkpoints/lofimodel_9_epoch150.pth"
 print("Loading lofi model...", end=" ")
 lofi_model = LofiModel(device=device)
 lofi_model.load_state_dict(torch.load(lofi_checkpoint, map_location=device))

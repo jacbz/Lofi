@@ -5,7 +5,7 @@ from model.constants import *
 
 
 def generate(model):
-    hash, (pred_chords, pred_notes) = model.generate()
+    hash, (pred_chords, pred_notes, pred_bpm, pred_key, pred_mode, pred_valence, pred_energy) = model.generate()
 
     chords = pred_chords.argmax(dim=2)[0].tolist()
     notes = pred_notes.argmax(dim=2)[0].cpu().numpy()
@@ -16,16 +16,11 @@ def generate(model):
     notes = notes[:cut_off_point * NOTES_PER_CHORD]
 
     title = hash
-    #key = pred_key.argmax().item() + 1
-    key = 1
-    #mode = pred_mode.argmax().item() + 1
-    mode = 1
-    #bpm = round(pred_bpm.item() * 30 + 70)
-    bpm = 80
-    #energy = pred_energy.item()
-    energy = 0.5
-    #valence = pred_valence.item()
-    valence = 0.5
+    key = pred_key.argmax().item() + 1
+    mode = pred_mode.argmax().item() + 1
+    bpm = round(pred_bpm.item() * 30 + 70)
+    energy = round(pred_energy.item(), 3)
+    valence = round(pred_valence.item(), 3)
     chords = chords
     melodies = notes.reshape(-1, NOTES_PER_CHORD)
     melodies = [x.tolist() for x in [*melodies]]

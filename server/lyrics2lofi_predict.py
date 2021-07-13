@@ -27,8 +27,8 @@ def predict(model, input):
     key = pred_key.argmax().item() + 1
     mode = pred_mode.argmax().item() + 1
     bpm = round(pred_bpm.item() * 30 + 70)
-    energy = pred_energy.item()
-    valence = pred_valence.item()
+    energy = round(pred_energy.item(), 3)
+    valence = round(pred_valence.item(), 3)
     chords = chords
     melodies = notes.reshape(-1, NOTES_PER_CHORD)
     melodies = [x.tolist() for x in [*melodies]]
