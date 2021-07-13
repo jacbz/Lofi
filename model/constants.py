@@ -6,7 +6,7 @@ BATCH_SIZE = 128
 LEARNING_RATE = 0.001
 
 # number of epochs to scale sample scheduling to
-SCHEDULED_SAMPLING_EPOCHS = 200
+SCHEDULED_SAMPLING_CONVERGENCE = 50
 START_SCHEDULED_SAMPLING_RATE = 0.5
 END_SCHEDULED_SAMPLING_RATE = 0.1
 # number of epochs to wait before adding the melody loss
@@ -17,7 +17,7 @@ def sampling_rate_at_epoch(epoch):
     if epoch < 0:
         return START_SCHEDULED_SAMPLING_RATE
     # expected speed of convergence
-    k = SCHEDULED_SAMPLING_EPOCHS / 10
+    k = SCHEDULED_SAMPLING_CONVERGENCE
     return (k / (k + math.exp(epoch / k))) * (START_SCHEDULED_SAMPLING_RATE - END_SCHEDULED_SAMPLING_RATE) + END_SCHEDULED_SAMPLING_RATE
 
 HIDDEN_SIZE = 400

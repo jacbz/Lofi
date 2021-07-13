@@ -77,13 +77,7 @@ class Encoder(nn.Module):
         self.valence_embedding = nn.Linear(in_features=1, out_features=HIDDEN_SIZE2)
         self.energy_embedding = nn.Linear(in_features=1, out_features=HIDDEN_SIZE2)
 
-        self.downsample = nn.Sequential(
-            nn.Linear(in_features=4*HIDDEN_SIZE + 5*HIDDEN_SIZE2, out_features=HIDDEN_SIZE),
-            nn.ReLU(),
-            nn.Linear(in_features=HIDDEN_SIZE, out_features=HIDDEN_SIZE)
-        )
-
-        # self.downsample = nn.Linear(in_features=4*HIDDEN_SIZE, out_features=HIDDEN_SIZE)
+        self.downsample = nn.Linear(in_features=4*HIDDEN_SIZE + 5*HIDDEN_SIZE2, out_features=HIDDEN_SIZE)
 
 
     def forward(self, chords, melodies, bpm, key, mode, valence, energy, batch_num_chords):
@@ -120,11 +114,7 @@ class Decoder(nn.Module):
             nn.ReLU(),
             nn.Linear(in_features=HIDDEN_SIZE, out_features=CHORD_PREDICTION_LENGTH)
         )
-        self.chord_embedding_downsample = nn.Sequential(
-            nn.Linear(in_features=2*HIDDEN_SIZE, out_features=HIDDEN_SIZE),
-            nn.ReLU(),
-            nn.Linear(in_features=HIDDEN_SIZE, out_features=HIDDEN_SIZE)
-        )
+        self.chord_embedding_downsample = nn.Linear(in_features=2*HIDDEN_SIZE, out_features=HIDDEN_SIZE)
 
         self.melody_embeddings = nn.Embedding(num_embeddings=MELODY_PREDICTION_LENGTH, embedding_dim=HIDDEN_SIZE)
         self.melody_lstm = nn.LSTMCell(input_size=HIDDEN_SIZE * 1, hidden_size=HIDDEN_SIZE * 1)
@@ -133,11 +123,7 @@ class Decoder(nn.Module):
             nn.ReLU(),
             nn.Linear(in_features=HIDDEN_SIZE, out_features=MELODY_PREDICTION_LENGTH)
         )
-        self.melody_embedding_downsample = nn.Sequential(
-            nn.Linear(in_features=3*HIDDEN_SIZE, out_features=HIDDEN_SIZE),
-            nn.ReLU(),
-            nn.Linear(in_features=HIDDEN_SIZE, out_features=HIDDEN_SIZE)
-        )
+        self.melody_embedding_downsample = nn.Linear(in_features=3*HIDDEN_SIZE, out_features=HIDDEN_SIZE)
 
         self.key_linear = nn.Sequential(
             nn.Linear(in_features=HIDDEN_SIZE, out_features=HIDDEN_SIZE2),

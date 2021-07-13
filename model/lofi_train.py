@@ -196,7 +196,7 @@ if __name__ == '__main__':
             f"chord accuracy: {epoch_validation_chord_accuracy:.3f}, melody accuracy: {epoch_validation_melody_accuracy:.3f}")
 
         # copy old model
-        save_name = f"model2-epoch{epoch}.pth" if epoch > SCHEDULED_SAMPLING_EPOCHS / 5 and epoch % 10 == 0 else "model2.pth"
+        save_name = f"model2-epoch{epoch}.pth" if epoch % 10 == 0 else "model2.pth"
         torch.save(model.state_dict(), save_name)
 
         training_losses_chords.append(epoch_training_loss_chord)
@@ -211,7 +211,7 @@ if __name__ == '__main__':
         validation_accuracies_chords.append(epoch_validation_chord_accuracy)
         validation_accuracies_melodies.append(epoch_validation_melody_accuracy)
 
-        fig, axs = plot.subplots(2, 2, figsize=(8, 4.5))
+        fig, axs = plot.subplots(2, 2, figsize=(8, 4.5), dpi=200)
         # Chords loss
         axs[0, 0].set_title('Chords loss')
         axs[0, 0].plot(epochs, training_losses_chords, label='Train', color='royalblue')
