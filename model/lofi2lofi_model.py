@@ -7,9 +7,9 @@ from hashlib import md5
 from model.constants import *
 
 
-class LofiModel(nn.Module):
+class Lofi2LofiModel(nn.Module):
     def __init__(self, device="cuda" if torch.cuda.is_available() else "cpu"):
-        super(LofiModel, self).__init__()
+        super(Lofi2LofiModel, self).__init__()
         self.device = device
         self.encoder = Encoder(device)
         self.decoder = Decoder(device)

@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 
 from model.constants import *
 from model.lofi2lofi_dataset import Lofi2LofiDataset
-from model.lofi_model import LofiModel
+from model.lofi2lofi_model import Lofi2LofiModel
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
@@ -92,7 +92,7 @@ if __name__ == '__main__':
     ce_loss = nn.CrossEntropyLoss(reduction='none')
     mae = nn.L1Loss(reduction='mean')
 
-    model = LofiModel().to(device)
+    model = Lofi2LofiModel().to(device)
     # model.load_state_dict(torch.load("model-2021-07-04-15-57-370epochs.pth"))
 
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
