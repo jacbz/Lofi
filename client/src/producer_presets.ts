@@ -40,10 +40,10 @@ export class ProducerPreset {
 }
 
 export const selectPreset = (valence: number, energy: number): ProducerPreset => {
-  if (energy < 0.3) {
+  if (energy < 0.3 && valence < 0.5) {
     return Preset3;
   }
-  if (energy < 0.5) {
+  if (energy < 0.65) {
     return Preset2;
   }
   return Preset1;
@@ -84,7 +84,7 @@ export const Preset2: ProducerPreset = new ProducerPreset({
   }),
   harmony: new InstrumentConfiguration({
     instrument: Instrument.ElectricPiano,
-    octaveShift: 1,
+    octaveShift: 2,
     volume: 0.8
   }),
   firstBeatArpeggio: new InstrumentConfiguration({

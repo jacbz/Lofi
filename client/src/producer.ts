@@ -161,16 +161,9 @@ class Producer {
   }
 
   produceIntro(): number {
-    // one empty measure, arpeggios, followed by one empty measure
-    // const length = 1 + Math.ceil(this.chordProgressionChords.length / 4) + 1;
-    // this.chordProgressionChords.forEach((chord, chordNo) => {
-    //   // hold the last arpeggio longer
-    //   const duration = chordNo === this.chordProgression.length - 1 ? '1:1' : '0:2';
-    //   this.addArpeggio(Instrument.ElectricGuitar, chord.notes, duration, '64n', `1:${chordNo}`);
-    // });
-    // return length;
+    // TODO: produce a more interesting intro
 
-    // const end = this.addOneShot(0);
+    // measure of silence
     return 1;
   }
 
@@ -210,7 +203,7 @@ class Producer {
   }
 
   produceFx() {
-    if (this.valence < 0.2) {
+    if (this.valence < 0.5 && this.modeNum === 6) {
       // add rain
       const randomRain = SAMPLEGROUPS.get('rain').getRandomSample(this.valence);
       // end half a measure before the end
@@ -337,7 +330,7 @@ class Producer {
           this.addNote(
             this.preset.melody.instrument,
             melody,
-            '1:0',
+            null,
             `${measure}:0:${i * 2}`,
             this.preset.melody.volume
           );

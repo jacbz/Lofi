@@ -302,7 +302,9 @@ shuffleButton.addEventListener('click', async () => {
   shuffleButton.classList.toggle('active', player.shuffle);
 });
 volumeButton.addEventListener('click', async () => {
-  player.gain.gain.value = volumeBar.valueAsNumber;
+  if (player.gain) {
+    player.gain.gain.value = volumeBar.valueAsNumber;
+  }
   player.muted = !player.muted;
   volumeButton.classList.toggle('muted', player.muted);
 });

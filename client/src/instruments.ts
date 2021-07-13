@@ -3,20 +3,25 @@ import { FrequencyShifter } from 'tone';
 
 export enum Instrument {
   /** Salamander grand piano, velocity 6 */
-  Piano = 'piano',
+  Piano,
   /** Salamander grand piano, velocity 1 */
-  SoftPiano = 'piano-soft',
+  SoftPiano,
   /** Mellow electric piano */
-  ElectricPiano = 'piano-electric',
-  Harp = 'harp',
-  AcousticGuitar = 'guitar-acoustic',
-  BassGuitar = 'guitar-bass',
-  ElectricGuitar = 'guitar-electric',
-  Bass = 'bass'
+  ElectricPiano,
+  /** Harp */
+  Harp,
+  /** Acoustic guitar */
+  AcousticGuitar,
+  /** Bass Guitar */
+  BassGuitar,
+  /** Electric guitar */
+  ElectricGuitar,
+  /** Synth (Tone.js) */
+  Synth
 }
 
 const BASE_URL = './samples/instruments';
-export const getInstrumentSampler = (instrument: Instrument) => {
+export const getInstrument = (instrument: Instrument) => {
   switch (instrument) {
     case Instrument.Piano: {
       return new Tone.Sampler({
@@ -82,7 +87,7 @@ export const getInstrumentSampler = (instrument: Instrument) => {
           'F#7': 'Fs7.mp3'
         },
         baseUrl: `${BASE_URL}/piano-soft/`,
-        volume: 6
+        volume: 4
       });
     }
 
@@ -208,17 +213,15 @@ export const getInstrumentSampler = (instrument: Instrument) => {
       });
     }
 
-    case Instrument.Bass: {
-      return new Tone.Sampler({
-        urls: {
-          C1: 'C.mp3',
-          'D#1': 'Ds.mp3',
-          E1: 'E.mp3',
-          F1: 'F.mp3',
-          G1: 'G.mp3'
+    case Instrument.Synth: {
+      return new Tone.PolySynth(Tone.Synth, {
+        envelope: {
+          attack: 0.02,
+          decay: 0.1,
+          sustain: 0.3,
+          release: 1
         },
-        baseUrl: `${BASE_URL}/bass/`,
-        volume: 0
+        volume: -10
       });
     }
 
@@ -227,17 +230,19 @@ export const getInstrumentSampler = (instrument: Instrument) => {
   }
 };
 
-export const DefaultReverb = new Tone.Reverb({
-  decay: 2,
-  wet: 0.2,
-  preDelay: 0.3
-});
+export const DefaultFilters = [
+  new Tone.Reverb({
+    decay: 2,
+    wet: 0.2,
+    preDelay: 0.3
+  })
+];
 
 export const getInstrumentFilters = (instrument: Instrument) => {
   switch (instrument) {
     case Instrument.Piano: {
       return [
-        DefaultReverb
+        ...DefaultFilters
         // new Tone.Filter({
         //   type: 'lowpass',
         //   frequency: 3600,
@@ -253,26 +258,26 @@ export const getInstrumentFilters = (instrument: Instrument) => {
 
     case Instrument.SoftPiano: {
       return [
-        DefaultReverb
+        ...DefaultFilters
       ];
     }
 
     case Instrument.ElectricPiano: {
       return [
-        DefaultReverb
+        ...DefaultFilters
         // new FrequencyShifter(3)
       ];
     }
 
     case Instrument.AcousticGuitar: {
       return [
-        DefaultReverb
+        ...DefaultFilters
       ];
     }
 
     case Instrument.ElectricGuitar: {
       return [
-        DefaultReverb,
+        ...DefaultFilters,
         new Tone.Filter({
           type: 'highpass',
           frequency: 350,
@@ -283,7 +288,7 @@ export const getInstrumentFilters = (instrument: Instrument) => {
 
     case Instrument.BassGuitar: {
       return [
-        DefaultReverb,
+        ...DefaultFilters,
         new Tone.Filter({
           type: 'highpass',
           frequency: 300,
@@ -292,11 +297,15 @@ export const getInstrumentFilters = (instrument: Instrument) => {
       ];
     }
 
-    case Instrument.Bass: {
-      return [DefaultReverb];
+    case Instrument.Synth: {
+      return [
+        ...DefaultFilters
+      ];
     }
 
     default:
-      return [DefaultReverb];
+      return [
+        ...DefaultFilters
+      ];
   }
 };

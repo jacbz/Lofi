@@ -95,7 +95,7 @@ class InstrumentNote {
   /** Pitch(es) to play, e.g. 'D#1' or ['C', 'E', 'G'] */
   pitch: string | string[];
 
-  /** Duration in Tone.js time */
+  /** Duration in Tone.js time, if null, play entire note */
   duration: Time;
 
   /** Onset time in Tone.js */

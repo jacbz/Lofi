@@ -1,5 +1,5 @@
 import * as Tone from 'tone';
-import { getInstrumentFilters, getInstrumentSampler, Instrument } from './instruments';
+import { getInstrumentFilters, getInstrument, Instrument } from './instruments';
 import * as Samples from './samples';
 import { Track } from './track';
 import { compress } from './helper';
@@ -50,7 +50,9 @@ class Player {
 
   set muted(muted: boolean) {
     this._muted = muted;
-    this.gain.gain.value = muted ? 0 : this.getGain();
+    if (this.gain) {
+      this.gain.gain.value = muted ? 0 : this.getGain();
+    }
   }
 
   /** Function to get the gain from the UI */
@@ -70,7 +72,7 @@ class Player {
 
   samplePlayers: Map<string, Tone.Player[]>;
 
-  instrumentSamplers: Map<Instrument, Tone.Sampler>;
+  instruments: Map<Instrument, any>;
 
   gain: Tone.Gain;
 
@@ -114,7 +116,7 @@ class Player {
     Tone.Transport.bpm.value = this.currentTrack.bpm;
 
     this.samplePlayers = new Map();
-    this.instrumentSamplers = new Map();
+    this.instruments = new Map();
 
     // load samples
     for (const [sampleGroupName, sampleIndex] of this.currentTrack.samples) {
@@ -130,9 +132,9 @@ class Player {
       const player = new Tone.Player({
         url: sampleGroup.getSampleUrl(sampleIndex),
         volume: sampleGroup.volume,
-        loop: sampleGroup.isLoop
-        // fadeIn: '4n',
-        // fadeOut: sampleGroup.isLoop ? 0 : '4n'
+        loop: sampleGroup.isLoop,
+        fadeIn: '8n',
+        fadeOut: '8n'
       })
         .chain(...filters, this.gain, Tone.Destination)
         .sync();
@@ -146,11 +148,11 @@ class Player {
     // load instruments
     const instrumentVolumes = new Map();
     for (const instrument of this.currentTrack.instruments) {
-      const sampler = getInstrumentSampler(instrument)
+      const toneInstrument = getInstrument(instrument)
         .chain(...getInstrumentFilters(instrument), this.gain, Tone.Destination)
         .sync();
-      this.instrumentSamplers.set(instrument, sampler);
-      instrumentVolumes.set(sampler, sampler.volume.value);
+      this.instruments.set(instrument, toneInstrument);
+      instrumentVolumes.set(toneInstrument, toneInstrument.volume.value);
     }
 
     // set swing
@@ -169,13 +171,21 @@ class Player {
     }
 
     for (const noteTiming of this.currentTrack.instrumentNotes) {
-      const instrumentSampler = this.instrumentSamplers.get(noteTiming.instrument);
-      instrumentSampler.triggerAttackRelease(
-        noteTiming.pitch,
-        noteTiming.duration,
-        noteTiming.time,
-        noteTiming.velocity !== undefined ? noteTiming.velocity : 1
-      );
+      const instrumentSampler = this.instruments.get(noteTiming.instrument);
+      if (noteTiming.duration) {
+        instrumentSampler.triggerAttackRelease(
+          noteTiming.pitch,
+          noteTiming.duration,
+          noteTiming.time,
+          noteTiming.velocity !== undefined ? noteTiming.velocity : 1
+        );
+      } else {
+        instrumentSampler.triggerAttack(
+          noteTiming.pitch,
+          noteTiming.time,
+          noteTiming.velocity !== undefined ? noteTiming.velocity : 1
+        );
+      }
     }
 
     const analyzer = new Tone.Analyser('fft', 16);
@@ -216,7 +226,7 @@ class Player {
   /** Seeks to a specific position in the current track */
   seek(seconds: number) {
     if (!this.currentTrack) return;
-    this.instrumentSamplers?.forEach((s) => s.releaseAll());
+    this.instruments?.forEach((s) => s.releaseAll());
     Tone.Transport.seconds = seconds;
     this.updateTrackDisplay(seconds);
   }
@@ -243,7 +253,7 @@ class Player {
     this.gain?.disconnect();
     Tone.Transport.cancel();
     Tone.Transport.stop();
-    this.instrumentSamplers?.forEach((s) => s.dispose());
+    this.instruments?.forEach((s) => s.dispose());
     this.samplePlayers?.forEach((s) => s.forEach((t) => t.dispose()));
   }
 
