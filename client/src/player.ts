@@ -346,7 +346,7 @@ class Player {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: this.currentTrack.title,
       artist: 'Lofi generator',
-      artwork: [{ src: './background.jpg', type: 'image/jpg' }]
+      artwork: [{ src: './cover.jpg', type: 'image/jpg' }]
     });
     this.updateAudioWebApiPosition(0);
   }
