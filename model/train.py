@@ -40,7 +40,7 @@ def train(dataset, model, name):
 
         chords_gt = data["chords"].to(device)[:, :max_num_chords]
         notes_gt = data["melody_notes"].to(device)[:, :max_num_notes]
-        bpm_gt = data["bpm"].to(device)
+        tempo_gt = data["tempo"].to(device)
         key_gt = data["key"].to(device)
         mode_gt = data["mode"].to(device)
         valence_gt = data["valence"].to(device)
@@ -49,11 +49,11 @@ def train(dataset, model, name):
         # run model
         if name == "lyrics2lofi":
             input = pack_padded_sequence(embeddings, embedding_lengths, batch_first=True, enforce_sorted=False)
-            pred_chords, pred_notes, pred_bpm, pred_key, pred_mode, pred_valence, pred_energy, kl = \
+            pred_chords, pred_notes, pred_tempo, pred_key, pred_mode, pred_valence, pred_energy, kl = \
                 model(input, max_num_chords, sampling_rate_chords, sampling_rate_melodies, chords_gt, notes_gt)
         else:
-            pred_chords, pred_notes, pred_bpm, pred_key, pred_mode, pred_valence, pred_energy, kl = \
-                model(chords_gt, notes_gt, bpm_gt, key_gt, mode_gt, valence_gt, energy_gt, num_chords, max_num_chords, sampling_rate_chords, sampling_rate_melodies)
+            pred_chords, pred_notes, pred_tempo, pred_key, pred_mode, pred_valence, pred_energy, kl = \
+                model(chords_gt, notes_gt, tempo_gt, key_gt, mode_gt, valence_gt, energy_gt, num_chords, max_num_chords, sampling_rate_chords, sampling_rate_melodies)
 
         def compute_mask(max_length, curr_length):
             arange = torch.arange(max_length, device=device).repeat((chords_gt.shape[0], 1)).permute(0, 1)
@@ -74,17 +74,17 @@ def train(dataset, model, name):
             loss_melody = 0
 
         loss_kl = kl
-        loss_bpm = l1_loss(pred_bpm[:, 0], bpm_gt)
-        loss_key = ce_loss(pred_key, key_gt).mean() / 5
-        loss_mode = ce_loss(pred_mode, mode_gt).mean()
-        loss_valence = l1_loss(pred_valence[:, 0], valence_gt)
-        loss_energy = l1_loss(pred_energy[:, 0], energy_gt)
-        loss_total = loss_chords + loss_kl + loss_melody + loss_bpm + loss_key + loss_mode + loss_energy + loss_valence
+        loss_tempo = l1_loss(pred_tempo[:, 0], tempo_gt) / 5
+        loss_key = ce_loss(pred_key, key_gt).mean() / 30
+        loss_mode = ce_loss(pred_mode, mode_gt).mean() / 10
+        loss_valence = l1_loss(pred_valence[:, 0], valence_gt) / 5
+        loss_energy = l1_loss(pred_energy[:, 0], energy_gt) / 5
+        loss_total = loss_chords + loss_kl + loss_melody + loss_tempo + loss_key + loss_mode + loss_energy + loss_valence
 
         tp_chords = torch.masked_select(pred_chords.argmax(dim=2) == chords_gt, mask_chord).tolist()
         tp_melodies = torch.masked_select(pred_notes.argmax(dim=2) == notes_gt, mask_melody).tolist()
 
-        return loss_total, loss_chords, loss_kl, loss_melody, loss_bpm, loss_key, loss_mode, loss_valence, loss_energy, tp_chords, tp_melodies
+        return loss_total, loss_chords, loss_kl, loss_melody, loss_tempo, loss_key, loss_mode, loss_valence, loss_energy, tp_chords, tp_melodies
 
     print(f"Starting training: {name}")
     epoch = 0
@@ -95,7 +95,7 @@ def train(dataset, model, name):
         ep_train_losses_chords, ep_train_losses_melodies, ep_train_losses_kl, ep_train_tp_chords, ep_train_tp_melodies = [], [], [], [], []
         ep_val_losses_chords, ep_val_losses_melodies, ep_val_losses_kl, ep_val_tp_chords, ep_val_tp_melodies = [], [], [], [], []
 
-        sampling_rate_chords = sampling_rate_at_epoch(epoch)
+        sampling_rate_chords = 0
         sampling_rate_melodies = 0
         # sampling_rate_melodies = sampling_rate_at_epoch(epoch - MELODY_EPOCH_DELAY)
 
@@ -105,7 +105,7 @@ def train(dataset, model, name):
         model.train()
         for batch, data in enumerate(train_dataloader):
             loss, loss_chords, kl_loss, loss_melody,\
-                loss_bpm, loss_key, loss_mode, loss_valence, loss_energy,\
+                loss_tempo, loss_key, loss_mode, loss_valence, loss_energy,\
                 batch_tp_chords, batch_tp_melodies = compute_loss(data)
 
             ep_train_losses_chords.append(loss_chords)
@@ -120,7 +120,7 @@ def train(dataset, model, name):
             optimizer.step()
             loss = loss.item()
             print(f"\tBatch {batch}:\tLoss {loss:.3f} (C: {loss_chords:.3f} + KL: {kl_loss:.3f} + "
-                  f"M: {loss_melody:.3f} + B: {loss_bpm:.3f} + K: {loss_key:.3f} + Mo: {loss_mode:.3f} + "
+                  f"M: {loss_melody:.3f} + B: {loss_tempo:.3f} + K: {loss_key:.3f} + Mo: {loss_mode:.3f} + "
                   f"V: {loss_valence:.3f} + E: {loss_energy:.3f})")
 
         # VALIDATION
@@ -128,7 +128,7 @@ def train(dataset, model, name):
         for batch, data in enumerate(val_dataloader):
             with torch.no_grad():
                 loss, loss_chords, kl_loss, loss_melody,\
-                    loss_bpm, loss_key, loss_mode, loss_valence, loss_energy,\
+                    loss_tempo, loss_key, loss_mode, loss_valence, loss_energy,\
                     batch_tp_chords, batch_tp_melodies = compute_loss(data)
 
                 ep_val_losses_chords.append(loss_chords)
@@ -138,7 +138,7 @@ def train(dataset, model, name):
                 ep_val_tp_melodies.extend(batch_tp_melodies)
 
                 print(f"\tValidation Batch {batch}:\tLoss {loss:.3f} (C: {loss_chords:.3f} + KL: {kl_loss:.3f} + "
-                      f"M: {loss_melody:.3f} + B: {loss_bpm:.3f} + K: {loss_key:.3f} + Mo: {loss_mode:.3f} + "
+                      f"M: {loss_melody:.3f} + B: {loss_tempo:.3f} + K: {loss_key:.3f} + Mo: {loss_mode:.3f} + "
                       f"V: {loss_valence:.3f} + E: {loss_energy:.3f})")
 
         # copy old model

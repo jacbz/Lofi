@@ -18,7 +18,7 @@ def process_sample(json_file):
     # normalize tempo into range 70-100
     bpm = min(100.0, max(70.0, ((bpm - 70) * (3 / 13)) + 70))
     # normalize tempo into [0, 1], cutting off at 70 and 100
-    bpm = (bpm / 30) - (7 / 3)
+    tempo = (bpm / 30) - (7 / 3)
 
     json_chords = json_file["tracks"]["chord"]
     json_notes = json_file["tracks"]["melody"]
@@ -57,7 +57,7 @@ def process_sample(json_file):
         "chords": chords_list,
         "num_chords": num_chords,
         "melody_notes": note_list,
-        "bpm": bpm,
+        "tempo": tempo,
         "energy": energy,
         "valence": valence
     }

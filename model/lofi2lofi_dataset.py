@@ -27,7 +27,7 @@ class Lofi2LofiDataset(Dataset):
             "chords": torch.tensor(sample["chords"]),
             "num_chords": sample["num_chords"],
             "melody_notes": torch.tensor(sample["melody_notes"]),
-            "bpm": sample["bpm"],
+            "tempo": sample["tempo"],
             "energy": sample["energy"],
             "valence": sample["valence"]
         }
