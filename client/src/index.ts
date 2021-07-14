@@ -7,25 +7,46 @@ import generate from './api';
 
 const player = new Player();
 
+// try to load playlist from local storage
+let playlistToLoad: OutputParams[] = [];
+const localStoragePlaylist = localStorage.getItem('playlist');
+if (localStoragePlaylist) {
+  try {
+    playlistToLoad = JSON.parse(localStoragePlaylist);
+  } catch (e) {
+    console.log('Error parsing', localStoragePlaylist);
+  }
+}
+
+const updateLocalStorage = () => {
+  localStorage.setItem('playlist', JSON.stringify(player.playlist.map((t) => t.outputParams)));
+};
+player.updateLocalStorage = updateLocalStorage;
+
 // load playlist in URL if possible
 const queryString = window.location.search;
 if (queryString.length > 0) {
-  let outputParams: OutputParams[];
   const compressed = queryString.substring(1);
   try {
     const decompressed = decompress(compressed);
-    outputParams = JSON.parse(decompressed);
-    // window.history.pushState({}, null, '/');
+    const outputParams: OutputParams[] = JSON.parse(decompressed);
+    playlistToLoad = [
+      ...playlistToLoad.filter((p) => outputParams.every((p2) => p2.title !== p.title)),
+      ...outputParams
+    ];
+    window.history.pushState({}, null, '/');
   } catch (e) {
     console.log('Error parsing', compressed);
   }
-  if (outputParams) {
-    const playlist = outputParams.map((params) => {
-      const producer = new Producer();
-      return producer.produce(params);
-    });
-    player.playlist = playlist;
-  }
+}
+
+if (playlistToLoad.length > 0) {
+  const playlist = playlistToLoad.map((params) => {
+    const producer = new Producer();
+    return producer.produce(params);
+  });
+  player.playlist = playlist;
+  updateLocalStorage();
 }
 
 /** Formats seconds into an MM:SS string */
@@ -236,6 +257,7 @@ Sortable.create(playlistContainer, {
       player.currentPlayingIndex = event.newIndex;
     }
     updatePlaylistDisplay();
+    updateLocalStorage();
   }
 });
 updatePlaylistDisplay();

@@ -70,6 +70,9 @@ class Player {
   /** Function to call when isPlaying changes */
   onPlayingStateChange: () => void;
 
+  /** Update local storage playlist when it changes */
+  updateLocalStorage: () => void;
+
   samplePlayers: Map<string, Tone.Player[]>;
 
   instruments: Map<Instrument, any>;
@@ -79,6 +82,7 @@ class Player {
   /** Adds a given track to the playlist */
   addToPlaylist(track: Track) {
     this.playlist.push(track);
+    this.updateLocalStorage();
     this.updatePlaylistDisplay();
     if (!this.isPlaying) {
       this.playTrack(this.playlist.length - 1);
@@ -317,6 +321,7 @@ class Player {
   /** Deletes a track from the playlist */
   deleteTrack(index: number) {
     this.playlist.splice(index, 1);
+    this.updateLocalStorage();
     if (index === this.currentPlayingIndex) {
       this.unload();
     } else if (index < this.currentPlayingIndex) {

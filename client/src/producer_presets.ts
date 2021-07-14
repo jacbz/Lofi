@@ -43,7 +43,7 @@ export const selectPreset = (valence: number, energy: number): ProducerPreset =>
   if (energy < 0.3 && valence < 0.5) {
     return Preset3;
   }
-  if (energy < 0.65) {
+  if (energy < 0.6) {
     return Preset2;
   }
   return Preset1;

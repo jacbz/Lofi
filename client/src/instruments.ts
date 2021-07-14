@@ -265,7 +265,6 @@ export const getInstrumentFilters = (instrument: Instrument) => {
     case Instrument.ElectricPiano: {
       return [
         ...DefaultFilters
-        // new FrequencyShifter(3)
       ];
     }
 
