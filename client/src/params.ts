@@ -16,10 +16,7 @@ export const getRandomOutputParams = () => {
   return JSON.stringify(params, null, 2);
 };
 
-export class InputParams {
-  text: string;
-}
-
+export const HIDDEN_SIZE = 100;
 export class OutputParams {
   /** Optional: title */
   title: string;

@@ -2,13 +2,22 @@
 <html lang="en">
 
 <head>
-  <title>Lo-fi music</title>
+  <title>LOFI</title>
   <meta charset="utf-8" />
 </head>
 
 <body>
   <div id="header">LOFI</div>
   <div id="center">
+    <div id="slider-panel" class="panel">
+      <div class="header">
+        <div class="header-text">LATENT SPACE</div>
+      </div>
+      <div id="slider-panel-content">
+        <div id="sliders"></div>
+        <button id="generate-button" class="flat"><div id="loading-animation" style="display: none"><div></div><div></div><div></div></div>Generate</button>
+      </div>
+    </div>
     <div id="player-panel" class="panel">
       <div id="now-playing">        
         <div id="cover">
@@ -72,20 +81,20 @@
       </template>
       <div id="playlist">
         
-        <div id="playlist-header">
-          <div id="playlist-header-text">NOW PLAYING</div>
+        <div id="playlist-header" class="header">
+          <div id="playlist-header-text" class="header-text">NOW PLAYING</div>
           <button id="export-button" class="plain" title="Share this playlist"></button>
           <div id="export-panel" class="panel" style="visibility: hidden;">
-            <div id="export-panel-header-text">SHARE THIS PLAYLIST</div>
+            <div class="header">
+              <div class="header-text">SHARE THIS PLAYLIST</div>
+            </div>
             <div id="export-panel-content">
               <input id="export-url-input" readonly>
               <button id="copy-button" class="flat">Copy</button>
             </div>
           </div>
         </div>
-        <div id="playlist-tracks"></div>
-        <div id="playlist-footer">
-          <button id="generate-button" class="flat"><div id="loading-animation" style="visibility: hidden"><div></div><div></div><div></div></div>Generate a new track</button>
+        <div id="playlist-tracks"></div>          
         </div>
       </div>
      

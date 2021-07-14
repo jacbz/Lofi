@@ -136,10 +136,10 @@ class Decoder(nn.Module):
         # the chord LSTM input at first only consists of z
         # after the first iteration, we use the chord embeddings
         chords_lstm_input = z
-        melody_embeddings = 0  # these will be set in the very first iteration
+        melody_embeddings = None  # these will be set in the very first iteration
 
         for i in range(num_chords):
-            hx_chords, cx_chords = self.chords_lstm(chords_lstm_input, (hx_chords, cx_chords))
+            hx_chords, cx_chords = self.chords_lstm(chord_embeddings, (hx_chords, cx_chords))
             chord_prediction = self.chord_prediction(hx_chords)
             chord_outputs.append(chord_prediction)
 
@@ -153,13 +153,13 @@ class Decoder(nn.Module):
 
             # let z influence the chord embedding
             chord_embeddings = self.chord_embedding_downsample(torch.cat((chord_embeddings, z), dim=1))
-            chords_lstm_input = chord_embeddings
 
             # the melody LSTM input at first only includes the chord embeddings
             # after the first iteration, the input also includes the melody embeddings of the notes up to that point
-            melody_lstm_input = melody_embeddings + chord_embeddings
+            if melody_embeddings is None:
+                melody_embeddings = chord_embeddings
             for j in range(NOTES_PER_CHORD):
-                hx_melody, cx_melody = self.melody_lstm(melody_lstm_input, (hx_melody, cx_melody))
+                hx_melody, cx_melody = self.melody_lstm(melody_embeddings, (hx_melody, cx_melody))
                 melody_prediction = self.melody_prediction(hx_melody)
                 melody_outputs.append(melody_prediction)
                 # perform teacher forcing during training
@@ -171,7 +171,6 @@ class Decoder(nn.Module):
                     melody_embeddings = self.melody_embeddings(melody_prediction.argmax(dim=1))
                 melody_embeddings = self.melody_embedding_downsample(
                     torch.cat((melody_embeddings, chord_embeddings, z), dim=1))
-                melody_lstm_input = melody_embeddings
 
         chord_outputs = torch.stack(chord_outputs, dim=1)
         melody_outputs = torch.stack(melody_outputs, dim=1)

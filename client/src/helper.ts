@@ -73,6 +73,15 @@ export const measuresToSeconds = (measures: number, bpm: number) => {
   return measureInSeconds * measures;
 };
 
+/** Returns a number sampled from a standard normal distribution */
+export const randn = () => {
+  let u = 0;
+  let v = 0;
+  while (u === 0) u = Math.random(); // Converting [0,1) to (0,1)
+  while (v === 0) v = Math.random();
+  return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+};
+
 /** Returns a quasi-random number between min-max based on given seed number */
 export const randomFromInterval = (min: number, max: number, seed?: number) => {
   const randomNumber = seed ? random(seed) : Math.random();

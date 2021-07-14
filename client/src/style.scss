@@ -5,6 +5,7 @@ $title-font: 'Monoton', sans-serif;
 $body-font: 'Josefin Sans', 'Segoe UI', sans-serif;
 $ui-background: rgba(0, 0, 0, 0.25);
 $ui-hover-background: rgba(255, 255, 255, 0.2);
+$height: 426px;
 
 * {
   font-family: $body-font;
@@ -42,7 +43,77 @@ body {
   display: flex;
   flex-direction: row;
   gap: 12px;
+  margin-top: 25px;
 }
+
+.header {
+  display: block;
+  text-align: center;
+  border-bottom: 1px solid $ui-background;
+  position: relative;
+
+  .header-text {
+    letter-spacing: 3px;
+    font-size: 80%;
+    font-weight: 500;
+    user-select: none;
+    padding: 8px;
+  }
+}
+
+#slider-panel {
+  width: 200px;
+
+  #slider-panel-content {
+    display: flex;
+    flex-direction: column;
+    height: $height - 16px;
+    padding: 8px;
+    justify-content: space-between;
+  }
+
+  #sliders {
+    display: flex;
+    flex-direction: column;
+  }
+
+  $slider-height: 3.7px;
+  input[type='range'] { 
+    border-radius: 0;
+    margin: 0;
+    height: $slider-height;
+
+    @mixin slider-track {
+      height: $slider-height;
+    }
+
+    @mixin slider-thumb {
+      height: $slider-height;
+      width: $slider-height;
+      margin-top: 0.25px;
+      border-radius: 0;
+    }
+
+    &::-webkit-slider-runnable-track {
+      @include slider-track;
+    }
+    &::-moz-range-track {
+      @include slider-track;
+    }
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      @include slider-thumb;
+    }
+    &::-moz-range-thumb {
+      @include slider-thumb;
+    }
+  }
+
+  #generate-button {
+    width: 100%
+  }
+}
+
 
 #input-panel {
   display: flex;
@@ -106,7 +177,7 @@ body {
           height: 64px;
 
           #vinyl-top-text {
-            font-size: 90%;
+            font-size: 85%;
             font-weight: bold;
           }
 
@@ -116,7 +187,7 @@ body {
           }
 
           #vinyl-bottom-text2 {
-            font-size: 70%;
+            font-size: 65%;
             letter-spacing: 0.8px;
           }
         }
@@ -261,18 +332,6 @@ body {
     flex-direction: column;
 
     #playlist-header {
-      display: block;
-      text-align: center;
-      border-bottom: 1px solid $ui-background;
-      position: relative;
-
-      #playlist-header-text, #export-panel-header-text {
-        letter-spacing: 3px;
-        font-size: 80%;
-        font-weight: 500;
-        user-select: none;
-        padding: 8px;
-      }
 
       #export-button {
         position: absolute;
@@ -291,10 +350,6 @@ body {
         visibility: hidden;
         opacity: 0;
 
-        #export-panel-header-text {
-          border-bottom: 1px solid $ui-background;
-        }
-
         input {
           padding: 4px;
         }
@@ -309,58 +364,8 @@ body {
     }
 
     #playlist-tracks {      
-      height: 360px;
+      height: $height;
       overflow-y: auto;
-    }
-
-    #playlist-footer {
-      margin-top: auto;
-      padding: 8px;
-      border-top: 1px solid $ui-background;
-
-      #generate-button {
-        width: 100%
-      }
-
-      #loading-animation {
-        display: inline-block;
-        position: relative;
-        width: 20px;
-        height: 12px;
-        margin-right: 4px;
-
-        div {
-          position: absolute;
-          left: 2px;
-          width: 4px;
-          background: #fff;
-          animation: loading 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
-
-          &:nth-child(1) {
-            left: 2px;
-            animation-delay: -0.24s;
-          }
-          &:nth-child(2) {
-            left: 8px;
-            animation-delay: -0.12s;
-          }
-          &:nth-child(3) {
-            left: 14px;
-            animation-delay: 0;
-          }
-        }
-      }
-      
-      @keyframes loading {
-        0% {
-          top: 0px;
-          height: 16px;
-        }
-        50%, 100% {
-          top: 4px;
-          height: 8px;
-        }
-      }      
     }
 
     .track {
@@ -538,7 +543,7 @@ input[type='range'] {
   -webkit-appearance: none;
   background: $ui-background;
   border-radius: 5px;
-  
+  height: 8px;
 
   &:focus {
     outline: none;
@@ -571,6 +576,7 @@ input[type='range'] {
   }
   &::-moz-range-thumb {
     @include slider-thumb;
+    border: 0;
   }
 }
 
@@ -579,6 +585,7 @@ input[type='range'] {
   visibility: hidden;
   opacity: 0;
   transition: visibility 0.2s, opacity 0.2s;
+  height: 4px;
 
   @mixin slider-track {
     height: 4px;
@@ -602,6 +609,46 @@ input[type='range'] {
   }
   &::-moz-range-thumb {
     @include slider-thumb;
+  }
+}
+
+#loading-animation {
+  display: inline-block;
+  position: relative;
+  width: 20px;
+  height: 12px;
+  margin-right: 4px;
+
+  div {
+    position: absolute;
+    left: 2px;
+    width: 4px;
+    background: #fff;
+    animation: loading 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+
+    &:nth-child(1) {
+      left: 2px;
+      animation-delay: -0.24s;
+    }
+    &:nth-child(2) {
+      left: 8px;
+      animation-delay: -0.12s;
+    }
+    &:nth-child(3) {
+      left: 14px;
+      animation-delay: 0;
+    }
+  }
+}
+
+@keyframes loading {
+  0% {
+    top: 0px;
+    height: 16px;
+  }
+  50%, 100% {
+    top: 4px;
+    height: 8px;
   }
 }
 

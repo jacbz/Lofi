@@ -1,9 +1,9 @@
 import Sortable from 'sortablejs';
 import Player, { RepeatMode } from './player';
 import Producer from './producer';
-import { getRandomOutputParams, OutputParams } from './params';
-import { decompress } from './helper';
-import generate from './api';
+import { getRandomOutputParams, HIDDEN_SIZE, OutputParams } from './params';
+import { decompress, randn } from './helper';
+import { decode } from './api';
 
 const player = new Player();
 
@@ -48,6 +48,49 @@ if (playlistToLoad.length > 0) {
   player.playlist = playlist;
   updateLocalStorage();
 }
+
+// Sliders
+const slidersEl = document.getElementById('sliders');
+const sliders: HTMLInputElement[] = [];
+for (let i = 0; i < HIDDEN_SIZE; i += 1) {
+  const slider = document.createElement('input') as HTMLInputElement;
+  slider.type = 'range';
+  slider.min = '-4';
+  slider.max = '4';
+  slider.step = '0.001';
+  slider.valueAsNumber = randn();
+  slidersEl.appendChild(slider);
+  sliders.push(slider);
+}
+
+// Generate button
+const generateButton = document.getElementById('generate-button') as HTMLButtonElement;
+const loadingAnimation = document.getElementById('loading-animation');
+generateButton.addEventListener('click', async () => {
+  generateButton.disabled = true;
+  loadingAnimation.style.display = null;
+
+  const numberArray = sliders.map((n) => n.valueAsNumber);
+
+  let params;
+  try {
+    params = await decode(numberArray);
+  } catch (err) {
+    generateButton.textContent = 'Error!';
+    return;
+  }
+  const producer = new Producer();
+  const track = producer.produce(params);
+  player.addToPlaylist(track);
+  // scroll to end of playlist
+  playlistContainer.scrollTop = playlistContainer.scrollHeight;
+
+  generateButton.disabled = false;
+  loadingAnimation.style.display = 'none';
+  sliders.forEach((s) => {
+    s.valueAsNumber = randn();
+  });
+});
 
 /** Formats seconds into an MM:SS string */
 const formatTime = (seconds: number) => {
@@ -138,30 +181,6 @@ player.updateTrackDisplay = (seconds?: number, spectrum?: Float32Array) => {
   formatInputRange(seekbar, '#fc5c8c');
   updateVisualization(spectrum);
 };
-
-// Generate button
-const generateButton = document.getElementById('generate-button') as HTMLButtonElement;
-const loadingAnimation = document.getElementById('loading-animation');
-generateButton.addEventListener('click', async () => {
-  generateButton.disabled = true;
-  loadingAnimation.style.visibility = 'visible';
-
-  let params;
-  try {
-    params = await generate();
-  } catch (err) {
-    generateButton.textContent = 'Error!';
-    return;
-  }
-  generateButton.disabled = false;
-  loadingAnimation.style.visibility = 'hidden';
-
-  const producer = new Producer();
-  const track = producer.produce(params);
-  player.addToPlaylist(track);
-  // scroll to end of playlist
-  playlistContainer.scrollTop = playlistContainer.scrollHeight;
-});
 
 // Input field
 const inputTextarea = document.getElementById('input') as HTMLTextAreaElement;
