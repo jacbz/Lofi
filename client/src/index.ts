@@ -63,6 +63,14 @@ for (let i = 0; i < HIDDEN_SIZE; i += 1) {
   sliders.push(slider);
 }
 
+// Refresh Button
+const refreshButton = document.getElementById('refresh-button');
+refreshButton.addEventListener('click', () => {
+  sliders.forEach((s) => {
+    s.valueAsNumber = randn();
+  });
+});
+
 // Generate button
 const generateButton = document.getElementById('generate-button') as HTMLButtonElement;
 const loadingAnimation = document.getElementById('loading-animation');
@@ -87,9 +95,6 @@ generateButton.addEventListener('click', async () => {
 
   generateButton.disabled = false;
   loadingAnimation.style.display = 'none';
-  sliders.forEach((s) => {
-    s.valueAsNumber = randn();
-  });
 });
 
 /** Formats seconds into an MM:SS string */

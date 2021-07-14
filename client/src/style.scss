@@ -75,6 +75,15 @@ body {
   #sliders {
     display: flex;
     flex-direction: column;
+    position: relative;
+
+    #refresh-button {
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      border: 1px white;
+      background-image: url("icons/refresh.svg");
+    }
   }
 
   $slider-height: 3.7px;
@@ -332,7 +341,6 @@ body {
     flex-direction: column;
 
     #playlist-header {
-
       #export-button {
         position: absolute;
         top: 2px;
