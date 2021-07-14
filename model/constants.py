@@ -5,7 +5,11 @@ LEARNING_RATE = 0.001
 WEIGHT_DECAY = 0.1
 TRAIN_VALIDATION_SPLIT = 0.85
 
-# scheduled sampling speed of convergence
+# whether to enable teacher forcing
+# see Goyal, Anirudh et al.(2016): Professor forcing: a new algorithm for training recurrent networks
+TEACHER_FORCE = False
+# scheduled sampling parameters, when teacher forcing is active
+# see Bengio, Samy et al. (2015): Scheduled Sampling for Sequence Prediction with Recurrent Neural Networks
 SCHEDULED_SAMPLING_CONVERGENCE = 30
 START_SCHEDULED_SAMPLING_RATE = 0.5
 END_SCHEDULED_SAMPLING_RATE = 0.1

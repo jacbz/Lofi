@@ -97,7 +97,10 @@ def train(dataset, model, name):
 
         sampling_rate_chords = 0
         sampling_rate_melodies = 0
-        # sampling_rate_melodies = sampling_rate_at_epoch(epoch - MELODY_EPOCH_DELAY)
+
+        if TEACHER_FORCE:
+            sampling_rate_chords = sampling_rate_at_epoch(epoch)
+            sampling_rate_melodies = sampling_rate_at_epoch(epoch - MELODY_EPOCH_DELAY)
 
         print(f"Scheduled sampling rate: C {sampling_rate_chords}, M {sampling_rate_melodies}")
 
@@ -120,7 +123,7 @@ def train(dataset, model, name):
             optimizer.step()
             loss = loss.item()
             print(f"\tBatch {batch}:\tLoss {loss:.3f} (C: {loss_chords:.3f} + KL: {kl_loss:.3f} + "
-                  f"M: {loss_melody:.3f} + B: {loss_tempo:.3f} + K: {loss_key:.3f} + Mo: {loss_mode:.3f} + "
+                  f"M: {loss_melody:.3f} + T: {loss_tempo:.3f} + K: {loss_key:.3f} + Mo: {loss_mode:.3f} + "
                   f"V: {loss_valence:.3f} + E: {loss_energy:.3f})")
 
         # VALIDATION
@@ -138,7 +141,7 @@ def train(dataset, model, name):
                 ep_val_tp_melodies.extend(batch_tp_melodies)
 
                 print(f"\tValidation Batch {batch}:\tLoss {loss:.3f} (C: {loss_chords:.3f} + KL: {kl_loss:.3f} + "
-                      f"M: {loss_melody:.3f} + B: {loss_tempo:.3f} + K: {loss_key:.3f} + Mo: {loss_mode:.3f} + "
+                      f"M: {loss_melody:.3f} + T: {loss_tempo:.3f} + K: {loss_key:.3f} + Mo: {loss_mode:.3f} + "
                       f"V: {loss_valence:.3f} + E: {loss_energy:.3f})")
 
         # copy old model
