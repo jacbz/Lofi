@@ -86,8 +86,8 @@ body {
       align-items: center;
 
       #vinyl {
-        width: 190px;
-        height: 190px;
+        width: 214px;
+        height: 214px;
         background: url("vinyl.svg");
         background-size: 100%;
         animation: rotation 30s infinite linear;
@@ -102,8 +102,8 @@ body {
           left: 50%;
           top: 50%;
           transform: translate(-50%, -50%);
-          width: 52px;
-          height: 52px;
+          width: 64px;
+          height: 64px;
 
           #vinyl-top-text {
             font-size: 90%;
@@ -309,7 +309,7 @@ body {
     }
 
     #playlist-tracks {      
-      max-height: 37vh;
+      height: 360px;
       overflow-y: auto;
     }
 
