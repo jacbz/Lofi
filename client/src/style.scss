@@ -123,19 +123,6 @@ body {
   }
 }
 
-
-#input-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 12px;
-  width: 210px;
-
-  #input {
-    flex: 1;
-  }
-}
-
 #player-panel {
   display: flex;
   flex-direction: row;

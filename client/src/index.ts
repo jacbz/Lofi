@@ -1,7 +1,7 @@
 import Sortable from 'sortablejs';
 import Player, { RepeatMode } from './player';
 import Producer from './producer';
-import { getRandomOutputParams, HIDDEN_SIZE, OutputParams } from './params';
+import { HIDDEN_SIZE, OutputParams } from './params';
 import { decompress, randn } from './helper';
 import { decode } from './api';
 
@@ -186,26 +186,6 @@ player.updateTrackDisplay = (seconds?: number, spectrum?: Float32Array) => {
   formatInputRange(seekbar, '#fc5c8c');
   updateVisualization(spectrum);
 };
-
-// Input field
-const inputTextarea = document.getElementById('input') as HTMLTextAreaElement;
-inputTextarea.textContent = getRandomOutputParams();
-
-// Add button
-const addButton = document.getElementById('add-button');
-addButton.addEventListener('click', async () => {
-  let params: OutputParams;
-  try {
-    params = JSON.parse(inputTextarea.value);
-    inputTextarea.textContent = getRandomOutputParams();
-  } catch (e) {
-    window.alert('Could not parse JSON');
-    return;
-  }
-  const producer = new Producer();
-  const track = producer.produce(params);
-  player.addToPlaylist(track);
-});
 
 // On track change
 const vinyl = document.getElementById('vinyl');
