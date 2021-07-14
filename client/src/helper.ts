@@ -56,16 +56,6 @@ export const mountNotesOnScale = (offsetScaleDegree: number, notes: number[], sc
 export const keyNumberToString = (key: number): string =>
   Tonal.Scale.get('C chromatic').notes[key - 1];
 
-/** Returns the closest pitch shift distance from key1 to key2, e.g. 'C' and 'G' => -5 */
-export const pitchShiftDistance = (key1: string, key2: string) => {
-  const shiftUpInterval =
-    Tonal.Interval.get(Tonal.Interval.distance(`${key1}1`, `${key2}2`)).semitones % 12;
-    // shift down sounds weird with Tone.js
-  // const shiftDownInterval =
-  //   Tonal.Interval.get(Tonal.Interval.distance(`${key1}2`, `${key2}1`)).semitones % 12;
-  return shiftUpInterval;
-};
-
 /** Adds two Tone.js Time objects together */
 export const addTime = (time1: Time, time2: Time) => {
   const time = Tone.Time(time1).toSeconds() + Tone.Time(time2).toSeconds();

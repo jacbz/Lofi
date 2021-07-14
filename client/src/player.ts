@@ -121,22 +121,14 @@ class Player {
     // load samples
     for (const [sampleGroupName, sampleIndex] of this.currentTrack.samples) {
       const sampleGroup = Samples.SAMPLEGROUPS.get(sampleGroupName);
-      const filters = sampleGroup.getFilters();
-      // if the sample group specifies a specific key, shift to that key
-      // if (sampleGroup.keys && sampleGroup.keys[sampleIndex] !== this.currentTrack.keyNum) {
-      //   const shift = pitchShiftDistance(
-      //     keyNumberToString(sampleGroup.keys[sampleIndex] - 1), this.currentTrack.key
-      //   );
-      //   filters.push(new PitchShift(shift));
-      // }
       const player = new Tone.Player({
         url: sampleGroup.getSampleUrl(sampleIndex),
         volume: sampleGroup.volume,
-        loop: sampleGroup.isLoop,
+        loop: true,
         fadeIn: '8n',
         fadeOut: '8n'
       })
-        .chain(...filters, this.gain, Tone.Destination)
+        .chain(...sampleGroup.getFilters(), this.gain, Tone.Destination)
         .sync();
 
       if (!this.samplePlayers.has(sampleGroupName)) {

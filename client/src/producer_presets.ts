@@ -62,7 +62,7 @@ export const Preset1: ProducerPreset = new ProducerPreset({
   firstBeatArpeggio: new InstrumentConfiguration({
     instrument: Instrument.Piano,
     octaveShift: -1,
-    volume: 0.2
+    volume: 0.15
   }),
   firstBeatArpeggioPattern: [1, 5, 8, 5, 10, 5, 8],
   // secondBeatArpeggio: new InstrumentConfiguration({

@@ -410,28 +410,6 @@ class Producer {
       );
     });
   }
-
-  /** Adds a oneshot, centered within a measure window */
-  // addOneShot(startMeasure: number) {
-  //   const oneshotGroup = SAMPLEGROUPS.get('guitar-electric-major');
-  //   const oneshotSample = oneshotGroup.getRandomSampleByKey(
-  //     this.energy + this.valence,
-  //     this.keyNum
-  //   );
-
-  //   // get length in seconds
-  //   const oneshotDuration = oneshotGroup.durations[oneshotSample];
-
-  //   // get length in measures
-  //   const measureDuration = 60 / (this.bpm / 4);
-  //   const oneshotLength = oneshotDuration / measureDuration;
-  //   const oneshotMeasures = Math.ceil(oneshotLength);
-  //   const offsetMeasure = oneshotMeasures - oneshotLength;
-
-  //   // return endMeasure
-  //   this.addSample(oneshotGroup.name, oneshotSample, `${startMeasure}:0`, `${startMeasure + oneshotMeasures - offsetMeasure}:0`);
-  //   return oneshotMeasures;
-  // }
 }
 
 export default Producer;

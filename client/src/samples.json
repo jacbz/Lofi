@@ -88,88 +88,15 @@
       "name": "vinyl",
       "category": "fx",
       "comment": "Vinyl scratches; selected randomly",
-      "volume": 0,
-      "size": 26
+      "volume": -6,
+      "size": 25
     },
     {
       "name": "rain",
       "category": "fx",
       "comment": "Light rain; selected randomly",
-      "volume": -10,
+      "volume": -16,
       "size": 13
-    }
-  ],
-  
-  "oneshots": [
-    {
-      "name": "epiano-major",
-      "volume": 0,
-      "mode": 1,
-      "keys": [1, 3, 3, 4, 6, 10],
-      "durations": [11.2, 12, 11.2, 10.2, 20.2, 22.6]
-    },    
-    {
-      "name": "epiano-minor",
-      "volume": 0,
-      "mode": 6,
-      "keys": [2, 3, 6, 10, 12, 12, 12],
-      "durations": [10.9, 22.6, 22.1, 21.3, 23.4, 11.4, 11.3]
-    },
-    {
-      "name": "guitar-acoustic-major",
-      "volume": 0,
-      "mode": 1,
-      "keys": [12],
-      "durations": [12.8]
-    },
-    {
-      "name": "guitar-acoustic-minor",
-      "volume": 0,
-      "mode": 6,
-      "keys": [3, 4, 12, 12],
-      "durations": [21.3, 12.8, 11.3, 10.7]
-    },
-    {
-      "name": "guitar-electric-major",
-      "volume": 0,
-      "mode": 1,
-      "keys": [7, 10],
-      "durations": [5.6, 12.8]
-    },
-    {
-      "name": "guitar-electric-minor",
-      "volume": 0,
-      "mode": 6,
-      "keys": [2, 2, 3, 3, 9, 9, 12],
-      "durations": [25.6, 10.7, 27.4, 12, 10.7, 10.7, 12.8]
-    },
-    {
-      "name": "harp-major",
-      "volume": 0,
-      "mode": 1,
-      "keys": [3, 3, 3, 3],
-      "durations": [24, 22.6, 21.3, 21.3]
-    },
-    {
-      "name": "harp-minor",
-      "volume": 0,
-      "mode": 6,
-      "keys": [2, 9, 12, 12],
-      "durations": [20.2, 22.6, 25.6, 12]
-    },
-    {
-      "name": "piano-major",
-      "volume": 0,
-      "mode": 1,
-      "keys": [11, 12, 12],
-      "durations": [11.7, 11.2, 10.7]
-    },
-    {
-      "name": "piano-minor",
-      "volume": 0,
-      "mode": 6,
-      "keys": [2, 2, 7, 9, 11, 12],
-      "durations": [24, 10.7, 12.5, 10.7, 10.7, 11.1]
     }
   ]
 }
