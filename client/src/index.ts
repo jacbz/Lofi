@@ -34,7 +34,7 @@ if (queryString.length > 0) {
       ...playlistToLoad.filter((p) => outputParams.every((p2) => p2.title !== p.title)),
       ...outputParams
     ];
-    window.history.pushState({}, null, '/');
+    window.history.pushState({}, null, window.location.href.split('?')[0]);
   } catch (e) {
     console.log('Error parsing', compressed);
   }
