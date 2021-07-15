@@ -413,9 +413,9 @@ body {
       &.loading {
         .track-loading {
           display: inline-block;
-          width: 12px;
+          width: 14px;
           height: 14px;
-          margin-right: 4px;
+          margin-right: 6px;
           
           &:after {
             content: " ";
@@ -438,7 +438,6 @@ body {
           }
         }
       }
-
       
       &.playing {
         background: rgba(0,0,0,0.15);

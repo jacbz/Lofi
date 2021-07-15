@@ -126,10 +126,10 @@ class Decoder(nn.Module):
 
         batch_size = z.shape[0]
         # initialize hidden states and cell states randomly
-        hx_chords = torch.randn(batch_size, HIDDEN_SIZE, device=self.device)
-        cx_chords = torch.randn(batch_size, HIDDEN_SIZE, device=self.device)
-        hx_melody = torch.randn(batch_size, HIDDEN_SIZE, device=self.device)
-        cx_melody = torch.randn(batch_size, HIDDEN_SIZE, device=self.device)
+        hx_chords = torch.zeros(batch_size, HIDDEN_SIZE, device=self.device)
+        cx_chords = torch.zeros(batch_size, HIDDEN_SIZE, device=self.device)
+        hx_melody = torch.zeros(batch_size, HIDDEN_SIZE, device=self.device)
+        cx_melody = torch.zeros(batch_size, HIDDEN_SIZE, device=self.device)
 
         chord_outputs = []
         melody_outputs = []
