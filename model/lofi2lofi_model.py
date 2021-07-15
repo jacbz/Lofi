@@ -51,7 +51,14 @@ class Lofi2LofiModel(nn.Module):
         return self.decode(mu)
 
     def decode(self, mu):
-        hash = '#' + str(int(md5(mu.numpy()).hexdigest(), 16))[:24]
+        # create a hash for vector mu
+        hash = ""
+        # first 20 characters are each sampled from 5 entries
+        for i in range(0, 100, 5):
+            hash += str((mu[0][i:i+1].abs().sum() * 587).int().item())[-1]
+        # last 4 characters are the beginning of the MD5 hash of the whole vector
+        hash2 = int(md5(mu.numpy()).hexdigest(), 16)
+        hash = f"#{hash}{hash2}"[:25]
         return hash, self.decoder(mu, MAX_CHORD_LENGTH)
 
     def interpolate(self):
