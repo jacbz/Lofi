@@ -146,7 +146,9 @@ def train(dataset, model, name):
 
         # copy old model
         save_name = f"{name}-epoch{epoch}.pth" if epoch % 10 == 0 else f"{name}.pth"
+        decoder_save_name = f"{name}-decoder-epoch{epoch}.pth" if epoch % 10 == 0 else f"{name}-decoder.pth"
         torch.save(model.state_dict(), save_name)
+        torch.save(model.decoder.state_dict(), decoder_save_name)
         epoch += 1
 
         ep_train_loss_chord = sum(ep_train_losses_chords) / len(ep_train_losses_chords)

@@ -8,7 +8,7 @@ import torch
 
 from server.lofi2lofi_generate import generate, decode
 from server.lyrics2lofi_predict import predict
-from model.lofi2lofi_model import Lofi2LofiModel
+from model.lofi2lofi_model import Decoder as Lofi2LofiDecoder
 from model.lyrics2lofi_model import Lyrics2LofiModel
 
 device = "cpu"
@@ -19,9 +19,9 @@ limiter = Limiter(
     default_limits=["30 per minute"]
 )
 
-lofi2lofi_checkpoint = "checkpoints/lofi2lofi.pth"
+lofi2lofi_checkpoint = "checkpoints/lofi2lofi_decoder.pth"
 print("Loading lofi model...", end=" ")
-lofi2lofi_model = Lofi2LofiModel(device=device)
+lofi2lofi_model = Lofi2LofiDecoder(device=device)
 lofi2lofi_model.load_state_dict(torch.load(lofi2lofi_checkpoint, map_location=device))
 print(f"Loaded {lofi2lofi_checkpoint}.")
 lofi2lofi_model.to(device)

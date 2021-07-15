@@ -124,11 +124,12 @@ class Decoder(nn.Module):
         energy_embedding = self.energy_embedding(energy_output)
         z = self.downsample(torch.cat((z, tempo_embedding, mode_embedding, valence_embedding, energy_embedding), dim=1))
 
+        batch_size = z.shape[0]
         # initialize hidden states and cell states randomly
-        hx_chords = torch.randn(z.shape[0], HIDDEN_SIZE, device=self.device)
-        cx_chords = torch.randn(z.shape[0], HIDDEN_SIZE, device=self.device)
-        hx_melody = torch.randn(z.shape[0], HIDDEN_SIZE, device=self.device)
-        cx_melody = torch.randn(z.shape[0], HIDDEN_SIZE, device=self.device)
+        hx_chords = torch.randn(batch_size, HIDDEN_SIZE, device=self.device)
+        cx_chords = torch.randn(batch_size, HIDDEN_SIZE, device=self.device)
+        hx_melody = torch.randn(batch_size, HIDDEN_SIZE, device=self.device)
+        cx_melody = torch.randn(batch_size, HIDDEN_SIZE, device=self.device)
 
         chord_outputs = []
         melody_outputs = []

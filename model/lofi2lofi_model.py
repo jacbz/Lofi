@@ -46,27 +46,6 @@ class Lofi2LofiModel(nn.Module):
         else:
             return mu
 
-    def generate(self):
-        mu = torch.randn(1, HIDDEN_SIZE)
-        return self.decode(mu)
-
-    def decode(self, mu):
-        # create a hash for vector mu
-        hash = ""
-        # first 20 characters are each sampled from 5 entries
-        for i in range(0, 100, 5):
-            hash += str((mu[0][i:i+1].abs().sum() * 587).int().item())[-1]
-        # last 4 characters are the beginning of the MD5 hash of the whole vector
-        hash2 = int(md5(mu.numpy()).hexdigest(), 16)
-        hash = f"#{hash}{hash2}"[:25]
-        return hash, self.decoder(mu, MAX_CHORD_LENGTH)
-
-    def interpolate(self):
-        mu1 = torch.randn(1, HIDDEN_SIZE)
-        mu2 = torch.randn(1, HIDDEN_SIZE)
-        mu3 = 0.5 * mu1 + 0.5 * mu2
-        return [self.decode(mu) for mu in [mu1, mu2, mu3]]
-
 
 class Encoder(nn.Module):
     def __init__(self, device):
@@ -158,18 +137,34 @@ class Decoder(nn.Module):
             nn.Linear(in_features=HIDDEN_SIZE2, out_features=1),
         )
 
-    def forward(self, z, num_chords, sampling_rate_chords=0, sampling_rate_melodies=0, gt_chords=None, gt_melody=None):
+    def generate(self):
+        mu = torch.randn(1, HIDDEN_SIZE)
+        return self(mu)
+
+    def decode(self, mu):
+        # create a hash for vector mu
+        hash = ""
+        # first 20 characters are each sampled from 5 entries
+        for i in range(0, 100, 5):
+            hash += str((mu[0][i:i+1].abs().sum() * 587).int().item())[-1]
+        # last 4 characters are the beginning of the MD5 hash of the whole vector
+        hash2 = int(md5(mu.numpy()).hexdigest(), 16)
+        hash = f"#{hash}{hash2}"[:25]
+        return hash, self(mu, MAX_CHORD_LENGTH)
+
+    def forward(self, z, num_chords=MAX_CHORD_LENGTH, sampling_rate_chords=0, sampling_rate_melodies=0, gt_chords=None, gt_melody=None):
         tempo_output = self.tempo_linear(z)
         key_output = self.key_linear(z)
         mode_output = self.mode_linear(z)
         valence_output = self.valence_linear(z)
         energy_output = self.energy_linear(z)
 
+        batch_size = z.shape[0]
         # initialize hidden states and cell states randomly
-        hx_chords = torch.randn(z.shape[0], HIDDEN_SIZE, device=self.device)
-        cx_chords = torch.randn(z.shape[0], HIDDEN_SIZE, device=self.device)
-        hx_melody = torch.randn(z.shape[0], HIDDEN_SIZE, device=self.device)
-        cx_melody = torch.randn(z.shape[0], HIDDEN_SIZE, device=self.device)
+        hx_chords = torch.randn(batch_size, HIDDEN_SIZE, device=self.device)
+        cx_chords = torch.randn(batch_size, HIDDEN_SIZE, device=self.device)
+        hx_melody = torch.randn(batch_size, HIDDEN_SIZE, device=self.device)
+        cx_melody = torch.randn(batch_size, HIDDEN_SIZE, device=self.device)
 
         chord_outputs = []
         melody_outputs = []
