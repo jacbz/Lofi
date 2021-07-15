@@ -35,6 +35,20 @@ class Player {
     }
   }
 
+  /** Whether the player is currently loading */
+  private _isLoading: boolean = false;
+
+  get isLoading() {
+    return this._isLoading;
+  }
+
+  set isLoading(isLoading: boolean) {
+    if (this._isLoading !== isLoading) {
+      this._isLoading = isLoading;
+      this.onLoadingStateChange();
+    }
+  }
+
   repeat: RepeatMode = RepeatMode.NONE;
 
   shuffle = false;
@@ -70,6 +84,9 @@ class Player {
   /** Function to call when isPlaying changes */
   onPlayingStateChange: () => void;
 
+  /** Function to call when isLoading changes */
+  onLoadingStateChange: () => void;
+
   /** Update local storage playlist when it changes */
   updateLocalStorage: () => void;
 
@@ -80,7 +97,7 @@ class Player {
   gain: Tone.Gain;
 
   constructor() {
-    // preload instrument samples
+    // preload most common instruments
     [Instrument.ElectricPiano, Instrument.BassGuitar, Instrument.Piano].forEach((instrument) => {
       getInstrument(instrument);
     });
@@ -111,6 +128,8 @@ class Player {
     if (!this.currentTrack) {
       return;
     }
+    this.isLoading = true;
+
     this.gain = new Tone.Gain();
     this.isPlaying = true;
     this.setAudioWebApiMetadata();
@@ -196,6 +215,8 @@ class Player {
 
     const fadeOutBegin = this.currentTrack.length - this.currentTrack.fadeOutDuration;
     Tone.Transport.scheduleRepeat((time) => {
+      this.isLoading = false;
+
       const seconds = Tone.Transport.getSecondsAtTime(time);
       const spectrum = analyzer.getValue() as Float32Array;
       this.updateTrackDisplay(seconds, spectrum);

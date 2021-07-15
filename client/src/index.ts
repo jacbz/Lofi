@@ -207,12 +207,17 @@ const vinyl = document.getElementById('vinyl');
 const vinylColor = document.getElementById('vinyl-color');
 const vinylBottomText1 = document.getElementById('vinyl-bottom-text1');
 const vinylBottomText2 = document.getElementById('vinyl-bottom-text2');
-const onTrackChange = () => {
-  const trackElements = playlistContainer.querySelectorAll('.track');
+const playlistContainer = document.getElementById('playlist-tracks');
+const updateTrackClasses = () => {
   player.playlist.forEach((track, i) => {
+    const trackElements = playlistContainer.querySelectorAll('.track');
     const trackElement = trackElements[i];
     trackElement.classList.toggle('playing', player.currentTrack === track);
+    trackElement.classList.toggle('loading', player.currentTrack === track && player.isLoading);
   });
+};
+const onTrackChange = () => {
+  updateTrackClasses();
 
   if (player.currentTrack) {
     vinylBottomText1.textContent = `${player.currentTrack.key} ${player.currentTrack.mode}`;
@@ -232,7 +237,6 @@ const onTrackChange = () => {
 player.onTrackChange = onTrackChange;
 
 // Playlist
-const playlistContainer = document.getElementById('playlist-tracks');
 const updatePlaylistDisplay = () => {
   playlistContainer.innerHTML = '';
   player.playlist.forEach((track, i) => {
@@ -302,6 +306,7 @@ const updatePlayingState = () => {
   }
 };
 player.onPlayingStateChange = updatePlayingState;
+player.onLoadingStateChange = updateTrackClasses;
 playButton.addEventListener('click', async () => {
   if (player.isPlaying) {
     player.pause();
