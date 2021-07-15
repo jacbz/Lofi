@@ -1,4 +1,4 @@
-# Lofi music client
+# LOFI Client
 
 * Prerequisites: Node.js 14
 * Recommended: Visual Studio Code

@@ -135,7 +135,7 @@ class Decoder(nn.Module):
 
         # the chord LSTM input at first only consists of z
         # after the first iteration, we use the chord embeddings
-        chords_lstm_input = z
+        chord_embeddings = z
         melody_embeddings = None  # these will be set in the very first iteration
 
         for i in range(num_chords):

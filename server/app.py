@@ -27,13 +27,13 @@ print(f"Loaded {lofi2lofi_checkpoint}.")
 lofi2lofi_model.to(device)
 lofi2lofi_model.eval()
 
-# lyrics2lofi_checkpoint = "checkpoints/lyrics2lofi.pth"
-# print("Loading lyrics2lofi model...", end=" ")
-# lyrics2lofi_model = Lyrics2LofiModel(device=device)
-# lyrics2lofi_model.load_state_dict(torch.load(lyrics2lofi_checkpoint, map_location=device))
-# print(f"Loaded {lyrics2lofi_checkpoint}.")
-# lyrics2lofi_model.to(device)
-# lyrics2lofi_model.eval()
+lyrics2lofi_checkpoint = "checkpoints/lyrics2lofi.pth"
+print("Loading lyrics2lofi model...", end=" ")
+lyrics2lofi_model = Lyrics2LofiModel(device=device)
+lyrics2lofi_model.load_state_dict(torch.load(lyrics2lofi_checkpoint, map_location=device))
+print(f"Loaded {lyrics2lofi_checkpoint}.")
+lyrics2lofi_model.to(device)
+lyrics2lofi_model.eval()
 
 
 @app.route('/')
@@ -42,7 +42,7 @@ def home():
 
 
 @app.route('/generate', methods=['GET'])
-def generate():
+def generate_new_sample():
     json_output = generate(lofi2lofi_model)
     response = jsonify(json_output)
     response.headers.add('Access-Control-Allow-Origin', '*')
@@ -59,11 +59,11 @@ def decode_input():
 
     return response
 
-# @app.route('/predict', methods=['GET'])
-# def lyrics_to_track():
-#     input = request.args.get('input')
-#     json_output = predict(lyrics2lofi_model, input)
-#     response = jsonify(json_output)
-#     response.headers.add('Access-Control-Allow-Origin', '*')
-#
-#     return response
+@app.route('/predict', methods=['GET'])
+def lyrics_to_track():
+    input = request.args.get('input')
+    json_output = predict(lyrics2lofi_model, input)
+    response = jsonify(json_output)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+
+    return response
