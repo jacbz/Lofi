@@ -62,13 +62,28 @@ body {
 }
 
 #slider-panel {
-  width: 200px;
+  width: 190px;
+
+  .header {
+    display: relative;
+  }  
+
+  #help {
+    cursor: help;
+    position: absolute;
+    right: 8px;
+    top: 6px;
+    width: 15px;
+    height: 15px;
+    background: url('icons/help.svg') no-repeat;
+    display: inline-block;
+  }
 
   #slider-panel-content {
     display: flex;
     flex-direction: column;
     height: $height - 16px;
-    padding: 8px;
+    padding: 4px 8px 8px 8px;
     justify-content: space-between;
   }
 
@@ -76,6 +91,8 @@ body {
     display: flex;
     flex-direction: column;
     position: relative;
+    margin-left: -8px;
+    margin-right: -8px;
 
     #refresh-button {
       position: absolute;
@@ -119,7 +136,7 @@ body {
   }
 
   #generate-button {
-    width: 100%
+    width: 100%;
   }
 }
 
