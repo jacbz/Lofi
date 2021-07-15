@@ -79,6 +79,13 @@ class Player {
 
   gain: Tone.Gain;
 
+  constructor() {
+    // preload instrument samples
+    [Instrument.ElectricPiano, Instrument.BassGuitar, Instrument.Piano].forEach((instrument) => {
+      getInstrument(instrument);
+    });
+  }
+
   /** Adds a given track to the playlist */
   addToPlaylist(track: Track) {
     this.playlist.push(track);
