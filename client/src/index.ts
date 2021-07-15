@@ -7,19 +7,34 @@ import { decode } from './api';
 
 const player = new Player();
 
+// check if local storage is available
+let localStorageAvailable = false;
+try {
+  const x = '__storage_test__';
+  window.localStorage.setItem(x, x);
+  window.localStorage.removeItem(x);
+  localStorageAvailable = true;
+} catch (e) {
+  console.log('Local storage is unavailable');
+}
+
 // try to load playlist from local storage
 let playlistToLoad: OutputParams[] = [];
-const localStoragePlaylist = localStorage.getItem('playlist');
-if (localStoragePlaylist) {
-  try {
-    playlistToLoad = JSON.parse(localStoragePlaylist);
-  } catch (e) {
-    console.log('Error parsing', localStoragePlaylist);
+if (localStorageAvailable) {
+  const localStoragePlaylist = localStorage.getItem('playlist');
+  if (localStoragePlaylist) {
+    try {
+      playlistToLoad = JSON.parse(localStoragePlaylist);
+    } catch (e) {
+      console.log('Error parsing', localStoragePlaylist);
+    }
   }
 }
 
 const updateLocalStorage = () => {
-  localStorage.setItem('playlist', JSON.stringify(player.playlist.map((t) => t.outputParams)));
+  if (localStorageAvailable) {
+    localStorage.setItem('playlist', JSON.stringify(player.playlist.map((t) => t.outputParams)));
+  }
 };
 player.updateLocalStorage = updateLocalStorage;
 
