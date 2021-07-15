@@ -9,18 +9,6 @@
 <body>
   <div id="header">LOFI</div>
   <div id="center">
-    <div id="slider-panel" class="panel">
-      <div class="header">
-        <div class="header-text">LATENT SPACE</div>
-        <div id="help" title="Our machine learning model has learned to represent a lofi track as a vector of 100 features. Each slider here corresponds to a feature in the latent space. Slide them around to hear what the resulting track sounds like!&#013;&#013;&#013;Note: as the latent space is built on a normal distribution, keeping sliders near the center will make the track sound better."></div>
-      </div>
-      <div id="slider-panel-content">
-        <div id="sliders">
-          <button id="refresh-button" class="plain" title="Sample new values from a normal distribution"></button>
-        </div>
-        <button id="generate-button" class="flat"><div id="loading-animation" style="display: none"><div></div><div></div><div></div></div>Generate</button>
-      </div>
-    </div>
     <div id="player-panel" class="panel">
       <div id="now-playing">        
         <div id="cover">
@@ -82,8 +70,7 @@
           </div>
         </div>
       </template>
-      <div id="playlist">
-        
+      <div id="playlist">        
         <div id="playlist-header" class="header">
           <div id="playlist-header-text" class="header-text">NOW PLAYING</div>
           <button id="export-button" class="plain" title="Share this playlist"></button>
@@ -98,8 +85,19 @@
           </div>
         </div>
         <div id="playlist-tracks"></div>          
+      </div>
+    </div>
+    <div id="slider-panel" class="panel">
+      <div class="header">
+        <div class="header-text">LATENT SPACE</div>
+        <div id="help" title="Our machine learning model has learned to represent a lofi track as a vector of 100 features. Each slider here corresponds to a feature in the latent space. Slide them around to hear what the resulting track sounds like!&#013;&#013;&#013;Note: as the latent space is built on a normal distribution, keeping sliders near the center will make the track sound better."></div>
+      </div>
+      <div id="slider-panel-content">
+        <div id="sliders">
+          <button id="refresh-button" class="plain" title="Sample new values from a normal distribution"></button>
         </div>
-      </div>     
+        <button id="generate-button" class="flat"><div id="loading-animation" style="display: none"><div></div><div></div><div></div></div>Generate</button>
+      </div>
     </div>
   </div>
 
