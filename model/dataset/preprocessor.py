@@ -1,19 +1,20 @@
-import os
-import time
 import json
+import os
 import shutil
+import time
+from pathlib import Path
+
 import requests
 import spotipy
 from bs4 import BeautifulSoup
 from spotipy import SpotifyClientCredentials
-from pathlib import Path
 
 add_lyrics = False
 lyrics_provider = "google"  # google or musixmatch
 add_spotify = True
 
 hooktheory_folder = "hooktheory"
-output_folder = "processed-spotify-all"
+output_folder = "processed"
 log_file = "log.txt"
 alphabet_paths = [f.path for f in os.scandir(hooktheory_folder) if f.is_dir()]
 headers = {
@@ -66,11 +67,13 @@ def process_song(artist, song, path):
             json_data = json.load(json_file)
 
             # skip if no melodies
-            if len(json_data["tracks"]["melody"]) is 0 or all([note["isRest"] for note in json_data["tracks"]["melody"]]):
+            if len(json_data["tracks"]["melody"]) is 0 or all(
+                    [note["isRest"] for note in json_data["tracks"]["melody"]]):
                 continue
 
             # skip of no chords
-            if len(json_data["tracks"]["chord"]) is 0 or all([chord["isRest"] for chord in json_data["tracks"]["chord"]]):
+            if len(json_data["tracks"]["chord"]) is 0 or all(
+                    [chord["isRest"] for chord in json_data["tracks"]["chord"]]):
                 continue
 
             if add_lyrics:
