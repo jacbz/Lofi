@@ -13,7 +13,7 @@ $height: 426px;
 }
 
 body {
-  background: url("background.jpg"), black;
+  background: url('background.jpg'), black;
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-position: center center;
@@ -66,7 +66,7 @@ body {
 
   .header {
     display: relative;
-  }  
+  }
 
   #help {
     cursor: help;
@@ -99,12 +99,12 @@ body {
       top: 2px;
       right: 4px;
       border: 1px white;
-      background-image: url("icons/refresh.svg");
+      background-image: url('icons/refresh.svg');
     }
   }
 
   $slider-height: 3.7px;
-  input[type='range'] { 
+  input[type='range'] {
     border-radius: 0;
     margin: 0;
     height: $slider-height;
@@ -144,7 +144,7 @@ body {
   display: flex;
   flex-direction: row;
   width: 650px;
-  
+
   #now-playing {
     flex: 1;
     display: flex;
@@ -172,7 +172,7 @@ body {
       #vinyl {
         width: 214px;
         height: 214px;
-        background: url("vinyl.svg");
+        background: url('vinyl.svg');
         background-size: 100%;
         animation: rotation 30s infinite linear;
         position: relative;
@@ -180,7 +180,7 @@ body {
         &.paused {
           animation-play-state: paused;
         }
-        
+
         #vinyl-center {
           position: absolute;
           left: 50%;
@@ -226,7 +226,7 @@ body {
         width: 78px;
         user-select: none;
 
-        #current-time {    
+        #current-time {
           flex: 3;
           text-align: right;
         }
@@ -252,24 +252,24 @@ body {
       #subtitle-buttons {
         display: flex;
         gap: 6px;
-          
+
         #repeat-button {
-          background-image: url("icons/repeat.svg");
-  
+          background-image: url('icons/repeat.svg');
+
           &.repeat-all {
-            background-image: url("icons/repeat-all.svg");
+            background-image: url('icons/repeat-all.svg');
           }
-  
+
           &.repeat-one {
-            background-image: url("icons/repeat-one.svg");
+            background-image: url('icons/repeat-one.svg');
           }
         }
 
         #shuffle-button {
-          background-image: url("icons/shuffle.svg");
-  
+          background-image: url('icons/shuffle.svg');
+
           &.active {
-            background-image: url("icons/shuffle-active.svg");
+            background-image: url('icons/shuffle-active.svg');
           }
         }
 
@@ -283,17 +283,16 @@ body {
               opacity: 1;
             }
           }
-          
+
           #volume-button {
-            background-image: url("icons/volume.svg");
-    
+            background-image: url('icons/volume.svg');
+
             &.muted {
-              background-image: url("icons/volume-muted.svg");
+              background-image: url('icons/volume-muted.svg');
             }
           }
         }
       }
-
     }
 
     #buttons {
@@ -306,17 +305,17 @@ body {
       position: relative;
 
       #play-previous-button {
-        background-image: url("icons/previous.svg");
+        background-image: url('icons/previous.svg');
       }
-      
+
       #play-next-button {
-        background-image: url("icons/next.svg");
-      }      
+        background-image: url('icons/next.svg');
+      }
 
       #play-button {
         height: 72px;
         width: 72px;
-        
+
         #play-button-icon {
           height: 28px;
           width: 28px;
@@ -349,7 +348,7 @@ body {
         position: absolute;
         top: 2px;
         right: 4px;
-        background-image: url("icons/export.svg");
+        background-image: url('icons/export.svg');
       }
 
       #export-panel {
@@ -375,7 +374,7 @@ body {
       }
     }
 
-    #playlist-tracks {      
+    #playlist-tracks {
       height: $height;
       overflow-y: auto;
     }
@@ -398,13 +397,13 @@ body {
       }
 
       &.dragging {
-        background: rgba(0,0,0,0.2) !important;
+        background: rgba(0, 0, 0, 0.2) !important;
       }
 
       &:hover {
-        background: rgba(0,0,0,0.1);
+        background: rgba(0, 0, 0, 0.1);
 
-        .track-actions {          
+        .track-actions {
           visibility: visible;
           opacity: 1;
         }
@@ -416,9 +415,9 @@ body {
           width: 14px;
           height: 14px;
           margin-right: 6px;
-          
+
           &:after {
-            content: " ";
+            content: ' ';
             display: block;
             width: 10px;
             height: 10px;
@@ -427,7 +426,7 @@ body {
             border-color: #fff transparent #fff transparent;
             animation: loading-rings 1.2s linear infinite;
           }
-  
+
           @keyframes loading-rings {
             0% {
               transform: rotate(0deg);
@@ -438,13 +437,13 @@ body {
           }
         }
       }
-      
+
       &.playing {
-        background: rgba(0,0,0,0.15);
+        background: rgba(0, 0, 0, 0.15);
 
         &:not(.loading) {
-          .track-name:before {      
-            content: "";
+          .track-name:before {
+            content: '';
             width: 12px;
             height: 14px;
             background: url('icons/play.svg') no-repeat;
@@ -463,17 +462,17 @@ body {
         gap: 8px;
 
         .delete-button {
-          background-image: url("icons/delete.svg");
+          background-image: url('icons/delete.svg');
         }
-  
+
         .sort-handle {
-          background-image: url("icons/sorthandle.svg");
+          background-image: url('icons/sorthandle.svg');
           width: 24px;
           background-size: 24px;
           background-position: center;
           background-repeat: no-repeat;
         }
-      }  
+      }
     }
   }
 }
@@ -506,8 +505,8 @@ footer {
   text-align: center;
 
   #github {
-    &:before {      
-      content: "";
+    &:before {
+      content: '';
       width: 20px;
       height: 20px;
       background: url('icons/github.svg');
@@ -570,12 +569,14 @@ button.circle {
   }
 }
 
-textarea, input:not([type]) {
+textarea,
+input:not([type]) {
   background: $ui-background;
   border: 0;
   resize: none;
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     outline: none;
     background: $ui-hover-background;
   }
@@ -689,12 +690,12 @@ input[type='range'] {
     top: 0px;
     height: 16px;
   }
-  50%, 100% {
+  50%,
+  100% {
     top: 4px;
     height: 8px;
   }
 }
-
 
 // scrollbars
 * {
@@ -710,12 +711,9 @@ input[type='range'] {
 
 // preload icons not immediately visible to avoid loading times
 #preload-images {
-  display: hidden; 
+  display: hidden;
   width: 0;
   height: 0;
-  background: url('icons/repeat-all.svg'),
-              url('icons/repeat-one.svg'),
-              url('icons/shuffle-active.svg'),
-              url('icons/volume-muted.svg'),
-              url('icons/play.svg')
+  background: url('icons/repeat-all.svg'), url('icons/repeat-one.svg'),
+    url('icons/shuffle-active.svg'), url('icons/volume-muted.svg'), url('icons/play.svg');
 }

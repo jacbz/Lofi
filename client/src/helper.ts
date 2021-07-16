@@ -38,21 +38,21 @@ export const octShift = (note: string, octaves: number) => {
 export const octShiftAll = (notes: string[], octaves: number) =>
   notes.map((n) => octShift(n, octaves));
 
-/** e.g. 8 -> [0, 1] */
+/** Maps a given note number to a scale degree and octave, e.g. 8 -> [0, 1] */
 export const mapNote = (note: number) => {
   const scaleDegreeIndex = (note - 1) % 7;
   const octave = Math.floor((note - 1) / 7);
   return [scaleDegreeIndex, octave];
 };
 
-/**  e.g. in G major:  */
+/** Mounts given note numbers on a given scale */
 export const mountNotesOnScale = (offsetScaleDegree: number, notes: number[], scale: string[]) =>
   notes.map((n) => {
     const [scaleDegreeIndex, octave] = mapNote(n + offsetScaleDegree - 1);
     return octShift(scale[scaleDegreeIndex], octave);
   });
 
-/** 2 => 'C#' */
+/** Converts a key number to string, e.g. 2 => 'C#' */
 export const keyNumberToString = (key: number): string =>
   Tonal.Scale.get('C chromatic').notes[key - 1];
 
@@ -62,6 +62,7 @@ export const addTime = (time1: Time, time2: Time) => {
   return Tone.Time(time).toBarsBeatsSixteenths();
 };
 
+/** Substracts one Tone.js Time objects to another */
 export const subtractTime = (time1: Time, time2: Time) => {
   const time = Tone.Time(time1).toSeconds() - Tone.Time(time2).toSeconds();
   return Tone.Time(time).toBarsBeatsSixteenths();

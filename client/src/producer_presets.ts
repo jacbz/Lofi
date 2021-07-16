@@ -1,17 +1,9 @@
 import { Instrument } from './instruments';
 
-export class InstrumentConfiguration {
-  instrument: Instrument;
-
-  volume = 1;
-
-  octaveShift = 0;
-
-  public constructor(init?: Partial<InstrumentConfiguration>) {
-    Object.assign(this, init);
-  }
-}
-
+/**
+ * A ProducerPreset defines which parts are being played, which instruments are playing them,
+ * and other parameters,
+ */
 export class ProducerPreset {
   /** Instrument that plays the root note at the first beat beginning of each chord */
   bassLine: InstrumentConfiguration;
@@ -25,9 +17,6 @@ export class ProducerPreset {
   /** First beat arpeggio pattern, played in eighth notes */
   firstBeatArpeggioPattern = [1, 5, 8, 9, 10];
 
-  /** Instrument that plays the diminished chord arpeggio at the second beat */
-  secondBeatArpeggio: InstrumentConfiguration;
-
   /** Instrument that plays the melody */
   melody: InstrumentConfiguration;
 
@@ -39,6 +28,22 @@ export class ProducerPreset {
   }
 }
 
+/** Defines a particular instrument configuration */
+export class InstrumentConfiguration {
+  instrument: Instrument;
+
+  /** Volume between [0, 1] */
+  volume = 1;
+
+  /** Octaves to shift up or down */
+  octaveShift = 0;
+
+  public constructor(init?: Partial<InstrumentConfiguration>) {
+    Object.assign(this, init);
+  }
+}
+
+/** Deterministically selects a specific ProducerPreset based on valence and energy */
 export const selectPreset = (valence: number, energy: number): ProducerPreset => {
   if (energy < 0.3 && valence < 0.5) {
     return Preset3;
@@ -49,6 +54,7 @@ export const selectPreset = (valence: number, energy: number): ProducerPreset =>
   return Preset1;
 };
 
+/** A preset, with electric guitar melodies */
 export const Preset1: ProducerPreset = new ProducerPreset({
   bassLine: new InstrumentConfiguration({
     instrument: Instrument.BassGuitar,
@@ -65,10 +71,6 @@ export const Preset1: ProducerPreset = new ProducerPreset({
     volume: 0.15
   }),
   firstBeatArpeggioPattern: [1, 5, 8, 5, 10, 5, 8],
-  // secondBeatArpeggio: new InstrumentConfiguration({
-  //   instrument: Instrument.AcousticGuitar,
-  //   volume: 0.3
-  // }),
   melody: new InstrumentConfiguration({
     instrument: Instrument.ElectricGuitar,
     octaveShift: 0,
@@ -92,10 +94,6 @@ export const Preset2: ProducerPreset = new ProducerPreset({
     octaveShift: -1,
     volume: 0.25
   }),
-  // secondBeatArpeggio: new InstrumentConfiguration({
-  //   instrument: Instrument.Piano,
-  //   volume: 0.3
-  // }),
   melody: new InstrumentConfiguration({
     instrument: Instrument.ElectricPiano,
     octaveShift: 1,

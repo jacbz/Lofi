@@ -74,6 +74,7 @@ class Producer {
   /** Drum beat timings, as tuples of (isStart, Time) */
   drumbeatTimings: [boolean, Time][] = [];
 
+  /** Takes OutputParams and deterministically produces a Track */
   produce(params: OutputParams): Track {
     // must be 70, 75, 80, 85, 90, 95 or 100
     let bpm = Math.round(params.bpm / 5) * 5;
@@ -103,6 +104,7 @@ class Producer {
 
     this.preset = Presets.selectPreset(this.valence, this.energy);
 
+    // swing with probability 1/10
     const swing = randomFromInterval(1, 10, this.energy) <= 1;
 
     this.chordsTonal = this.chords.map((c, chordNo) => {
@@ -160,6 +162,7 @@ class Producer {
     return track;
   }
 
+  /** Produces the track's intro and returns the number of measures */
   produceIntro(): number {
     // TODO: produce a more interesting intro
 
@@ -167,6 +170,7 @@ class Producer {
     return 1;
   }
 
+  /** Produces the track's main part and returns the number of measures */
   produceMain(): number {
     const numberOfIterations = Math.ceil(24 / this.chords.length);
     const length = this.chords.length * numberOfIterations;
@@ -188,6 +192,7 @@ class Producer {
     return length;
   }
 
+  /** Produces the track's outro and returns the number of measures */
   produceOutro(): number {
     // the measure where the outro part starts
     const measureStart = this.introLength + this.mainLength;
@@ -202,6 +207,7 @@ class Producer {
     return length;
   }
 
+  /** Produces FX for the whole track */
   produceFx() {
     if (this.valence < 0.5 && this.modeNum === 6) {
       // add rain
@@ -216,6 +222,7 @@ class Producer {
     }
   }
 
+  /** Produces a single iteration of the chord progression; can be cut off prematurely */
   produceIteration(iterationMeasure: number, cutoff?: number) {
     let noDrumBeatCurrently = false;
     const chords = cutoff ? this.chords.slice(0, cutoff) : this.chords;
@@ -270,7 +277,11 @@ class Producer {
         // first beat arpeggio
         if (this.preset.firstBeatArpeggio) {
           const arpeggioNotes = octShiftAll(
-            mountNotesOnScale(scaleDegree, this.preset.firstBeatArpeggioPattern, this.notesInScalePitched),
+            mountNotesOnScale(
+              scaleDegree,
+              this.preset.firstBeatArpeggioPattern,
+              this.notesInScalePitched
+            ),
             this.preset.firstBeatArpeggio.octaveShift
           );
           this.addArpeggio(
@@ -280,19 +291,6 @@ class Producer {
             '8n',
             `${measure}:0`,
             this.preset.firstBeatArpeggio.volume
-          );
-        }
-
-        // second beat arpeggio
-        if (this.preset.secondBeatArpeggio) {
-          const arpeggioNotes = octShiftAll(chord.notes, this.preset.secondBeatArpeggio.octaveShift);
-          this.addArpeggio(
-            this.preset.secondBeatArpeggio.instrument,
-            arpeggioNotes,
-            '0:3',
-            '16n',
-            `${measure}:1`,
-            this.preset.secondBeatArpeggio.volume
           );
         }
       }
@@ -341,7 +339,7 @@ class Producer {
     return chords.length;
   }
 
-  /** simplify key signature, e.g. Db major instead of C# major */
+  /** Simplifies key signature, e.g. Db major instead of C# major */
   simplifyKeySignature() {
     if (this.mode === 'ionian') {
       this.mode = 'major';
@@ -361,14 +359,17 @@ class Producer {
     }
   }
 
+  /** Starts the drumbeat at the given time */
   startDrumbeat(time: Time) {
     this.drumbeatTimings.push([true, time]);
   }
 
+  /** Stops the drumbeat at the given time */
   endDrumbeat(time: Time) {
     this.drumbeatTimings.push([false, time]);
   }
 
+  /** Adds a given sample to the track */
   addSample(sample: string, sampleIndex: number, startTime: Time, stopTime: Time) {
     if (!this.samples.some(([s, i]) => s === sample && i === sampleIndex)) {
       this.samples.push([sample, sampleIndex]);
@@ -376,6 +377,7 @@ class Producer {
     this.sampleLoops.push(new SampleLoop(sample, sampleIndex, startTime, stopTime));
   }
 
+  /** Adds a given instrument note to the track */
   addNote(
     instrument: Instrument,
     pitch: string | string[],

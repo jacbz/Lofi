@@ -5,11 +5,13 @@ import { Track } from './track';
 import { compress } from './helper';
 
 /**
- * The Player plays a Track through Tone.js.
+ * A class that plays a Track by synthesizing events in Tone.js.
  */
 class Player {
+  /** Current list of tracks in queue */
   playlist: Track[] = [];
 
+  /** Current track in playlist being played */
   currentPlayingIndex: number;
 
   /** Current track. Can be undefined */
@@ -90,10 +92,13 @@ class Player {
   /** Update local storage playlist when it changes */
   updateLocalStorage: () => void;
 
+  /** Map of sample group to players */
   samplePlayers: Map<string, Tone.Player[]>;
 
+  /** Map of instrument to samplers */
   instruments: Map<Instrument, any>;
 
+  /** Master gain */
   gain: Tone.Gain;
 
   constructor() {
@@ -177,12 +182,11 @@ class Player {
       instrumentVolumes.set(toneInstrument, toneInstrument.volume.value);
     }
 
-    // set swing
+    // set up swing
     Tone.Transport.swing = this.currentTrack.swing ? 2 / 3 : 0;
 
     // wait until all samples are loaded
     await Tone.loaded();
-    // await this.reverb.generate();
 
     for (const sampleLoop of this.currentTrack.sampleLoops) {
       const samplePlayer = this.samplePlayers.get(sampleLoop.sampleGroupName)[
@@ -210,10 +214,13 @@ class Player {
       }
     }
 
+    // connect analyzer for visualizations
     const analyzer = new Tone.Analyser('fft', 16);
     this.gain.connect(analyzer);
 
     const fadeOutBegin = this.currentTrack.length - this.currentTrack.fadeOutDuration;
+
+    // schedule events to do every 100ms
     Tone.Transport.scheduleRepeat((time) => {
       this.isLoading = false;
 
@@ -226,7 +233,7 @@ class Player {
         this.playNext();
       }
 
-      // fade out
+      // schedule fade out in the last seconds
       const volumeOffset = seconds < fadeOutBegin ? 0 : (seconds - fadeOutBegin) * 4;
       for (const [sampler, volume] of instrumentVolumes) {
         sampler.volume.value = volume - volumeOffset;
@@ -364,6 +371,9 @@ class Player {
     const compressed = compress(json);
     return `${window.location.origin}${window.location.pathname}?${compressed}`.replace(
       'home.in.tum.de/~zhangja/lofi',
+      'lofi.jacobzhang.de'
+    ).replace(
+      'localhost:8080',
       'lofi.jacobzhang.de'
     );
   }

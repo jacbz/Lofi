@@ -1,7 +1,7 @@
 import Sortable from 'sortablejs';
 import Player, { RepeatMode } from './player';
 import Producer from './producer';
-import { HIDDEN_SIZE, OutputParams } from './params';
+import { LATENT_SPACE_DIMENSIONS, OutputParams } from './params';
 import { decompress, randn } from './helper';
 import { decode } from './api';
 
@@ -30,7 +30,6 @@ if (localStorageAvailable) {
     }
   }
 }
-
 const updateLocalStorage = () => {
   if (localStorageAvailable) {
     localStorage.setItem('playlist', JSON.stringify(player.playlist.map((t) => t.outputParams)));
@@ -67,7 +66,7 @@ if (playlistToLoad.length > 0) {
 // Sliders
 const slidersEl = document.getElementById('sliders');
 const sliders: HTMLInputElement[] = [];
-for (let i = 0; i < HIDDEN_SIZE; i += 1) {
+for (let i = 0; i < LATENT_SPACE_DIMENSIONS; i += 1) {
   const slider = document.createElement('input') as HTMLInputElement;
   slider.type = 'range';
   slider.min = '-4';

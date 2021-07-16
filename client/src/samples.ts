@@ -5,6 +5,7 @@ import sampleConfig from './samples.json';
 export const SAMPLES_BASE_URL = './samples';
 export const SAMPLE_DEFAULT_VOLUME = -6;
 
+/** A SampleGroup defines a collection of samples, as taken from samples.json */
 class SampleGroup {
   name: string;
 
@@ -30,6 +31,7 @@ class SampleGroup {
     return `${SAMPLES_BASE_URL}/loops/${this.name}/${this.name}_${index + 1}.mp3`;
   }
 
+  /** Returns sample-specific Tone.js filters */
   getFilters(): any[] {
     if (this.name.includes('drumloop')) {
       return [
@@ -60,6 +62,7 @@ export const SAMPLEGROUPS: Map<string, SampleGroup> = sampleConfig.loops.reduce(
   new Map()
 );
 
+/** Selects a suitable drumbeat based on BPM and energy value */
 export const selectDrumbeat = (bpm: number, energy: number): [string, number] => {
   const sampleGroup = `drumloop${bpm}`;
 

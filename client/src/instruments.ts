@@ -1,5 +1,4 @@
 import * as Tone from 'tone';
-import { FrequencyShifter } from 'tone';
 
 export enum Instrument {
   /** Salamander grand piano, velocity 6 */
@@ -240,40 +239,6 @@ export const DefaultFilters = [
 
 export const getInstrumentFilters = (instrument: Instrument) => {
   switch (instrument) {
-    case Instrument.Piano: {
-      return [
-        ...DefaultFilters
-        // new Tone.Filter({
-        //   type: 'lowpass',
-        //   frequency: 3600,
-        //   Q: 0.2
-        // }),
-        // new Tone.Filter({
-        //   type: 'highpass',
-        //   frequency: 700,
-        //   Q: 0.2
-        // })
-      ];
-    }
-
-    case Instrument.SoftPiano: {
-      return [
-        ...DefaultFilters
-      ];
-    }
-
-    case Instrument.ElectricPiano: {
-      return [
-        ...DefaultFilters
-      ];
-    }
-
-    case Instrument.AcousticGuitar: {
-      return [
-        ...DefaultFilters
-      ];
-    }
-
     case Instrument.ElectricGuitar: {
       return [
         ...DefaultFilters,
@@ -293,12 +258,6 @@ export const getInstrumentFilters = (instrument: Instrument) => {
           frequency: 300,
           Q: 0.5
         })
-      ];
-    }
-
-    case Instrument.Synth: {
-      return [
-        ...DefaultFilters
       ];
     }
 
