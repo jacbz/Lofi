@@ -1,7 +1,7 @@
 import Sortable from 'sortablejs';
 import Player, { RepeatMode } from './player';
 import Producer from './producer';
-import { LATENT_SPACE_DIMENSIONS, OutputParams } from './params';
+import { DEFAULT_OUTPUTPARAMS, HIDDEN_SIZE, OutputParams } from './params';
 import { decompress, randn } from './helper';
 import { decode } from './api';
 
@@ -40,9 +40,9 @@ player.updateLocalStorage = updateLocalStorage;
 // load playlist in URL if possible
 const queryString = window.location.search;
 if (queryString.length > 0) {
-  const compressed = queryString.substring(1);
+  const compressedPlaylist = queryString === '?default' ? DEFAULT_OUTPUTPARAMS : queryString.substring(1);
   try {
-    const decompressed = decompress(compressed);
+    const decompressed = decompress(compressedPlaylist);
     const outputParams: OutputParams[] = JSON.parse(decompressed);
     playlistToLoad = [
       ...playlistToLoad.filter((p) => outputParams.every((p2) => p2.title !== p.title)),
@@ -50,7 +50,7 @@ if (queryString.length > 0) {
     ];
     window.history.pushState({}, null, window.location.href.split('?')[0]);
   } catch (e) {
-    console.log('Error parsing', compressed);
+    console.log('Error parsing', compressedPlaylist);
   }
 }
 
@@ -66,7 +66,7 @@ if (playlistToLoad.length > 0) {
 // Sliders
 const slidersEl = document.getElementById('sliders');
 const sliders: HTMLInputElement[] = [];
-for (let i = 0; i < LATENT_SPACE_DIMENSIONS; i += 1) {
+for (let i = 0; i < HIDDEN_SIZE; i += 1) {
   const slider = document.createElement('input') as HTMLInputElement;
   slider.type = 'range';
   slider.min = '-4';

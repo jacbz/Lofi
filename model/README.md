@@ -46,13 +46,11 @@ We trained two VAEs, Lofi2Lofi and Lyrics2Lofi.
 
 Lofi2Lofi is a symmetrical VAE. Each dataset sample is encoded in the same format as the output.
 
-
-
-![](https://i.imgur.com/BQqqtCN.png)
+![](https://svgshare.com/i/ZF5.svg)
 
 The architecture of the decoder is easier to look at if we unroll the LSTMs:
 
-![](https://i.imgur.com/dfMUvKh.png)
+![](https://svgshare.com/i/ZEy.svg)
 
 This architecture ensures that melodies are conditioned on the chord and each note is conditioned on the previous notes. In music, context is very important, and we hope to reflect that in our model.
 
@@ -60,9 +58,7 @@ This architecture ensures that melodies are conditioned on the chord and each no
 
 Lyrics2Lofi is an asymmetrical VAE which takes lyrics as input. We initially hoped to be able to turn input text into lo-fi music, but preliminary results show that text embeddings are simply not able to provide enough information about the music itself, leading to poor validation performance.
 
-
-
-![](https://i.imgur.com/nsf5CPf.png)
+![](https://svgshare.com/i/ZCo.svg)
 
 ## Running the model
 
