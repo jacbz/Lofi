@@ -1,4 +1,5 @@
 import * as Tone from 'tone';
+import { SAMPLES_BASE_URL } from './samples';
 
 export enum Instrument {
   /** Salamander grand piano, velocity 6 */
@@ -19,7 +20,7 @@ export enum Instrument {
   Synth
 }
 
-const BASE_URL = './samples/instruments';
+const BASE_URL = `${SAMPLES_BASE_URL}/instruments`;
 export const getInstrument = (instrument: Instrument) => {
   switch (instrument) {
     case Instrument.Piano: {

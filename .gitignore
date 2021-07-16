@@ -1,7 +1,6 @@
 # Client
 client/node_modules
 client/dist
-client/assets/samples
 
 # Model
 .idea

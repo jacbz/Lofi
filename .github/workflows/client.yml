@@ -34,4 +34,4 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
           
       - name: Deploy to web server
-        run: rsync -avz --delete ./client/dist/ --exclude "/samples" ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_PATH }}
+        run: rsync -avz --delete ./client/dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_PATH }}
