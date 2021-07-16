@@ -1,15 +1,14 @@
 import json
 
-import numpy as np
+import torch
 from flask import Flask, request, jsonify
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-import torch
 
-from server.lofi2lofi_generate import generate, decode
-from server.lyrics2lofi_predict import predict
 from model.lofi2lofi_model import Decoder as Lofi2LofiDecoder
 from model.lyrics2lofi_model import Lyrics2LofiModel
+from server.lofi2lofi_generate import decode
+from server.lyrics2lofi_predict import predict
 
 device = "cpu"
 app = Flask(__name__)
@@ -41,14 +40,6 @@ def home():
     return 'Server running'
 
 
-@app.route('/generate', methods=['GET'])
-def generate_new_sample():
-    json_output = generate(lofi2lofi_model)
-    response = jsonify(json_output)
-    response.headers.add('Access-Control-Allow-Origin', '*')
-
-    return response
-
 @app.route('/decode', methods=['GET'])
 def decode_input():
     input = request.args.get('input')
@@ -58,6 +49,7 @@ def decode_input():
     response.headers.add('Access-Control-Allow-Origin', '*')
 
     return response
+
 
 @app.route('/predict', methods=['GET'])
 def lyrics_to_track():

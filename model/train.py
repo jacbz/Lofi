@@ -53,8 +53,10 @@ def train(dataset, model, name):
                 model(input, max_num_chords, sampling_rate_chords, sampling_rate_melodies, chords_gt, notes_gt)
         else:
             pred_chords, pred_notes, pred_tempo, pred_key, pred_mode, pred_valence, pred_energy, kl = \
-                model(chords_gt, notes_gt, tempo_gt, key_gt, mode_gt, valence_gt, energy_gt, num_chords, max_num_chords, sampling_rate_chords, sampling_rate_melodies)
+                model(chords_gt, notes_gt, tempo_gt, key_gt, mode_gt, valence_gt, energy_gt, num_chords, max_num_chords,
+                      sampling_rate_chords, sampling_rate_melodies)
 
+        # compute a boolean mask to select entries up to a specific index
         def compute_mask(max_length, curr_length):
             arange = torch.arange(max_length, device=device).repeat((chords_gt.shape[0], 1)).permute(0, 1)
             lengths_stacked = curr_length.repeat((max_length, 1)).permute(1, 0)
@@ -70,7 +72,7 @@ def train(dataset, model, name):
         mask_melody = compute_mask(max_num_notes, num_notes)
         loss_melody = torch.masked_select(loss_melody_notes, mask_melody).mean()
 
-        if (epoch < MELODY_EPOCH_DELAY):
+        if epoch < MELODY_EPOCH_DELAY:
             loss_melody = 0
 
         loss_kl = kl
@@ -107,9 +109,9 @@ def train(dataset, model, name):
         # TRAINING
         model.train()
         for batch, data in enumerate(train_dataloader):
-            loss, loss_chords, kl_loss, loss_melody,\
-                loss_tempo, loss_key, loss_mode, loss_valence, loss_energy,\
-                batch_tp_chords, batch_tp_melodies = compute_loss(data)
+            loss, loss_chords, kl_loss, loss_melody, \
+            loss_tempo, loss_key, loss_mode, loss_valence, loss_energy, \
+            batch_tp_chords, batch_tp_melodies = compute_loss(data)
 
             ep_train_losses_chords.append(loss_chords)
             ep_train_losses_melodies.append(loss_melody)
@@ -130,9 +132,9 @@ def train(dataset, model, name):
         model.eval()
         for batch, data in enumerate(val_dataloader):
             with torch.no_grad():
-                loss, loss_chords, kl_loss, loss_melody,\
-                    loss_tempo, loss_key, loss_mode, loss_valence, loss_energy,\
-                    batch_tp_chords, batch_tp_melodies = compute_loss(data)
+                loss, loss_chords, kl_loss, loss_melody, \
+                loss_tempo, loss_key, loss_mode, loss_valence, loss_energy, \
+                batch_tp_chords, batch_tp_melodies = compute_loss(data)
 
                 ep_val_losses_chords.append(loss_chords)
                 ep_val_losses_melodies.append(loss_melody)

@@ -1,5 +1,7 @@
-from model.constants import *
 import jsonpickle
+
+from model.constants import *
+
 
 class Output:
     def __init__(self, title, pred_chords, pred_notes, pred_tempo, pred_key, pred_mode, pred_valence, pred_energy):

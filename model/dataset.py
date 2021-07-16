@@ -1,4 +1,5 @@
 import collections
+
 from model.constants import *
 
 
@@ -44,7 +45,7 @@ def process_sample(json_file):
     num_chords = num_measures * CHORD_DISCRETIZATION_LENGTH
 
     chords_list, note_list, num_chords = discretize_sample(json_chords, json_notes, octave_boundary_lower,
-                                                                num_chords, num_measures * beats_per_measure)
+                                                           num_chords, num_measures * beats_per_measure)
 
     # pad chord and melodies to max measure length
     chords_list.append(CHORD_END_TOKEN)

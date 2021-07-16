@@ -1,8 +1,9 @@
+from hashlib import md5
+
 import numpy as np
 import torch
 from torch import nn
-from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
-from hashlib import md5
+from torch.nn.utils.rnn import pack_padded_sequence
 
 from model.constants import *
 
@@ -16,7 +17,8 @@ class Lofi2LofiModel(nn.Module):
         self.mean_linear = nn.Linear(in_features=HIDDEN_SIZE, out_features=HIDDEN_SIZE)
         self.variance_linear = nn.Linear(in_features=HIDDEN_SIZE, out_features=HIDDEN_SIZE)
 
-    def forward(self, gt_chords, gt_melodies, gt_tempo, gt_key, gt_mode, gt_valence, gt_energy, batch_num_chords, num_chords, sampling_rate_chords=0, sampling_rate_melodies=0):
+    def forward(self, gt_chords, gt_melodies, gt_tempo, gt_key, gt_mode, gt_valence, gt_energy, batch_num_chords,
+                num_chords, sampling_rate_chords=0, sampling_rate_melodies=0):
         # encode
         h = self.encoder(gt_chords, gt_melodies, gt_tempo, gt_key, gt_mode, gt_valence, gt_energy, batch_num_chords)
         # VAE
@@ -52,10 +54,12 @@ class Encoder(nn.Module):
         super(Encoder, self).__init__()
         self.device = device
         self.chord_embeddings = nn.Embedding(num_embeddings=CHORD_PREDICTION_LENGTH, embedding_dim=HIDDEN_SIZE)
-        self.chords_lstm = nn.LSTM(input_size=HIDDEN_SIZE, hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS, bidirectional=True, batch_first=True)
+        self.chords_lstm = nn.LSTM(input_size=HIDDEN_SIZE, hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS,
+                                   bidirectional=True, batch_first=True)
 
         self.melody_embeddings = nn.Embedding(num_embeddings=MELODY_PREDICTION_LENGTH, embedding_dim=HIDDEN_SIZE)
-        self.melody_lstm = nn.LSTM(input_size=HIDDEN_SIZE, hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS, bidirectional=True, batch_first=True)
+        self.melody_lstm = nn.LSTM(input_size=HIDDEN_SIZE, hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS,
+                                   bidirectional=True, batch_first=True)
 
         self.tempo_embedding = nn.Linear(in_features=1, out_features=HIDDEN_SIZE2)
         self.key_embedding = nn.Embedding(num_embeddings=NUMBER_OF_KEYS, embedding_dim=HIDDEN_SIZE2)
@@ -63,19 +67,16 @@ class Encoder(nn.Module):
         self.valence_embedding = nn.Linear(in_features=1, out_features=HIDDEN_SIZE2)
         self.energy_embedding = nn.Linear(in_features=1, out_features=HIDDEN_SIZE2)
 
-        self.downsample = nn.Linear(in_features=4*HIDDEN_SIZE + 5*HIDDEN_SIZE2, out_features=HIDDEN_SIZE)
-
+        self.downsample = nn.Linear(in_features=4 * HIDDEN_SIZE + 5 * HIDDEN_SIZE2, out_features=HIDDEN_SIZE)
 
     def forward(self, chords, melodies, tempo, key, mode, valence, energy, batch_num_chords):
         chord_embeddings = self.chord_embeddings(chords)
         chords_input = pack_padded_sequence(chord_embeddings, batch_num_chords, batch_first=True, enforce_sorted=False)
         chords_out, (h_chords, _) = self.chords_lstm(chords_input)
-        # chords_out_repeated = pad_packed_sequence(chords_out, batch_first=True)[0].repeat_interleave( NOTES_PER_CHORD, 1)
-        # chords_out_repeated = chords_out_repeated[:,:,:HIDDEN_SIZE] + chords_out_repeated[:,:,HIDDEN_SIZE:]
 
-        # add two directions together
-        melody_embeddings = self.melody_embeddings(melodies)# + chords_out_repeated
-        melody_input = pack_padded_sequence(melody_embeddings, batch_num_chords * NOTES_PER_CHORD, batch_first=True, enforce_sorted=False)
+        melody_embeddings = self.melody_embeddings(melodies)
+        melody_input = pack_padded_sequence(melody_embeddings, batch_num_chords * NOTES_PER_CHORD, batch_first=True,
+                                            enforce_sorted=False)
         _, (h_melodies, _) = self.melody_lstm(melody_input)
 
         tempo_embedding = self.tempo_embedding(tempo.unsqueeze(1).float())
@@ -85,7 +86,9 @@ class Encoder(nn.Module):
         energy_embedding = self.energy_embedding(energy.unsqueeze(1).float())
 
         h_concatenated = torch.cat((h_chords[-1], h_chords[-2], h_melodies[-1], h_melodies[-2]), dim=1)
-        return self.downsample(torch.cat((h_concatenated, tempo_embedding, key_embedding, mode_embedding, valence_embedding, energy_embedding), dim=1))
+        return self.downsample(torch.cat(
+            (h_concatenated, tempo_embedding, key_embedding, mode_embedding, valence_embedding, energy_embedding),
+            dim=1))
 
 
 class Decoder(nn.Module):
@@ -100,7 +103,7 @@ class Decoder(nn.Module):
             nn.ReLU(),
             nn.Linear(in_features=HIDDEN_SIZE, out_features=CHORD_PREDICTION_LENGTH)
         )
-        self.chord_embedding_downsample = nn.Linear(in_features=2*HIDDEN_SIZE, out_features=HIDDEN_SIZE)
+        self.chord_embedding_downsample = nn.Linear(in_features=2 * HIDDEN_SIZE, out_features=HIDDEN_SIZE)
 
         self.melody_embeddings = nn.Embedding(num_embeddings=MELODY_PREDICTION_LENGTH, embedding_dim=HIDDEN_SIZE)
         self.melody_lstm = nn.LSTMCell(input_size=HIDDEN_SIZE * 1, hidden_size=HIDDEN_SIZE * 1)
@@ -109,7 +112,7 @@ class Decoder(nn.Module):
             nn.ReLU(),
             nn.Linear(in_features=HIDDEN_SIZE, out_features=MELODY_PREDICTION_LENGTH)
         )
-        self.melody_embedding_downsample = nn.Linear(in_features=3*HIDDEN_SIZE, out_features=HIDDEN_SIZE)
+        self.melody_embedding_downsample = nn.Linear(in_features=3 * HIDDEN_SIZE, out_features=HIDDEN_SIZE)
 
         self.key_linear = nn.Sequential(
             nn.Linear(in_features=HIDDEN_SIZE, out_features=HIDDEN_SIZE2),
@@ -137,22 +140,19 @@ class Decoder(nn.Module):
             nn.Linear(in_features=HIDDEN_SIZE2, out_features=1),
         )
 
-    def generate(self):
-        mu = torch.randn(1, HIDDEN_SIZE)
-        return self(mu)
-
     def decode(self, mu):
         # create a hash for vector mu
         hash = ""
         # first 20 characters are each sampled from 5 entries
         for i in range(0, 100, 5):
-            hash += str((mu[0][i:i+1].abs().sum() * 587).int().item())[-1]
+            hash += str((mu[0][i:i + 1].abs().sum() * 587).int().item())[-1]
         # last 4 characters are the beginning of the MD5 hash of the whole vector
         hash2 = int(md5(mu.numpy()).hexdigest(), 16)
         hash = f"#{hash}{hash2}"[:25]
         return hash, self(mu, MAX_CHORD_LENGTH)
 
-    def forward(self, z, num_chords=MAX_CHORD_LENGTH, sampling_rate_chords=0, sampling_rate_melodies=0, gt_chords=None, gt_melody=None):
+    def forward(self, z, num_chords=MAX_CHORD_LENGTH, sampling_rate_chords=0, sampling_rate_melodies=0, gt_chords=None,
+                gt_melody=None):
         tempo_output = self.tempo_linear(z)
         key_output = self.key_linear(z)
         mode_output = self.mode_linear(z)
@@ -160,7 +160,7 @@ class Decoder(nn.Module):
         energy_output = self.energy_linear(z)
 
         batch_size = z.shape[0]
-        # initialize hidden states and cell states randomly
+        # initialize hidden states and cell states
         hx_chords = torch.zeros(batch_size, HIDDEN_SIZE, device=self.device)
         cx_chords = torch.zeros(batch_size, HIDDEN_SIZE, device=self.device)
         hx_melody = torch.zeros(batch_size, HIDDEN_SIZE, device=self.device)
@@ -205,7 +205,8 @@ class Decoder(nn.Module):
                     melody_embeddings = self.melody_embeddings(gt_melody[:, i * NOTES_PER_CHORD + j])
                 else:
                     melody_embeddings = self.melody_embeddings(melody_prediction.argmax(dim=1))
-                melody_embeddings = self.melody_embedding_downsample(torch.cat((melody_embeddings, chord_embeddings, z), dim=1))
+                melody_embeddings = self.melody_embedding_downsample(
+                    torch.cat((melody_embeddings, chord_embeddings, z), dim=1))
 
         chord_outputs = torch.stack(chord_outputs, dim=1)
         melody_outputs = torch.stack(melody_outputs, dim=1)

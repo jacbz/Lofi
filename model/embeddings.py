@@ -1,9 +1,10 @@
-import numpy as np
-import torch
-from transformers import BertTokenizer, BertModel
-from torch.nn.utils.rnn import pad_sequence
 import json
 import os
+
+import numpy as np
+import torch
+from torch.nn.utils.rnn import pad_sequence
+from transformers import BertTokenizer, BertModel
 
 tokenizer = None
 model = None

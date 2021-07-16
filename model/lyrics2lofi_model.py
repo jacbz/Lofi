@@ -14,7 +14,8 @@ class Lyrics2LofiModel(nn.Module):
         self.mean_linear = nn.Linear(in_features=HIDDEN_SIZE, out_features=HIDDEN_SIZE)
         self.variance_linear = nn.Linear(in_features=HIDDEN_SIZE, out_features=HIDDEN_SIZE)
 
-    def forward(self, input, num_chords, sampling_rate_chords=0, sampling_rate_melodies=0, gt_chords=None, gt_melody=None):
+    def forward(self, input, num_chords=MAX_CHORD_LENGTH, sampling_rate_chords=0, sampling_rate_melodies=0,
+                gt_chords=None, gt_melody=None):
         # encode
         h = self.encoder(input)
 
@@ -50,8 +51,9 @@ class Encoder(nn.Module):
     def __init__(self, device):
         super(Encoder, self).__init__()
         self.device = device
-        self.encoder_lstm = nn.LSTM(input_size=BERT_EMBEDDING_LENGTH, hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS, bidirectional=True, batch_first=True)
-        self.downsample = nn.Linear(in_features=2*HIDDEN_SIZE, out_features=HIDDEN_SIZE)
+        self.encoder_lstm = nn.LSTM(input_size=BERT_EMBEDDING_LENGTH, hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS,
+                                    bidirectional=True, batch_first=True)
+        self.downsample = nn.Linear(in_features=2 * HIDDEN_SIZE, out_features=HIDDEN_SIZE)
 
     def forward(self, x):
         _, (h, _) = self.encoder_lstm(x)
@@ -92,7 +94,7 @@ class Decoder(nn.Module):
         self.mode_embedding = nn.Linear(in_features=NUMBER_OF_MODES, out_features=HIDDEN_SIZE)
         self.valence_embedding = nn.Linear(in_features=1, out_features=HIDDEN_SIZE)
         self.energy_embedding = nn.Linear(in_features=1, out_features=HIDDEN_SIZE)
-        self.downsample = nn.Linear(in_features=5*HIDDEN_SIZE, out_features=HIDDEN_SIZE)
+        self.downsample = nn.Linear(in_features=5 * HIDDEN_SIZE, out_features=HIDDEN_SIZE)
 
         self.chords_lstm = nn.LSTMCell(input_size=HIDDEN_SIZE * 1, hidden_size=HIDDEN_SIZE * 1)
         self.chord_embeddings = nn.Embedding(num_embeddings=CHORD_PREDICTION_LENGTH, embedding_dim=HIDDEN_SIZE)
@@ -101,7 +103,7 @@ class Decoder(nn.Module):
             nn.ReLU(),
             nn.Linear(in_features=HIDDEN_SIZE, out_features=CHORD_PREDICTION_LENGTH)
         )
-        self.chord_embedding_downsample = nn.Linear(in_features=2*HIDDEN_SIZE, out_features=HIDDEN_SIZE)
+        self.chord_embedding_downsample = nn.Linear(in_features=2 * HIDDEN_SIZE, out_features=HIDDEN_SIZE)
 
         self.melody_embeddings = nn.Embedding(num_embeddings=MELODY_PREDICTION_LENGTH, embedding_dim=HIDDEN_SIZE)
         self.melody_lstm = nn.LSTMCell(input_size=HIDDEN_SIZE * 1, hidden_size=HIDDEN_SIZE * 1)
@@ -110,7 +112,7 @@ class Decoder(nn.Module):
             nn.ReLU(),
             nn.Linear(in_features=HIDDEN_SIZE, out_features=MELODY_PREDICTION_LENGTH)
         )
-        self.melody_embedding_downsample = nn.Linear(in_features=3*HIDDEN_SIZE, out_features=HIDDEN_SIZE)
+        self.melody_embedding_downsample = nn.Linear(in_features=3 * HIDDEN_SIZE, out_features=HIDDEN_SIZE)
 
     def forward(self, z, num_chords, sampling_rate_chords=0, sampling_rate_melodies=0, gt_chords=None, gt_melody=None):
         tempo_output = self.tempo_linear(z)
@@ -125,7 +127,7 @@ class Decoder(nn.Module):
         z = self.downsample(torch.cat((z, tempo_embedding, mode_embedding, valence_embedding, energy_embedding), dim=1))
 
         batch_size = z.shape[0]
-        # initialize hidden states and cell states randomly
+        # initialize hidden states and cell states
         hx_chords = torch.zeros(batch_size, HIDDEN_SIZE, device=self.device)
         cx_chords = torch.zeros(batch_size, HIDDEN_SIZE, device=self.device)
         hx_melody = torch.zeros(batch_size, HIDDEN_SIZE, device=self.device)
