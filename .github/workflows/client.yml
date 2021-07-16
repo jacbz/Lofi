@@ -27,11 +27,8 @@ jobs:
         working-directory: ./client
         run: npm run build
 
-      - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
+      - name: Deploy to GitHub pages
+        uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }} 
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
-          
-      - name: Deploy to web server
-        run: rsync -avz --delete ./client/dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_PATH }}
+          branch: gh-pages
+          folder: client/dist
