@@ -1,9 +1,9 @@
 {
   "name": "lofi",
-  "version": "0.0.1",
-  "private": true,
-  "description": "TBD",
-  "author": "",
+  "version": "1.0.0",
+  "description": "ML-supported lo-fi music generator",
+  "author": "Jacob Zhang",
+  "license": "Apache-2.0",
   "main": "index.js",
   "scripts": {
     "build": "webpack --config webpack.prod.js",
