@@ -17,17 +17,30 @@ html {
 }
 
 body {
-  background: url('background.jpg'), black;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-position: center center;
-  background-size: cover;
   margin: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   height: 100%;
+}
+
+@mixin background($url) {  
+  background: url($url), black;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center center;
+  background-size: cover;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  z-index: -1;
+  @include background('background.jpg');
+  transform: translate3d(0, 0, 0);
 }
 
 #header {
@@ -299,8 +312,8 @@ $panel-border-radius: 6px;
       }
 
       #play-button {
-        height: 72px;
-        width: 72px;
+        min-height: 72px;
+        min-width: 72px;
 
         #play-button-icon {
           height: 28px;
@@ -467,7 +480,7 @@ $panel-border-radius: 6px;
         display: flex;
         gap: 8px;
 
-        @media (hover: hover) {
+        @media (hover: hover) and (pointer: fine) {
           visibility: hidden;
           opacity: 0;
         }
@@ -540,7 +553,7 @@ button.flat {
   transition: background-color 0.25s, color 0.25s;
   padding: 5px;
 
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     &:hover:enabled {
       background-color: white;
       color: black;
@@ -561,7 +574,7 @@ button.plain {
   border: 0;
   border-radius: 50%;
 
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     &:hover:enabled {
       background-color: $ui-hover-background;
     }
@@ -572,8 +585,8 @@ button.plain {
 }
 
 button.circle {
-  height: 46px;
-  width: 46px;
+  min-height: 46px;
+  min-width: 46px;
   border-radius: 50%;
   border: 0;
   background-color: $ui-background;
@@ -581,7 +594,7 @@ button.circle {
   background-repeat: no-repeat;
   background-size: 20px;
 
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     &:hover:enabled {
       background-color: $ui-hover-background;
     }
@@ -651,7 +664,7 @@ input[type='range'] {
   transition: visibility 0.2s, opacity 0.2s;
   height: 4px;
 
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     visibility: hidden;
     opacity: 0;
   }
@@ -744,11 +757,19 @@ input[type='range'] {
 }
 
 // responsive
-$responsive-min-width: 315px;
-$responsive-max-width: 400px;
+$responsive-min-width: 300px;
+$responsive-max-width: 360px;
 @media screen and (max-width: 1000px) {
   body {
     gap: 48px;
+  }
+
+  body::before {
+    @include background('background2.jpg')
+  }
+
+  #header {
+    font-size: 600%;
   }
 
   #center {
