@@ -13,7 +13,7 @@ spotify_client_*
 *.pth
 embedding*.json
 log.txt
-*.png
+model/*.png
 
 # Checkpoints
 checkpoints
