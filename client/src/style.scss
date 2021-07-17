@@ -10,6 +10,7 @@ $height: 426px;
 * {
   font-family: $body-font;
   color: white;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
@@ -28,7 +29,6 @@ body {
 @mixin background($url) {  
   background: url($url), black;
   background-repeat: no-repeat;
-  background-attachment: fixed;
   background-position: center center;
   background-size: cover;
 }
@@ -36,11 +36,10 @@ body {
 body::before {
   content: "";
   position: fixed;
-  height: 100%;
   width: 100%;
+  height: 100vh;
   z-index: -1;
   @include background('background.jpg');
-  transform: translate3d(0, 0, 0);
 }
 
 #header {
@@ -488,14 +487,6 @@ $panel-border-radius: 6px;
         .delete-button {
           background-image: url('icons/delete.svg');
         }
-
-        .sort-handle {
-          background-image: url('icons/sorthandle.svg');
-          width: 24px;
-          background-size: 24px;
-          background-position: center;
-          background-repeat: no-repeat;
-        }
       }
     }
   }
@@ -540,7 +531,6 @@ button {
   display: block;
   cursor: pointer;
   background-color: transparent;
-  -webkit-tap-highlight-color: transparent;
 
   &:focus {
     outline: none;
@@ -797,9 +787,13 @@ $responsive-max-width: 360px;
       border-top-right-radius: $panel-border-radius !important;
       border-bottom-right-radius: $panel-border-radius !important;
 
+      #buttons {
+        gap: 8px;
+      }
+
       button.plain {
-        height: 36px;
-        width: 36px;
+        min-height: 36px;
+        min-width: 36px;
         background-size: 18px;
       }
     }

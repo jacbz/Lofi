@@ -269,8 +269,9 @@ const updatePlaylistDisplay = () => {
 player.updatePlaylistDisplay = updatePlaylistDisplay;
 Sortable.create(playlistContainer, {
   animation: 250,
+  delay: 250,
+  delayOnTouchOnly: true,
   ghostClass: 'dragging',
-  handle: '.sort-handle',
   onEnd: (event) => {
     const element = player.playlist[event.oldIndex];
     player.playlist.splice(event.oldIndex, 1);
@@ -366,7 +367,6 @@ formatInputRange(volumeBar, '#fff');
 
 // If on mobile, move repeat and shuffle buttons
 if (/Mobi/.test(navigator.userAgent)) {
-  console.log("wo")
   const buttons = document.getElementById('buttons');
   buttons.insertBefore(repeatButton, playPreviousButton);
   buttons.appendChild(shuffleButton);
