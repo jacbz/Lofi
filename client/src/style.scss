@@ -407,6 +407,11 @@ $panel-border-radius: 6px;
       justify-content: space-between;
       align-items: center;
 
+      .track-display {
+        display: flex;
+        align-items: center;
+      }
+
       .track-name {
         font-weight: 500;
       }
@@ -434,7 +439,7 @@ $panel-border-radius: 6px;
           display: inline-block;
           width: 14px;
           height: 14px;
-          margin-right: 6px;
+          margin-right: 0.5em;
 
           &:after {
             content: ' ';
@@ -462,14 +467,15 @@ $panel-border-radius: 6px;
         background: rgba(0, 0, 0, 0.15);
 
         &:not(.loading) {
-          .track-name:before {
+          // playing icon
+          .track-icons:before {
             content: '';
             width: 12px;
             height: 14px;
             background: url('icons/play.svg') no-repeat;
             display: inline-block;
-            margin-right: 5px;
             vertical-align: -1px;
+            margin-right: 0.35em;
           }
         }
       }
