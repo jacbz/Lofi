@@ -12,6 +12,10 @@ $height: 426px;
   color: white;
 }
 
+html {
+  height: 100%;
+}
+
 body {
   background: url('background.jpg'), black;
   background-repeat: no-repeat;
@@ -19,31 +23,30 @@ body {
   background-position: center center;
   background-size: cover;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
 }
 
 #header {
   font-family: $title-font;
   font-size: 800%;
   user-select: none;
-  position: absolute;
-  width: 100%;
-  text-align: center;
+  margin-bottom: -40px;
 }
 
+$panel-border-radius: 6px;
 .panel {
   background: $ui-background;
-  border-radius: 6px;
+  border-radius: $panel-border-radius;
 }
 
 #center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -42%);
   display: flex;
   flex-direction: row;
   gap: 12px;
-  margin-top: 22px;
 }
 
 .header {
@@ -144,6 +147,7 @@ body {
   display: flex;
   flex-direction: row;
   width: 650px;
+  background: none;
 
   #now-playing {
     flex: 1;
@@ -151,6 +155,8 @@ body {
     flex-direction: column;
     gap: 2px;
     border-right: 1px solid $ui-background;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 
     @keyframes rotation {
       from {
@@ -253,26 +259,6 @@ body {
         display: flex;
         gap: 6px;
 
-        #repeat-button {
-          background-image: url('icons/repeat.svg');
-
-          &.repeat-all {
-            background-image: url('icons/repeat-all.svg');
-          }
-
-          &.repeat-one {
-            background-image: url('icons/repeat-one.svg');
-          }
-        }
-
-        #shuffle-button {
-          background-image: url('icons/shuffle.svg');
-
-          &.active {
-            background-image: url('icons/shuffle-active.svg');
-          }
-        }
-
         #volume-panel {
           display: flex;
           align-items: center;
@@ -335,6 +321,26 @@ body {
           }
         }
       }
+    }    
+
+    #repeat-button {
+      background-image: url('icons/repeat.svg');
+
+      &.repeat-all {
+        background-image: url('icons/repeat-all.svg');
+      }
+
+      &.repeat-one {
+        background-image: url('icons/repeat-one.svg');
+      }
+    }
+
+    #shuffle-button {
+      background-image: url('icons/shuffle.svg');
+
+      &.active {
+        background-image: url('icons/shuffle-active.svg');
+      }
     }
   }
 
@@ -342,6 +348,8 @@ body {
     flex: 1.4;
     display: flex;
     flex-direction: column;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 
     #playlist-header {
       #export-button {
@@ -454,12 +462,15 @@ body {
         }
       }
 
-      .track-actions {
-        visibility: hidden;
-        opacity: 0;
+      .track-actions {        
         transition: visibility 0.2s, opacity 0.2s;
         display: flex;
         gap: 8px;
+
+        @media (hover: hover) {
+          visibility: hidden;
+          opacity: 0;
+        }
 
         .delete-button {
           background-image: url('icons/delete.svg');
@@ -495,14 +506,8 @@ body {
   }
 }
 
-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
+#footer {
   margin-bottom: 8px;
-  text-align: center;
 
   #github {
     &:before {
@@ -522,6 +527,7 @@ button {
   display: block;
   cursor: pointer;
   background-color: transparent;
+  -webkit-tap-highlight-color: transparent;
 
   &:focus {
     outline: none;
@@ -534,7 +540,13 @@ button.flat {
   transition: background-color 0.25s, color 0.25s;
   padding: 5px;
 
-  &:hover:enabled {
+  @media (hover: hover) {
+    &:hover:enabled {
+      background-color: white;
+      color: black;
+    }
+  }
+  &:active {
     background-color: white;
     color: black;
   }
@@ -549,7 +561,12 @@ button.plain {
   border: 0;
   border-radius: 50%;
 
-  &:hover {
+  @media (hover: hover) {
+    &:hover:enabled {
+      background-color: $ui-hover-background;
+    }
+  }
+  &:active {
     background-color: $ui-hover-background;
   }
 }
@@ -564,7 +581,12 @@ button.circle {
   background-repeat: no-repeat;
   background-size: 20px;
 
-  &:hover {
+  @media (hover: hover) {
+    &:hover:enabled {
+      background-color: $ui-hover-background;
+    }
+  }
+  &:active {
     background-color: $ui-hover-background;
   }
 }
@@ -626,10 +648,13 @@ input[type='range'] {
 
 #volume-bar {
   width: 60px;
-  visibility: hidden;
-  opacity: 0;
   transition: visibility 0.2s, opacity 0.2s;
   height: 4px;
+
+  @media (hover: hover) {
+    visibility: hidden;
+    opacity: 0;
+  }
 
   @mixin slider-track {
     height: 4px;
@@ -716,4 +741,61 @@ input[type='range'] {
   height: 0;
   background: url('icons/repeat-all.svg'), url('icons/repeat-one.svg'),
     url('icons/shuffle-active.svg'), url('icons/volume-muted.svg'), url('icons/play.svg');
+}
+
+// responsive
+$responsive-min-width: 315px;
+$responsive-max-width: 400px;
+@media screen and (max-width: 1000px) {
+  body {
+    gap: 48px;
+  }
+
+  #center {
+    flex-direction: column;
+    align-items: center;
+    gap: 36px;
+  }
+
+  #player-panel {
+    flex-direction: column;
+    width: 80vw;
+    min-width: $responsive-min-width;
+    max-width: $responsive-max-width;
+    gap: 12px;
+
+    #volume-bar {
+      width: 120px;
+    }
+
+    #now-playing {
+      border: none !important;
+      border-bottom: 1px solid $ui-background;
+      margin-bottom: 24px;
+      
+      border-top-right-radius: $panel-border-radius !important;
+      border-bottom-right-radius: $panel-border-radius !important;
+
+      button.plain {
+        height: 36px;
+        width: 36px;
+        background-size: 18px;
+      }
+    }
+  
+    #playlist {  
+      border-top-left-radius: $panel-border-radius !important;
+      border-bottom-left-radius: $panel-border-radius !important;
+    }
+  }
+
+  #slider-panel {
+    width: 80vw;
+    min-width: $responsive-min-width;
+    max-width: $responsive-max-width;
+  }
+
+  #footer {
+    padding-bottom: 12px;
+  }
 }

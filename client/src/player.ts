@@ -369,13 +369,7 @@ class Player {
   getExportUrl() {
     const json = JSON.stringify(this.playlist.map((t) => t.outputParams));
     const compressed = compress(json);
-    return `${window.location.origin}${window.location.pathname}?${compressed}`.replace(
-      'home.in.tum.de/~zhangja/lofi',
-      'lofi.jacobzhang.de'
-    ).replace(
-      'localhost:8080',
-      'lofi.jacobzhang.de'
-    );
+    return `${window.location.origin}${window.location.pathname}?${compressed}`;
   }
 
   /** Set up Media Session API metadata */

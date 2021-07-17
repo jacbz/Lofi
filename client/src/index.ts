@@ -364,6 +364,14 @@ volumeBar.addEventListener('input', () => {
 });
 formatInputRange(volumeBar, '#fff');
 
+// If on mobile, move repeat and shuffle buttons
+if (/Mobi/.test(navigator.userAgent)) {
+  console.log("wo")
+  const buttons = document.getElementById('buttons');
+  buttons.insertBefore(repeatButton, playPreviousButton);
+  buttons.appendChild(shuffleButton);
+}
+
 // Export
 const exportButton = document.getElementById('export-button');
 const exportPanel = document.getElementById('export-panel');
