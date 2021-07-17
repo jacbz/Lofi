@@ -53,6 +53,7 @@ $panel-border-radius: 6px;
 .panel {
   background: $ui-background;
   border-radius: $panel-border-radius;
+  backdrop-filter: blur(12px);
 }
 
 #center {
@@ -160,15 +161,18 @@ $panel-border-radius: 6px;
   flex-direction: row;
   width: 650px;
   background: none;
+  position: relative;
 
-  #now-playing {
+  #current-track {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 2px;
-    border-right: 1px solid $ui-background;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+    @supports not (backdrop-filter: blur(12px)) {
+      border-right: 1px solid $ui-background;
+    }
 
     @keyframes rotation {
       from {
@@ -298,7 +302,7 @@ $panel-border-radius: 6px;
       flex-direction: row;
       justify-content: center;
       align-items: center;
-      gap: 16px;
+      gap: 8px;
       padding: 8px;
       position: relative;
 
@@ -335,8 +339,16 @@ $panel-border-radius: 6px;
       }
     }    
 
+
+    #repeat-button, #shuffle-button {
+      min-height: 32px;
+      min-width: 32px;
+      background-size: 16px;
+    }
+
     #repeat-button {
       background-image: url('icons/repeat.svg');
+      margin-right: -4px;
 
       &.repeat-all {
         background-image: url('icons/repeat-all.svg');
@@ -349,10 +361,33 @@ $panel-border-radius: 6px;
 
     #shuffle-button {
       background-image: url('icons/shuffle.svg');
+      margin-left: -4px;
 
       &.active {
         background-image: url('icons/shuffle-active.svg');
       }
+    }
+  }
+
+  #export-panel {
+    position: absolute;
+    top: -112px;
+    left: calc(100% - 250px);
+    z-index: 100;
+    width: 250px;
+    transition: visibility 0.2s, opacity 0.2s;
+    visibility: hidden;
+    opacity: 0;
+
+    input {
+      padding: 4px;
+    }
+
+    #export-panel-content {
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
   }
 
@@ -370,28 +405,6 @@ $panel-border-radius: 6px;
         right: 4px;
         background-image: url('icons/export.svg');
       }
-
-      #export-panel {
-        position: absolute;
-        top: -112px;
-        left: calc(100% - 250px);
-        z-index: 100;
-        width: 250px;
-        transition: visibility 0.2s, opacity 0.2s;
-        visibility: hidden;
-        opacity: 0;
-
-        input {
-          padding: 4px;
-        }
-
-        #export-panel-content {
-          padding: 8px;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-      }
     }
 
     #playlist-tracks {
@@ -400,7 +413,7 @@ $panel-border-radius: 6px;
     }
 
     .track {
-      padding: 10px;
+      padding: 10px 10px 10px 12px;
       border-bottom: 1px solid $ui-background;
       cursor: pointer;
       display: flex;
@@ -410,6 +423,7 @@ $panel-border-radius: 6px;
       .track-display {
         display: flex;
         align-items: center;
+        user-select: none;
       }
 
       .track-name {
@@ -518,6 +532,7 @@ $panel-border-radius: 6px;
 
 #footer {
   margin-bottom: 8px;
+  user-select: none;
 
   #github {
     &:before {
@@ -537,6 +552,7 @@ button {
   display: block;
   cursor: pointer;
   background-color: transparent;
+  user-select: none;
 
   &:focus {
     outline: none;
@@ -656,7 +672,7 @@ input[type='range'] {
 }
 
 #volume-bar {
-  width: 60px;
+  width: 100px;
   transition: visibility 0.2s, opacity 0.2s;
   height: 4px;
 
@@ -755,7 +771,7 @@ input[type='range'] {
 // responsive
 $responsive-min-width: 300px;
 $responsive-max-width: 360px;
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 900px) {
   body {
     gap: 48px;
   }
@@ -780,40 +796,27 @@ $responsive-max-width: 360px;
     min-width: $responsive-min-width;
     max-width: $responsive-max-width;
     gap: 12px;
-
-    #volume-bar {
-      width: 120px;
-    }
-
-    #now-playing {
+    
+    #current-track {
       border: none !important;
       border-bottom: 1px solid $ui-background;
       margin-bottom: 24px;
       
       border-top-right-radius: $panel-border-radius !important;
       border-bottom-right-radius: $panel-border-radius !important;
+    }
 
-      #buttons {
-        gap: 8px;
-      }
-
-      button.plain {
-        min-height: 36px;
-        min-width: 36px;
-        background-size: 18px;
-      }
+    #export-panel {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
     }
   
     #playlist {  
       border-top-left-radius: $panel-border-radius !important;
       border-bottom-left-radius: $panel-border-radius !important;
     }
-  }
-
-  #slider-panel {
-    width: 80vw;
-    min-width: $responsive-min-width;
-    max-width: $responsive-max-width;
   }
 
   #footer {

@@ -71,7 +71,7 @@ for (let i = 0; i < HIDDEN_SIZE; i += 1) {
   slider.type = 'range';
   slider.min = '-4';
   slider.max = '4';
-  slider.step = '0.001';
+  slider.step = '0.01';
   slider.valueAsNumber = randn();
   slidersEl.appendChild(slider);
   sliders.push(slider);
@@ -103,7 +103,7 @@ generateButton.addEventListener('click', async () => {
   }
   const producer = new Producer();
   const track = producer.produce(params);
-  player.addToPlaylist(track);
+  player.addToPlaylist(track, true);
   // scroll to end of playlist
   playlistContainer.scrollTop = playlistContainer.scrollHeight;
 
@@ -125,20 +125,20 @@ seekbar.addEventListener('input', () => {
 });
 let wasPaused = false;
 let seekbarDragging = false;
-seekbar.addEventListener('mousedown', () => {
+['mousedown', 'touchstart'].forEach((e) => seekbar.addEventListener(e, () => {
   seekbarDragging = true;
   wasPaused = !player.isPlaying;
   if (!wasPaused) {
     player.pause();
   }
-});
-seekbar.addEventListener('mouseup', () => {
+}));
+['mouseup', 'touchend'].forEach((e) => seekbar.addEventListener(e, () => {
   seekbarDragging = false;
   player.seek(seekbar.valueAsNumber);
   if (!wasPaused) {
     player.play();
   }
-});
+}));
 
 // Visualizer
 const visualizer = document.getElementById('visualizer');
@@ -269,7 +269,7 @@ const updatePlaylistDisplay = () => {
 player.updatePlaylistDisplay = updatePlaylistDisplay;
 Sortable.create(playlistContainer, {
   animation: 250,
-  delay: 250,
+  delay: 400,
   delayOnTouchOnly: true,
   ghostClass: 'dragging',
   onEnd: (event) => {
@@ -364,13 +364,6 @@ volumeBar.addEventListener('input', () => {
   formatInputRange(volumeBar, '#fff');
 });
 formatInputRange(volumeBar, '#fff');
-
-// If on mobile, move repeat and shuffle buttons
-if (/Mobi/.test(navigator.userAgent)) {
-  const buttons = document.getElementById('buttons');
-  buttons.insertBefore(repeatButton, playPreviousButton);
-  buttons.appendChild(shuffleButton);
-}
 
 // Export
 const exportButton = document.getElementById('export-button');

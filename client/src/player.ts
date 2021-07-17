@@ -109,11 +109,11 @@ class Player {
   }
 
   /** Adds a given track to the playlist */
-  addToPlaylist(track: Track) {
+  addToPlaylist(track: Track, playImmediately = false) {
     this.playlist.push(track);
     this.updateLocalStorage();
     this.updatePlaylistDisplay();
-    if (!this.isPlaying) {
+    if (playImmediately || !this.isPlaying) {
       this.playTrack(this.playlist.length - 1);
     }
     this.fillShuffleQueue();

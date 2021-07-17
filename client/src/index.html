@@ -11,7 +11,7 @@
   <div id="header">LOFI</div>
   <div id="center">
     <div id="player-panel">
-      <div id="now-playing" class="panel">
+      <div id="current-track" class="panel">
         <div id="cover">
           <div id="vinyl" class="paused" style="opacity: 0.5">
             <svg id="vinyl-center" viewBox="0 0 52 52">
@@ -35,8 +35,6 @@
           <input type="range" min="0" max="0" step="0.1" value="0" class="slider" id="seekbar">
           <div id="subtitle">
             <div id="subtitle-buttons">
-              <button id="repeat-button" class="plain" title="Repeat"></button>
-              <button id="shuffle-button" class="plain" title="Shuffle"></button>
               <div id="volume-panel">
                 <button id="volume-button" class="plain" title="Mute"></button>
                 <input type="range" min="0" max="1.25" step="0.01" value="1" class="slider" id="volume-bar">
@@ -50,11 +48,13 @@
           </div>
         </div>
         <div id="buttons">
+          <button id="repeat-button" class="plain" title="Repeat"></button>
           <button id="play-previous-button" class="circle"></button>
           <button id="play-button" class="circle">
             <div id="play-button-icon"></div>
           </button>
           <button id="play-next-button" class="circle"></button>
+          <button id="shuffle-button" class="plain" title="Shuffle"></button>
           <div id="visualizer"></div>
         </div>
       </div>
@@ -75,19 +75,19 @@
           </div>
         </div>
       </template>
+      <div id="export-panel" class="panel" style="visibility: hidden;">
+        <div class="header">
+          <div class="header-text">SHARE THIS PLAYLIST</div>
+        </div>
+        <div id="export-panel-content">
+          <input id="export-url-input" readonly>
+          <button id="copy-button" class="flat">Copy</button>
+        </div>
+      </div>
       <div id="playlist" class="panel">
         <div id="playlist-header" class="header">
-          <div id="playlist-header-text" class="header-text">NOW PLAYING</div>
+          <div id="playlist-header-text" class="header-text">PLAYLIST</div>
           <button id="export-button" class="plain" title="Share this playlist"></button>
-          <div id="export-panel" class="panel" style="visibility: hidden;">
-            <div class="header">
-              <div class="header-text">SHARE THIS PLAYLIST</div>
-            </div>
-            <div id="export-panel-content">
-              <input id="export-url-input" readonly>
-              <button id="copy-button" class="flat">Copy</button>
-            </div>
-          </div>
         </div>
         <div id="playlist-tracks"></div>          
       </div>
