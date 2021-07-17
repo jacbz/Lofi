@@ -10,100 +10,105 @@
 </head>
 
 <body>
-  <div id="header">LOFI</div>
+  <div id="header">LOFI</div>  
   <div id="center">
-    <div id="player-panel">
-      <div id="current-track" class="panel">
-        <div id="cover">
-          <div id="vinyl" class="paused" style="opacity: 0.5">
-            <svg id="vinyl-center" viewBox="0 0 52 52">
-              <defs>
-                <path id="tophalf" d="M 8 32 a 14 14 0 0 1 36 0" />
-                <path id="lowerhalf1" d="M 10 21 a 16 16 0 0 0 32 0" />
-                <path id="lowerhalf2" d="M 2 26 a 24 24 0 0 0 48 0" />
-              </defs>
-              <circle cx="26" cy="26" r="26" fill="#eee" id="vinyl-color" />
-              <circle cx="26" cy="26" r="2" fill="black" />
-              <text text-anchor="middle">
-                <textPath xlink:href="#tophalf" startOffset="50%" id="vinyl-top-text">LOFI</textPath>
-                <textPath xlink:href="#lowerhalf1" startOffset="50%" id="vinyl-bottom-text1"></textPath>
-                <textPath xlink:href="#lowerhalf2" startOffset="50%" id="vinyl-bottom-text2"></textPath>
-              </text>
-            </svg>
-          </div>
-        </div>
-        <div id="info">
-          <span id="title"></span>
-          <input type="range" min="0" max="0" step="0.1" value="0" class="slider" id="seekbar">
-          <div id="subtitle">
-            <div id="subtitle-buttons">
-              <div id="volume-panel">
-                <button id="volume-button" class="plain" title="Mute"></button>
-                <input type="range" min="0" max="1.25" step="0.01" value="1" class="slider" id="volume-bar">
-              </div>
-            </div>
-            <div id="time">
-              <span id="current-time">0:00</span>
-              <span id="slash">/</span>
-              <span id="total-time">0:00</span>
-            </div>            
-          </div>
-        </div>
-        <div id="buttons">
-          <button id="repeat-button" class="plain" title="Repeat"></button>
-          <button id="play-previous-button" class="circle"></button>
-          <button id="play-button" class="circle">
-            <div id="play-button-icon"></div>
-          </button>
-          <button id="play-next-button" class="circle"></button>
-          <button id="shuffle-button" class="plain" title="Shuffle"></button>
-          <div id="visualizer"></div>
-        </div>
-      </div>
-      <template id="playlist-track">
-        <div class="track">
-          <div class="track-display">
-            <div class="track-icons">
-              <div class="track-loading"></div>
-            </div>
-            <span>
-              <span class="track-name">Test</span>
-              ·
-              <span class="track-duration">1:23</span>
-            </span>
-          </div>
-          <div class="track-actions">
-            <button class="delete-button plain" title="Delete"></button>
-          </div>
-        </div>
-      </template>
-      <div id="export-panel" class="panel" style="visibility: hidden;">
-        <div class="header">
-          <div class="header-text">SHARE THIS PLAYLIST</div>
-        </div>
-        <div id="export-panel-content">
-          <input id="export-url-input" readonly>
-          <button id="copy-button" class="flat">Copy</button>
-        </div>
-      </div>
-      <div id="playlist" class="panel">
-        <div id="playlist-header" class="header">
-          <div id="playlist-header-text" class="header-text">PLAYLIST</div>
-          <button id="export-button" class="plain" title="Share this playlist"></button>
-        </div>
-        <div id="playlist-tracks"></div>          
-      </div>
+    <div id="intro-text" class="panel">
+      <span>Our machine learning model has learned to represent a lofi track as a vector of 100 features. Each slider in the Latent Space panel corresponds to one such feature. Slide them around and generate new tracks!</span>
     </div>
-    <div id="slider-panel" class="panel">
-      <div class="header">
-        <div class="header-text">LATENT SPACE</div>
-        <div id="help" title="Our machine learning model has learned to represent a lofi track as a vector of 100 features. Each slider here corresponds to a feature in the latent space. Slide them around to hear what the resulting track sounds like!&#013;&#013;&#013;Note: as the latent space is built on a normal distribution, keeping sliders near the center will make the track sound better."></div>
-      </div>
-      <div id="slider-panel-content">
-        <div id="sliders">
-          <button id="refresh-button" class="plain" title="Sample new values from a normal distribution"></button>
+    <div id="main">
+      <div id="player-panel">
+        <div id="current-track" class="panel">
+          <div id="cover">
+            <div id="vinyl" class="paused" style="opacity: 0.5">
+              <svg id="vinyl-center" viewBox="0 0 52 52">
+                <defs>
+                  <path id="tophalf" d="M 8 32 a 14 14 0 0 1 36 0" />
+                  <path id="lowerhalf1" d="M 10 21 a 16 16 0 0 0 32 0" />
+                  <path id="lowerhalf2" d="M 2 26 a 24 24 0 0 0 48 0" />
+                </defs>
+                <circle cx="26" cy="26" r="26" fill="#eee" id="vinyl-color" />
+                <circle cx="26" cy="26" r="2" fill="black" />
+                <text text-anchor="middle">
+                  <textPath xlink:href="#tophalf" startOffset="50%" id="vinyl-top-text">LOFI</textPath>
+                  <textPath xlink:href="#lowerhalf1" startOffset="50%" id="vinyl-bottom-text1"></textPath>
+                  <textPath xlink:href="#lowerhalf2" startOffset="50%" id="vinyl-bottom-text2"></textPath>
+                </text>
+              </svg>
+            </div>
+          </div>
+          <div id="info">
+            <span id="title"></span>
+            <input type="range" min="0" max="0" step="0.1" value="0" class="slider" id="seekbar">
+            <div id="subtitle">
+              <div id="subtitle-buttons">
+                <div id="volume-panel">
+                  <button id="volume-button" class="plain" title="Mute"></button>
+                  <input type="range" min="0" max="1.25" step="0.01" value="1" class="slider" id="volume-bar">
+                </div>
+              </div>
+              <div id="time">
+                <span id="current-time">0:00</span>
+                <span id="slash">/</span>
+                <span id="total-time">0:00</span>
+              </div>            
+            </div>
+          </div>
+          <div id="buttons">
+            <button id="repeat-button" class="plain" title="Repeat"></button>
+            <button id="play-previous-button" class="circle"></button>
+            <button id="play-button" class="circle">
+              <div id="play-button-icon"></div>
+            </button>
+            <button id="play-next-button" class="circle"></button>
+            <button id="shuffle-button" class="plain" title="Shuffle"></button>
+            <div id="visualizer"></div>
+          </div>
         </div>
-        <button id="generate-button" class="flat"><div id="loading-animation" style="display: none"><div></div><div></div><div></div></div>Generate</button>
+        <template id="playlist-track">
+          <div class="track">
+            <div class="track-display">
+              <div class="track-icons">
+                <div class="track-loading"></div>
+              </div>
+              <span>
+                <span class="track-name">Test</span>
+                ·
+                <span class="track-duration">1:23</span>
+              </span>
+            </div>
+            <div class="track-actions">
+              <button class="delete-button plain" title="Delete"></button>
+            </div>
+          </div>
+        </template>
+        <div id="export-panel" class="panel" style="visibility: hidden;">
+          <div class="header">
+            <div class="header-text">SHARE THIS PLAYLIST</div>
+          </div>
+          <div id="export-panel-content">
+            <input id="export-url-input" readonly>
+            <button id="copy-button" class="flat">Copy</button>
+          </div>
+        </div>
+        <div id="playlist" class="panel">
+          <div id="playlist-header" class="header">
+            <div id="playlist-header-text" class="header-text">PLAYLIST</div>
+            <button id="export-button" class="plain" title="Share this playlist"></button>
+          </div>
+          <div id="playlist-tracks"></div>          
+        </div>
+      </div>
+      <div id="slider-panel" class="panel">
+        <div class="header">
+          <div class="header-text">LATENT SPACE</div>
+          <button id="help" class="plain"></button>
+        </div>
+        <div id="slider-panel-content">
+          <div id="sliders">
+            <button id="refresh-button" class="plain" title="Sample new values from a normal distribution"></button>
+          </div>
+          <button id="generate-button" class="flat"><div id="loading-animation" style="display: none"><div></div><div></div><div></div></div>Generate</button>
+        </div>
       </div>
     </div>
   </div>

@@ -57,6 +57,30 @@ $panel-border-radius: 6px;
 }
 
 #center {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+#intro-text {
+  text-align: center;
+  display: flex;
+  width: 100%;
+  max-height: 0;
+  transition: max-height 0.5s;
+  overflow: hidden;
+
+  span {
+    font-size: 105%;
+    line-height: 125%;
+    flex-grow: 1;
+    width: 0;
+    padding: 12px;
+  }
+}
+
+#main {
   display: flex;
   flex-direction: row;
   gap: 12px;
@@ -87,12 +111,11 @@ $panel-border-radius: 6px;
   #help {
     cursor: help;
     position: absolute;
-    right: 8px;
-    top: 6px;
-    width: 15px;
-    height: 15px;
-    background: url('icons/help.svg') no-repeat;
-    display: inline-block;
+    right: 4px;
+    top: 3px;
+    width: 20px;
+    height: 20px;
+    background-image: url('icons/help.svg');
   }
 
   #slider-panel-content {
@@ -170,8 +193,9 @@ $panel-border-radius: 6px;
     gap: 2px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    @supports not (backdrop-filter: blur(12px)) {
-      border-right: 1px solid $ui-background;
+    border-right: 1px solid $ui-background;
+    @media not screen and (max-width: 900px) {
+      backdrop-filter: none;
     }
 
     @keyframes rotation {
@@ -300,7 +324,7 @@ $panel-border-radius: 6px;
     #buttons {
       display: flex;
       flex-direction: row;
-      justify-content: center;
+      justify-content: space-around;
       align-items: center;
       gap: 8px;
       padding: 8px;
@@ -337,8 +361,7 @@ $panel-border-radius: 6px;
           }
         }
       }
-    }    
-
+    }
 
     #repeat-button, #shuffle-button {
       min-height: 32px;
@@ -397,6 +420,9 @@ $panel-border-radius: 6px;
     flex-direction: column;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+    @media not screen and (max-width: 900px) {
+      backdrop-filter: none;
+    }
 
     #playlist-header {
       #export-button {
@@ -785,6 +811,14 @@ $responsive-max-width: 360px;
   }
 
   #center {
+    gap: 24px;
+  }
+
+  #intro-text {
+    order: 2;
+  }
+
+  #main {
     flex-direction: column;
     align-items: center;
     gap: 36px;
@@ -796,7 +830,7 @@ $responsive-max-width: 360px;
     min-width: $responsive-min-width;
     max-width: $responsive-max-width;
     gap: 12px;
-    
+
     #current-track {
       border: none !important;
       border-bottom: 1px solid $ui-background;

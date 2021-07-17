@@ -77,6 +77,17 @@ for (let i = 0; i < HIDDEN_SIZE; i += 1) {
   sliders.push(slider);
 }
 
+// Help button
+const helpButton = document.getElementById('help');
+const introText = document.getElementById('intro-text');
+helpButton.addEventListener('click', () => {
+  if (introText.style.maxHeight) {
+    introText.style.maxHeight = null;
+  } else {
+    introText.style.maxHeight = '200px';
+  }
+});
+
 // Refresh Button
 const refreshButton = document.getElementById('refresh-button');
 refreshButton.addEventListener('click', () => {
