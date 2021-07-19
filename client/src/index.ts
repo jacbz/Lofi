@@ -200,6 +200,7 @@ player.updateTrackDisplay = (seconds?: number, spectrum?: Float32Array) => {
     // when current time is within 0.1s of total length, display total length
     timeLabel.textContent = formatTime(seconds);
     totalTimeLabel.textContent = formatTime(totalLength);
+    vinyl.style.transform = `rotate(${(seconds * 8) % 360}deg)`;
   } else {
     vinyl.style.opacity = '0.5';
     titleLabel.textContent = '';
@@ -238,11 +239,6 @@ const onTrackChange = () => {
     vinylBottomText2.textContent = '';
     vinylColor.setAttribute('fill', '#eee');
   }
-
-  /* reset vinyl animation by triggering reflow */
-  vinyl.style.animation = 'none';
-  const _ = vinyl.offsetHeight;
-  vinyl.style.animation = null;
 };
 player.onTrackChange = onTrackChange;
 
@@ -308,11 +304,9 @@ player.getGain = () => volumeBar.valueAsNumber;
 const updatePlayingState = () => {
   if (player.isPlaying) {
     playButton.classList.toggle('paused', true);
-    vinyl.classList.toggle('paused', false);
     audio.play();
   } else {
     playButton.classList.toggle('paused', false);
-    vinyl.classList.toggle('paused', true);
     audio.pause();
   }
 };

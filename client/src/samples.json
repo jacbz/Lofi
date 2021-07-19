@@ -66,6 +66,7 @@
     },
     {
       "name": "drumloop95",
+      "comment": "Drum loops for 95 BPM",
       "volume": 0,
       "size": 4,
       "energyRanges": [

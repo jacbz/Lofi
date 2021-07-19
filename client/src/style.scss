@@ -197,16 +197,7 @@ $panel-border-radius: 6px;
     @media not screen and (max-width: 900px) {
       backdrop-filter: none;
     }
-
-    @keyframes rotation {
-      from {
-        transform: rotate(0deg);
-      }
-      to {
-        transform: rotate(359deg);
-      }
-    }
-
+    
     #cover {
       padding: 12px 24px;
       user-select: none;
@@ -220,12 +211,9 @@ $panel-border-radius: 6px;
         height: 214px;
         background: url('vinyl.svg');
         background-size: 100%;
-        animation: rotation 30s infinite linear;
+        transition: transform 0.1s linear;
         position: relative;
-
-        &.paused {
-          animation-play-state: paused;
-        }
+        filter: drop-shadow(0 0 1rem $ui-background);
 
         #vinyl-center {
           position: absolute;
