@@ -154,7 +154,7 @@ let seekbarDragging = false;
 // Visualizer
 const visualizer = document.getElementById('visualizer');
 const spectrumBars: HTMLDivElement[] = [];
-for (let i = 0; i < 16; i += 1) {
+for (let i = 0; i < 22; i += 1) {
   const spectrumBar = document.createElement('div');
   spectrumBar.classList.add('spectrum-bar');
   visualizer.appendChild(spectrumBar);
@@ -200,7 +200,7 @@ player.updateTrackDisplay = (seconds?: number, spectrum?: Float32Array) => {
     // when current time is within 0.1s of total length, display total length
     timeLabel.textContent = formatTime(seconds);
     totalTimeLabel.textContent = formatTime(totalLength);
-    vinyl.style.transform = `rotate(${(seconds * 8) % 360}deg)`;
+    vinyl.style.transform = `rotate(${seconds * 8}deg)`;
   } else {
     vinyl.style.opacity = '0.5';
     titleLabel.textContent = '';

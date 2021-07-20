@@ -211,7 +211,7 @@ $panel-border-radius: 6px;
         height: 214px;
         background: url('vinyl.svg');
         background-size: 100%;
-        transition: transform 0.1s linear;
+        transition: transform 0.4s;
         position: relative;
         filter: drop-shadow(0 0 1rem $ui-background);
 
@@ -532,15 +532,14 @@ $panel-border-radius: 6px;
   height: 100%;
   display: flex;
   flex-direction: row;
+  gap: 2px;
   align-items: flex-end;
   pointer-events: none;
 
   .spectrum-bar {
-    margin-left: 2px;
-    margin-right: 2px;
-    background: rgba(0, 0, 0, 0.08);
-    width: 100%;
-    transition: height 0.15s;
+    flex: 1;
+    background: rgba(0, 0, 0, 0.06);
+    transition: height 0.1s;
   }
 }
 

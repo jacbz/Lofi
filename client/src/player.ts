@@ -215,7 +215,7 @@ class Player {
     }
 
     // connect analyzer for visualizations
-    const analyzer = new Tone.Analyser('fft', 16);
+    const analyzer = new Tone.Analyser('fft', 32);
     this.gain.connect(analyzer);
 
     const fadeOutBegin = this.currentTrack.length - this.currentTrack.fadeOutDuration;
