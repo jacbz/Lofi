@@ -62,13 +62,12 @@ export const Preset1: ProducerPreset = new ProducerPreset({
   }),
   harmony: new InstrumentConfiguration({
     instrument: Instrument.ElectricPiano,
-    octaveShift: 1,
     volume: 0.8
   }),
   firstBeatArpeggio: new InstrumentConfiguration({
     instrument: Instrument.Piano,
     octaveShift: -1,
-    volume: 0.15
+    volume: 0.1
   }),
   firstBeatArpeggioPattern: [1, 5, 8, 5, 10, 5, 8],
   melody: new InstrumentConfiguration({
@@ -86,13 +85,11 @@ export const Preset2: ProducerPreset = new ProducerPreset({
   }),
   harmony: new InstrumentConfiguration({
     instrument: Instrument.ElectricPiano,
-    octaveShift: 2,
     volume: 0.8
   }),
   firstBeatArpeggio: new InstrumentConfiguration({
     instrument: Instrument.Harp,
-    octaveShift: -1,
-    volume: 0.25
+    volume: 0.2
   }),
   melody: new InstrumentConfiguration({
     instrument: Instrument.ElectricPiano,
@@ -110,7 +107,6 @@ export const Preset3: ProducerPreset = new ProducerPreset({
   }),
   harmony: new InstrumentConfiguration({
     instrument: Instrument.ElectricPiano,
-    octaveShift: 1,
     volume: 0.6
   }),
   melody: new InstrumentConfiguration({

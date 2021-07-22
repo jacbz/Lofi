@@ -95,8 +95,8 @@ class Producer {
     this.notesInScale = Tonal.Mode.notes(this.mode, this.tonic);
     this.notesInScalePitched = Tonal.Mode.notes(this.mode, `${this.tonic}3`);
 
-    // array of seventh chords, e.g. ["C7", "Dm7", "Em7", "F7", "G7", "Am7", "Bdim7"]
-    this.chordsInScale = Tonal.Mode.seventhChords(this.mode, this.tonic);
+    // array of triads, e.g. ["C", "Dm", "Em", "F", "G", "Am", "Bdim"]
+    this.chordsInScale = Tonal.Mode.triads(this.mode, this.tonic);
 
     this.energy = params.energy;
     this.valence = params.valence;
@@ -263,8 +263,9 @@ class Producer {
 
         // harmony
         if (this.preset.harmony) {
-          const harmonyNotes = chord.notes.slice(0, 3);
-          harmonyNotes[0] = octShift(harmonyNotes[0], this.preset.harmony.octaveShift);
+          const harmonyNotes = octShiftAll(chord.notes, this.preset.harmony.octaveShift);
+          // invert chord
+          harmonyNotes[0] = octShift(harmonyNotes[0], 1);
           this.addNote(
             this.preset.harmony.instrument,
             harmonyNotes,
