@@ -299,7 +299,9 @@ const playNextButton = document.getElementById('play-next-button');
 const repeatButton = document.getElementById('repeat-button');
 const shuffleButton = document.getElementById('shuffle-button');
 const volumeButton = document.getElementById('volume-button');
+const recordButton = document.getElementById('record-button');
 const volumeBar = document.getElementById('volume-bar') as HTMLInputElement;
+
 player.getGain = () => volumeBar.valueAsNumber;
 const updatePlayingState = () => {
   if (player.isPlaying) {
@@ -359,6 +361,23 @@ volumeButton.addEventListener('click', async () => {
   player.muted = !player.muted;
   volumeButton.classList.toggle('muted', player.muted);
 });
+
+const updateRecordingState = () => {
+  if (player.isRecording) {
+    recordButton.classList.toggle('paused', false);
+  } else {
+    recordButton.classList.toggle('paused', true);
+  }
+};
+player.onRecordingStateChange = updateRecordingState;
+recordButton.addEventListener('click', async () => {
+  if (player.isRecording) {
+    player.pauseRecording();
+  } else {
+    player.startRecording();
+  }
+});
+
 volumeBar.addEventListener('input', () => {
   if (player.muted) {
     volumeButton.click();
