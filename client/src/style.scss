@@ -204,6 +204,8 @@ $panel-border-radius: 6px;
       border-radius: 6px;
       padding: 6px 6px 4px 6px;
       margin: 6px 0 0 6px;
+      max-width: 56px;
+      color: #fff;
 
       &::before {
         content: '';
@@ -220,6 +222,7 @@ $panel-border-radius: 6px;
       }          
 
       &.paused{
+        color: rgba(255,255,255,0.5);
         &::before{
           background:radial-gradient(
             circle at 2px 2px,
