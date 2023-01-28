@@ -43,10 +43,11 @@ class Player {
    async downloadRecording() {
      if (this._recorder) {
        const recording = await this._recorder.stop();
-       if (recording.size > 0) {
+       const type = recording?.type?.split(';')[0]?.split('/')[1] || 'webm';
+       if (recording?.size > 0) {
          const url = URL.createObjectURL(recording);
          const anchor = document.createElement('a');
-         anchor.download = 'lofi-record.webm';
+         anchor.download = `lofi-record.${type}`;
          anchor.href = url;
          anchor.click();
        }
