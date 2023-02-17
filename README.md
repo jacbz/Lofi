@@ -14,6 +14,9 @@ Click [here](http://lofi.jacobzhang.de/?default) for a pre-generated lo-fi playl
 
 * **Client**: The client is written in TypeScript and built with Webpack. It uses Tone.js to generate music.
 * **Model**: The model is implemented in PyTorch. We synthesized various datasets, including Hooktheory and Spotify.
-* **Server**: The server is a basic Flask instance that deploys the trained model checkpoint. The client communicates with the Server using a REST API.
+* **Server**: The server is a basic Flask instance that deploys the trained model checkpoint. The client communicates with the server using a REST API.
 
-![](https://svgshare.com/i/ZG9.svg)
+## Setup
+If you only want to tinker around with the client, you will only need the `client` folder. This will use the project's server as the backend.
+
+If you want to deploy your own model, you can either train your own model (see the instructions in the `model`) or download the pre-trained checkpoint from [here](https://github.com/jacbz/Lofi/files/7519187/checkpoints.zip). Once you have deployed the server, change the server address inside `client\src\api.ts`.

@@ -1,11 +1,13 @@
 import { OutputParams } from './params';
 
+const server = 'https://lofiserver.jacobzhang.de';
+
 export const generate = (): Promise<OutputParams> =>
-  fetch('https://lofiserver.jacobzhang.de/generate')
+  fetch(`${server}/generate`)
     .then((response) => response.json())
     .then((response) => JSON.parse(response) as OutputParams);
 
 export const decode = (inputList: number[]): Promise<OutputParams> =>
-  fetch(`https://lofiserver.jacobzhang.de/decode?input=${JSON.stringify(inputList)}`)
+  fetch(`${server}/decode?input=${JSON.stringify(inputList)}`)
     .then((response) => response.json())
     .then((response) => JSON.parse(response) as OutputParams);
