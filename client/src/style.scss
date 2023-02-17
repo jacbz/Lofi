@@ -198,6 +198,42 @@ $panel-border-radius: 6px;
       backdrop-filter: none;
     }
     
+    #record-button {
+      width: auto;
+      height: auto;
+      border-radius: 6px;
+      padding: 6px 6px 4px 6px;
+      margin: 6px 0 0 6px;
+      max-width: 56px;
+      color: #fff;
+
+      &::before {
+        content: '';
+        background: radial-gradient(
+          circle at 2px 2px,
+          #f42 0%,
+          #f00 30%
+        );
+        width: 10px;
+        height: 10px;
+        margin-right: 3px;
+        border-radius: 50%;
+        display: inline-block;          
+      }          
+
+      &.paused{
+        color: rgba(255,255,255,0.5);
+        &::before{
+          background:radial-gradient(
+            circle at 2px 2px,
+            rgb(239, 139, 121) 0%,
+            rgb(173, 79, 79) 30%
+          );
+        }
+      }
+    }
+  
+
     #cover {
       padding: 12px 24px;
       user-select: none;

@@ -37,6 +37,63 @@ class Player {
     }
   }
 
+   /** Recorder */
+   private _recorder: Tone.Recorder;
+
+   async downloadRecording() {
+     if (this._recorder) {
+       const recording = await this._recorder.stop();
+       const type = recording?.type?.split(';')[0]?.split('/')[1] || 'webm';
+       if (recording?.size > 0) {
+         const url = URL.createObjectURL(recording);
+         const anchor = document.createElement('a');
+         anchor.download = `lofi-record.${type}`;
+         anchor.href = url;
+         anchor.click();
+       }
+       this._recorder = null;
+     }
+   }
+ 
+   /** Whether the player is currently recording */
+   private _isRecording: boolean = false;
+ 
+   get isRecording() {
+     return this._isRecording;
+   }
+ 
+   set isRecording(isRecording: boolean) {
+     if (this._isRecording !== isRecording) {
+       this._isRecording = isRecording;
+       if (!this._recorder) {
+         this._recorder = new Tone.Recorder();
+         this._recorder.start();
+       }
+ 
+       this.onRecordingStateChange();
+       if (this.gain) {
+         if (this._isRecording) {
+           this.gain.connect(this._recorder);
+         } else {
+           this.gain.disconnect(this._recorder);
+         }
+       }
+ 
+       if (!this._isRecording) {
+         this.downloadRecording();
+       }
+     }
+   }
+ 
+   pauseRecording() {
+     this.isRecording = false;
+   }
+ 
+   startRecording() {
+     this.isRecording = true;
+   }
+ 
+
   /** Whether the player is currently loading */
   private _isLoading: boolean = false;
 
@@ -85,6 +142,9 @@ class Player {
 
   /** Function to call when isPlaying changes */
   onPlayingStateChange: () => void;
+
+  /** Function to call when isRecording changes */
+  onRecordingStateChange: () => void;
 
   /** Function to call when isLoading changes */
   onLoadingStateChange: () => void;
@@ -217,6 +277,10 @@ class Player {
     // connect analyzer for visualizations
     const analyzer = new Tone.Analyser('fft', 32);
     this.gain.connect(analyzer);
+    
+    if (this._isRecording) {
+      this.gain.connect(this._recorder);
+    }
 
     const fadeOutBegin = this.currentTrack.length - this.currentTrack.fadeOutDuration;
 

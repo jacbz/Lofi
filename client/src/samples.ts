@@ -28,6 +28,10 @@ class SampleGroup {
   }
 
   getSampleUrl(index: number) {
+    // for drumloop100 we have a single file
+    if(this.name === 'drumloop100') {
+      return `${SAMPLES_BASE_URL}/loops/${this.name}/${this.name}.mp3`;  
+    }
     return `${SAMPLES_BASE_URL}/loops/${this.name}/${this.name}_${index + 1}.mp3`;
   }
 
