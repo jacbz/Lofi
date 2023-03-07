@@ -285,7 +285,7 @@ class Player {
     const fadeOutBegin = this.currentTrack.length - this.currentTrack.fadeOutDuration;
 
     // schedule events to do every 100ms
-    Tone.Transport.scheduleRepeat(async (time) => {
+    Tone.Transport.scheduleRepeat((time) => {
       this.isLoading = false;
 
       const seconds = Tone.Transport.getSecondsAtTime(time);
