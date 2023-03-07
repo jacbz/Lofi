@@ -3,6 +3,7 @@ import { getInstrumentFilters, getInstrument, Instrument } from './instruments';
 import * as Samples from './samples';
 import { Track } from './track';
 import { compress } from './helper';
+import { refresh, generateNewTrack } from '.';
 
 /**
  * A class that plays a Track by synthesizing events in Tone.js.
@@ -54,14 +55,14 @@ class Player {
        this._recorder = null;
      }
    }
- 
+
    /** Whether the player is currently recording */
    private _isRecording: boolean = false;
- 
+
    get isRecording() {
      return this._isRecording;
    }
- 
+
    set isRecording(isRecording: boolean) {
      if (this._isRecording !== isRecording) {
        this._isRecording = isRecording;
@@ -69,7 +70,7 @@ class Player {
          this._recorder = new Tone.Recorder();
          this._recorder.start();
        }
- 
+
        this.onRecordingStateChange();
        if (this.gain) {
          if (this._isRecording) {
@@ -78,21 +79,20 @@ class Player {
            this.gain.disconnect(this._recorder);
          }
        }
- 
+
        if (!this._isRecording) {
          this.downloadRecording();
        }
      }
    }
- 
+
    pauseRecording() {
      this.isRecording = false;
    }
- 
+
    startRecording() {
      this.isRecording = true;
    }
- 
 
   /** Whether the player is currently loading */
   private _isLoading: boolean = false;
@@ -173,7 +173,7 @@ class Player {
     this.playlist.push(track);
     this.updateLocalStorage();
     this.updatePlaylistDisplay();
-    if (playImmediately || !this.isPlaying) {
+    if (playImmediately) {
       this.playTrack(this.playlist.length - 1);
     }
     this.fillShuffleQueue();
@@ -277,7 +277,7 @@ class Player {
     // connect analyzer for visualizations
     const analyzer = new Tone.Analyser('fft', 32);
     this.gain.connect(analyzer);
-    
+
     if (this._isRecording) {
       this.gain.connect(this._recorder);
     }
@@ -285,7 +285,7 @@ class Player {
     const fadeOutBegin = this.currentTrack.length - this.currentTrack.fadeOutDuration;
 
     // schedule events to do every 100ms
-    Tone.Transport.scheduleRepeat((time) => {
+    Tone.Transport.scheduleRepeat(async (time) => {
       this.isLoading = false;
 
       const seconds = Tone.Transport.getSecondsAtTime(time);
@@ -380,7 +380,7 @@ class Player {
   }
 
   /** Plays the next track */
-  playNext() {
+  async playNext() {
     if (this.repeat === RepeatMode.ONE) {
       this.seek(0);
       return;
@@ -397,6 +397,14 @@ class Player {
       this.repeat === RepeatMode.ALL
     ) {
       nextTrackIndex = 0;
+    } else if (
+      this.currentPlayingIndex === this.playlist.length - 1 &&
+      this.repeat === RepeatMode.CONTINUOUS
+    ) {
+      this.unload();
+      refresh();
+      await generateNewTrack(false);
+      nextTrackIndex = this.playlist.length - 1;
     }
 
     if (nextTrackIndex !== null) {
@@ -460,7 +468,8 @@ class Player {
 export enum RepeatMode {
   NONE,
   ALL,
-  ONE
+  ONE,
+  CONTINUOUS
 }
 
 export default Player;

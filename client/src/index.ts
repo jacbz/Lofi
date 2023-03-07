@@ -90,16 +90,17 @@ helpButton.addEventListener('click', () => {
 
 // Refresh Button
 const refreshButton = document.getElementById('refresh-button');
-refreshButton.addEventListener('click', () => {
+export function refresh() {
   sliders.forEach((s) => {
     s.valueAsNumber = randn();
   });
-});
+}
+refreshButton.addEventListener('click', refresh);
 
 // Generate button
 const generateButton = document.getElementById('generate-button') as HTMLButtonElement;
 const loadingAnimation = document.getElementById('loading-animation');
-generateButton.addEventListener('click', async () => {
+export async function generateNewTrack(playImmediately = true) {
   generateButton.disabled = true;
   loadingAnimation.style.display = null;
 
@@ -114,13 +115,14 @@ generateButton.addEventListener('click', async () => {
   }
   const producer = new Producer();
   const track = producer.produce(params);
-  player.addToPlaylist(track, true);
+  player.addToPlaylist(track, playImmediately);
   // scroll to end of playlist
   playlistContainer.scrollTop = playlistContainer.scrollHeight;
 
   generateButton.disabled = false;
   loadingAnimation.style.display = 'none';
-});
+}
+generateButton.addEventListener('click', async () => generateNewTrack(true));
 
 /** Formats seconds into an MM:SS string */
 const formatTime = (seconds: number) => {
@@ -339,8 +341,14 @@ repeatButton.addEventListener('click', async () => {
       break;
     }
     case RepeatMode.ONE: {
-      player.repeat = RepeatMode.NONE;
+      player.repeat = RepeatMode.CONTINUOUS;
       repeatButton.classList.remove('repeat-one');
+      repeatButton.classList.add('repeat-continuous');
+      break;
+    }
+    case RepeatMode.CONTINUOUS: {
+      player.repeat = RepeatMode.NONE;
+      repeatButton.classList.remove('repeat-continuous');
       break;
     }
     default: {

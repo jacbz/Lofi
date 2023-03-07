@@ -26,7 +26,7 @@ body {
   height: 100%;
 }
 
-@mixin background($url) {  
+@mixin background($url) {
   background: url($url), black;
   background-repeat: no-repeat;
   background-position: center center;
@@ -197,7 +197,7 @@ $panel-border-radius: 6px;
     @media not screen and (max-width: 900px) {
       backdrop-filter: none;
     }
-    
+
     #record-button {
       width: auto;
       height: auto;
@@ -218,8 +218,8 @@ $panel-border-radius: 6px;
         height: 10px;
         margin-right: 3px;
         border-radius: 50%;
-        display: inline-block;          
-      }          
+        display: inline-block;
+      }
 
       &.paused{
         color: rgba(255,255,255,0.5);
@@ -232,7 +232,7 @@ $panel-border-radius: 6px;
         }
       }
     }
-  
+
 
     #cover {
       padding: 12px 24px;
@@ -404,6 +404,10 @@ $panel-border-radius: 6px;
       &.repeat-one {
         background-image: url('icons/repeat-one.svg');
       }
+
+      &.repeat-continuous {
+        background-image: url('icons/repeat-continuous.svg');
+      }
     }
 
     #shuffle-button {
@@ -544,7 +548,7 @@ $panel-border-radius: 6px;
         }
       }
 
-      .track-actions {        
+      .track-actions {
         transition: visibility 0.2s, opacity 0.2s;
         display: flex;
         gap: 8px;
@@ -813,7 +817,7 @@ input[type='range'] {
   display: hidden;
   width: 0;
   height: 0;
-  background: url('icons/repeat-all.svg'), url('icons/repeat-one.svg'),
+  background: url('icons/repeat-all.svg'), url('icons/repeat-one.svg'), url('icons/repeat-continuous.svg'),
     url('icons/shuffle-active.svg'), url('icons/volume-muted.svg'), url('icons/play.svg');
 }
 
@@ -858,7 +862,7 @@ $responsive-max-width: 360px;
       border: none !important;
       border-bottom: 1px solid $ui-background;
       margin-bottom: 24px;
-      
+
       border-top-right-radius: $panel-border-radius !important;
       border-bottom-right-radius: $panel-border-radius !important;
     }
@@ -869,8 +873,8 @@ $responsive-max-width: 360px;
       top: 50%;
       transform: translate(-50%, -50%);
     }
-  
-    #playlist {  
+
+    #playlist {
       border-top-left-radius: $panel-border-radius !important;
       border-bottom-left-radius: $panel-border-radius !important;
     }
