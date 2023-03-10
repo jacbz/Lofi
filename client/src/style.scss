@@ -461,8 +461,19 @@ $panel-border-radius: 6px;
       }
     }
 
+    #playlist-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #load-playlist-button {
+      position: absolute;
+    }
+
     #playlist-tracks {
       height: $height;
+      width: 100%;
       overflow-y: auto;
     }
 

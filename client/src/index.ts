@@ -220,6 +220,7 @@ const vinyl = document.getElementById('vinyl');
 const vinylColor = document.getElementById('vinyl-color');
 const vinylBottomText1 = document.getElementById('vinyl-bottom-text1');
 const vinylBottomText2 = document.getElementById('vinyl-bottom-text2');
+const loadPlaylistButton = document.getElementById('load-playlist-button');
 const playlistContainer = document.getElementById('playlist-tracks');
 const updateTrackClasses = () => {
   player.playlist.forEach((track, i) => {
@@ -244,8 +245,13 @@ const onTrackChange = () => {
 };
 player.onTrackChange = onTrackChange;
 
+loadPlaylistButton.addEventListener('click', () => {
+  window.location.href = '?default';
+});
+
 // Playlist
 const updatePlaylistDisplay = () => {
+  loadPlaylistButton.style.display = player.playlist.length > 0 ? 'none' : null;
   playlistContainer.innerHTML = '';
   player.playlist.forEach((track, i) => {
     const template = document.getElementById('playlist-track') as HTMLTemplateElement;
