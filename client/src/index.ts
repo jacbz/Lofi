@@ -90,17 +90,17 @@ helpButton.addEventListener('click', () => {
 
 // Refresh Button
 const refreshButton = document.getElementById('refresh-button');
-export function refresh() {
+export function refreshLatentSpace() {
   sliders.forEach((s) => {
     s.valueAsNumber = randn();
   });
 }
-refreshButton.addEventListener('click', refresh);
+refreshButton.addEventListener('click', refreshLatentSpace);
 
 // Generate button
 const generateButton = document.getElementById('generate-button') as HTMLButtonElement;
 const loadingAnimation = document.getElementById('loading-animation');
-export async function generateNewTrack(playImmediately = true) {
+export async function generateNewTrack() {
   generateButton.disabled = true;
   loadingAnimation.style.display = null;
 
@@ -115,14 +115,15 @@ export async function generateNewTrack(playImmediately = true) {
   }
   const producer = new Producer();
   const track = producer.produce(params);
-  player.addToPlaylist(track, playImmediately);
+  player.addToPlaylist(track);
   // scroll to end of playlist
   playlistContainer.scrollTop = playlistContainer.scrollHeight;
 
   generateButton.disabled = false;
   loadingAnimation.style.display = 'none';
 }
-generateButton.addEventListener('click', async () => generateNewTrack(true));
+
+generateButton.addEventListener('click', generateNewTrack);
 
 /** Formats seconds into an MM:SS string */
 const formatTime = (seconds: number) => {
@@ -270,7 +271,6 @@ const updatePlaylistDisplay = () => {
     trackElement.addEventListener('click', async (e: MouseEvent) => {
       if ((e.target as HTMLElement).tagName === 'BUTTON') return;
       player.playTrack(i);
-      console.log(track.outputParams);
     });
 
     const deleteButton = trackElement.querySelector('.delete-button');
@@ -304,7 +304,7 @@ updatePlaylistDisplay();
 const playButton = document.getElementById('play-button');
 const playPreviousButton = document.getElementById('play-previous-button');
 const playNextButton = document.getElementById('play-next-button');
-const repeatButton = document.getElementById('repeat-button');
+const repeatButton = document.getElementById('repeat-button') as HTMLButtonElement;
 const shuffleButton = document.getElementById('shuffle-button');
 const volumeButton = document.getElementById('volume-button');
 const recordButton = document.getElementById('record-button');
@@ -323,6 +323,8 @@ const updatePlayingState = () => {
 player.onPlayingStateChange = updatePlayingState;
 player.onLoadingStateChange = updateTrackClasses;
 playButton.addEventListener('click', async () => {
+  if (player.playlist.length === 0) return;
+  
   if (player.isPlaying) {
     player.pause();
   } else {
@@ -367,6 +369,7 @@ repeatButton.addEventListener('click', async () => {
 shuffleButton.addEventListener('click', async () => {
   player.shuffle = !player.shuffle;
   shuffleButton.classList.toggle('active', player.shuffle);
+  repeatButton.disabled = player.shuffle;
 });
 volumeButton.addEventListener('click', async () => {
   if (player.gain) {

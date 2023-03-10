@@ -658,6 +658,10 @@ button.plain {
   &:active {
     background-color: $ui-hover-background;
   }
+
+  &:disabled {
+    opacity: 0.5;
+  }
 }
 
 button.circle {

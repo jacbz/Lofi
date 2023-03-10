@@ -3,7 +3,7 @@ import { getInstrumentFilters, getInstrument, Instrument } from './instruments';
 import * as Samples from './samples';
 import { Track } from './track';
 import { compress } from './helper';
-import { refresh, generateNewTrack } from '.';
+import { refreshLatentSpace, generateNewTrack } from '.';
 
 /**
  * A class that plays a Track by synthesizing events in Tone.js.
@@ -169,13 +169,10 @@ class Player {
   }
 
   /** Adds a given track to the playlist */
-  addToPlaylist(track: Track, playImmediately = false) {
+  addToPlaylist(track: Track) {
     this.playlist.push(track);
     this.updateLocalStorage();
     this.updatePlaylistDisplay();
-    if (playImmediately) {
-      this.playTrack(this.playlist.length - 1);
-    }
     this.fillShuffleQueue();
   }
 
@@ -186,6 +183,12 @@ class Player {
     this.seek(0);
     this.stop();
     this.load();
+
+    // if this is the last track and continuous mode is enabled, generate the next track
+    if (this.repeat === RepeatMode.CONTINUOUS && this.currentPlayingIndex === this.playlist.length - 1) {
+      refreshLatentSpace();
+      generateNewTrack();
+    }
   }
 
   /** Sets up Tone.Transport for the current track and starts playback */
@@ -390,21 +393,13 @@ class Player {
     if (this.shuffle) {
       if (this.shuffleQueue.length === 0) this.fillShuffleQueue();
       nextTrackIndex = this.shuffleQueue.shift();
-    } else if (this.currentPlayingIndex < this.playlist.length - 1) {
-      nextTrackIndex = this.currentPlayingIndex + 1;
     } else if (
       this.currentPlayingIndex === this.playlist.length - 1 &&
       this.repeat === RepeatMode.ALL
     ) {
       nextTrackIndex = 0;
-    } else if (
-      this.currentPlayingIndex === this.playlist.length - 1 &&
-      this.repeat === RepeatMode.CONTINUOUS
-    ) {
-      this.unload();
-      refresh();
-      await generateNewTrack(false);
-      nextTrackIndex = this.playlist.length - 1;
+    } else {
+      nextTrackIndex = this.currentPlayingIndex + 1;
     }
 
     if (nextTrackIndex !== null) {
@@ -449,7 +444,7 @@ class Player {
     if (!('mediaSession' in navigator) || !this.currentTrack) return;
     navigator.mediaSession.metadata = new MediaMetadata({
       title: this.currentTrack.title,
-      artist: 'Lofi generator',
+      artist: 'lofi.jacobzhang.de',
       artwork: [{ src: './cover.jpg', type: 'image/jpg' }]
     });
     this.updateAudioWebApiPosition(0);
