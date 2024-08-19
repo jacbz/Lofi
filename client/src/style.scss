@@ -54,6 +54,7 @@ $panel-border-radius: 6px;
   background: $ui-background;
   border-radius: $panel-border-radius;
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 #center {
@@ -196,6 +197,7 @@ $panel-border-radius: 6px;
     border-right: 1px solid $ui-background;
     @media not screen and (max-width: 900px) {
       backdrop-filter: none;
+      -webkit-backdrop-filter: none;
     }
 
     #record-button {
@@ -450,6 +452,7 @@ $panel-border-radius: 6px;
     border-bottom-left-radius: 0;
     @media not screen and (max-width: 900px) {
       backdrop-filter: none;
+      -webkit-backdrop-filter: none;
     }
 
     #playlist-header {
