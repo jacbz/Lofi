@@ -1,7 +1,7 @@
 -f https://download.pytorch.org/whl/torch_stable.html
-torch==1.9.0+cpu
-flask
-Flask-Limiter
-numpy
-transformers
-jsonpickle
+torch==2.3.1+cpu
+flask~=3.0.3
+Flask-Limiter~=3.8.0
+transformers~=4.44.1
+jsonpickle~=3.2.2
+numpy~=2.1.0

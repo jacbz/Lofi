@@ -13,8 +13,8 @@ from server.lyrics2lofi_predict import predict
 device = "cpu"
 app = Flask(__name__)
 limiter = Limiter(
-    app,
-    key_func=get_remote_address,
+    get_remote_address,
+    app=app,
     default_limits=["30 per minute"]
 )
 
